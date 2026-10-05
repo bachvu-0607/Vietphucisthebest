@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-serif: 'Playfair Display', 'Newsreader', Georgia, serif;
+    --font-sans: 'Be Vietnam Pro', system-ui, -apple-system, sans-serif;
+
+    /* Heritage Palette */
+    --color-paper: #FAF7F2;
+    --color-paper-card: #FFFFFF;
+    --color-paper-secondary: #F4EFEA;
+    --color-ink: #1C1917;
+    --color-ink-light: #57534E;
+    --color-son-son: #9B2C2C;
+    --color-son-son-dark: #7A2121;
+    --color-dong-co: #C29B38;
+    --color-cham-co: #1E3A4A;
+    --color-border-subtle: #E8E2D8;
+  }
+
+  body {
+    background-color: var(--color-paper);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, .font-serif {
+    font-family: var(--font-serif);
+    letter-spacing: -0.015em;
+  }
+
+  /* Accessibility: Focus States */
+  button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+    outline: 2px solid #9B2C2C;
+    outline-offset: 2px;
+  }
+
+  /* Motion reduction */
+  @media (prefers-reduced-motion: reduce) {
+    *, ::before, ::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F4EFEA;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D8D0C5;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #BDB2A3;
+}
+
+/* Subtle Dó Paper Texture overlay */
+.bg-do-paper {
+  background-color: #FAF7F2;
+  background-image: radial-gradient(#E8E2D8 0.75px, transparent 0.75px);
+  background-size: 16px 16px;
+}
+
+/* Subtle Silk Pattern */
+.bg-silk-card {
+  background: #FFFFFF;
+  border: 1px solid #E8E2D8;
+  box-shadow: 0 4px 20px -2px rgba(92, 72, 56, 0.05);
+}
+
+/* Lacquer cinnabar badge & buttons */
+.btn-son-son {
+  background-color: #9B2C2C;
+  color: #FAF7F2;
+  transition: all 0.2s ease;
+}
+
+.btn-son-son:hover {
+  background-color: #832424;
+  box-shadow: 0 4px 12px rgba(155, 44, 44, 0.25);
+}

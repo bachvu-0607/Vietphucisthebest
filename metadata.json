@@ -1,0 +1,8 @@
+{
+  "name": "Việt Phục Remix",
+  "description": "Ứng dụng tìm hiểu, lựa chọn, phối thử và hoàn thiện trang phục truyền thống Việt Nam (Việt phục) phù hợp sự kiện bằng công nghệ AI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
