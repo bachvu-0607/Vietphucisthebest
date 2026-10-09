@@ -10,7 +10,7 @@ import {
 } from '../types';
 import { LayerCanvas } from './LayerCanvas';
 import { ComparisonModal } from './ComparisonModal';
-import { api } from '../services/api';
+import { api, UserProfile as UserProfileType } from '../services/api';
 import { ChimLacIcon } from './VietnameseMotifs';
 import {
   Sparkles,
@@ -48,6 +48,8 @@ interface StudioRemixProps {
   existingDraft?: FittingDraft | null;
   onDraftSaved: (draft: FittingDraft) => void;
   onJobCompleted: (job: AIJob) => void;
+  currentUser?: UserProfileType | null;
+  onRequestAuth?: (prompt?: string) => void;
 }
 
 export const StudioRemix: React.FC<StudioRemixProps> = ({
@@ -60,7 +62,9 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
   backgrounds,
   existingDraft,
   onDraftSaved,
-  onJobCompleted
+  onJobCompleted,
+  currentUser,
+  onRequestAuth
 }) => {
   const isFemaleOnly = costume.gender === 'female';
   const isMaleOnly = costume.gender === 'male';
@@ -497,6 +501,13 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
 
   // ACTION 1: Save Draft (No AI)
   const handleSaveDraft = async () => {
+    if (!currentUser) {
+      if (onRequestAuth) {
+        onRequestAuth('Vui lòng đăng nhập để lưu bản phối vào tủ đồ cá nhân.');
+      }
+      return;
+    }
+
     setSaveLoading(true);
     setSaveSuccessMsg(null);
     setSaveErrorMsg(null);
@@ -534,6 +545,13 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
 
   // ACTION 2: Generate AI Masterpiece
   const handleGenerateAI = async () => {
+    if (!currentUser) {
+      if (onRequestAuth) {
+        onRequestAuth('Vui lòng đăng nhập để sử dụng tính năng hoàn thiện cổ phục cùng AI.');
+      }
+      return;
+    }
+
     setAiErrorMsg(null);
     setAiLoading(true);
 
@@ -576,6 +594,13 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
   };
 
   const handleRetryAI = async () => {
+    if (!currentUser) {
+      if (onRequestAuth) {
+        onRequestAuth('Vui lòng đăng nhập để sử dụng tính năng này.');
+      }
+      return;
+    }
+
     if (!aiJob) return;
     setAiErrorMsg(null);
     setAiLoading(true);

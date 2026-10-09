@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { EventItem, Costume, BackgroundSetting, FittingDraft, AIJob } from './types';
-import { api } from './services/api';
+import { api, UserProfile as UserProfileType } from './services/api';
 import { Navbar } from './components/Navbar';
 import { EventSelector } from './components/EventSelector';
 import { CostumeList } from './components/CostumeList';
@@ -11,11 +11,18 @@ import { ComparisonModal } from './components/ComparisonModal';
 import { CultureGuideModal } from './components/CultureGuideModal';
 import { AoDaiRecommender } from './components/AoDaiRecommender';
 import { HomePage } from './components/HomePage';
+import { AuthModal } from './components/AuthModal';
 import { TrienSonSeal, ChimLacIcon, HoaSenDivider, PubSeal } from './components/VietnameseMotifs';
 import { Loader2, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function App() {
   const [currentView, setCurrentView] = useState<'home' | 'costumes' | 'costume-detail' | 'studio' | 'profile' | 'aodai-recommender'>('home');
+
+  // Authentication State & User Wardrobe
+  const [currentUser, setCurrentUser] = useState<UserProfileType | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState<boolean>(false);
+  const [authModalMode, setAuthModalMode] = useState<'login' | 'register'>('login');
+  const [authPromptMessage, setAuthPromptMessage] = useState<string | null>(null);
 
   const [events, setEvents] = useState<EventItem[]>([]);
   const [costumes, setCostumes] = useState<Costume[]>([]);
@@ -37,18 +44,43 @@ export default function App() {
     async function loadInitialData() {
       try {
         setLoading(true);
-        const [evts, costs, bgs, drfts, jobs] = await Promise.all([
+
+        // 1. Authenticate user session
+        let me: UserProfileType | null = null;
+        try {
+          me = await api.getMe();
+          setCurrentUser(me);
+        } catch {
+          setCurrentUser(null);
+        }
+
+        // 2. Fetch public cultural data
+        const [evts, costs, bgs] = await Promise.all([
           api.getEvents(),
           api.getCostumes(),
-          api.getBackgrounds(),
-          api.getDrafts(),
-          api.getAIJobs()
+          api.getBackgrounds()
         ]);
         setEvents(evts);
         setCostumes(costs);
         setBackgrounds(bgs);
-        setDrafts(drfts);
-        setAIJobs(jobs);
+
+        // 3. If logged in, fetch user's private wardrobe drafts and AI jobs
+        if (me) {
+          try {
+            const [drfts, jobs] = await Promise.all([
+              api.getDrafts(),
+              api.getAIJobs()
+            ]);
+            setDrafts(drfts);
+            setAIJobs(jobs);
+          } catch {
+            setDrafts([]);
+            setAIJobs([]);
+          }
+        } else {
+          setDrafts([]);
+          setAIJobs([]);
+        }
 
         if (evts.length > 0) setSelectedEvent(evts[0]);
         if (costs.length > 0) setSelectedCostume(costs[0]);
@@ -167,6 +199,33 @@ export default function App() {
     }
   };
 
+  const handleOpenAuth = (mode: 'login' | 'register' = 'login', prompt?: string) => {
+    setAuthModalMode(mode);
+    setAuthPromptMessage(prompt || null);
+    setShowAuthModal(true);
+  };
+
+  const handleAuthSuccess = async (user: UserProfileType) => {
+    setCurrentUser(user);
+    try {
+      const [drfts, jobs] = await Promise.all([
+        api.getDrafts(),
+        api.getAIJobs()
+      ]);
+      setDrafts(drfts);
+      setAIJobs(jobs);
+    } catch {}
+  };
+
+  const handleLogout = async () => {
+    try {
+      await api.logout();
+    } catch {}
+    setCurrentUser(null);
+    setDrafts([]);
+    setAIJobs([]);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FFF5F7] via-[#FDF0F3] to-[#FFF5F7] text-[#1C1917] flex flex-col font-sans selection:bg-[#C84B69]/20 selection:text-[#C84B69]">
       {/* Top Editorial Navigation */}
@@ -185,6 +244,9 @@ export default function App() {
         }}
         draftsCount={drafts.length}
         onOpenCultureGuide={() => setShowCultureModal(true)}
+        user={currentUser}
+        onOpenAuth={() => handleOpenAuth('login')}
+        onLogout={handleLogout}
       />
 
       {/* Main View Area */}
@@ -266,6 +328,8 @@ export default function App() {
                   existingDraft={activeDraft}
                   onDraftSaved={handleDraftSaved}
                   onJobCompleted={handleJobCompleted}
+                  currentUser={currentUser}
+                  onRequestAuth={(prompt) => handleOpenAuth('login', prompt)}
                 />
               ) : (
                 <div className="py-24 text-center">
@@ -291,6 +355,8 @@ export default function App() {
                 onDeleteDraft={handleDeleteDraft}
                 onRetryJob={handleRetryJob}
                 onViewJobResult={(job) => setInspectJob(job)}
+                currentUser={currentUser}
+                onOpenAuth={() => handleOpenAuth('login')}
               />
             )}
 
@@ -353,6 +419,15 @@ export default function App() {
       <CultureGuideModal
         isOpen={showCultureModal}
         onClose={() => setShowCultureModal(false)}
+      />
+
+      {/* User Authentication Modal (Register, Login, Forgot Password, Reset) */}
+      <AuthModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+        initialMode={authModalMode}
+        promptMessage={authPromptMessage}
       />
     </div>
   );

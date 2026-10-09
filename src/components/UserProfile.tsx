@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FittingDraft, AIJob, Costume } from '../types';
 import { TrienSonSeal, ChimLacIcon, TrongDongWatermark } from './VietnameseMotifs';
+import { api, UserProfile as UserProfileType } from '../services/api';
 import {
   Bookmark,
   Sparkles,
@@ -13,7 +14,10 @@ import {
   Eye,
   Calendar,
   Layers,
-  ArrowRight
+  ArrowRight,
+  User,
+  ShieldCheck,
+  Zap
 } from 'lucide-react';
 
 interface UserProfileProps {
@@ -24,6 +28,8 @@ interface UserProfileProps {
   onDeleteDraft: (draftId: string) => void;
   onRetryJob: (job: AIJob) => void;
   onViewJobResult: (job: AIJob) => void;
+  currentUser?: UserProfileType | null;
+  onOpenAuth?: () => void;
 }
 
 export const UserProfile: React.FC<UserProfileProps> = ({
@@ -33,9 +39,20 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   onOpenDraft,
   onDeleteDraft,
   onRetryJob,
-  onViewJobResult
+  onViewJobResult,
+  currentUser,
+  onOpenAuth
 }) => {
   const [activeTab, setActiveTab] = useState<'drafts' | 'completed' | 'processing'>('drafts');
+  const [dailyUsage, setDailyUsage] = useState<{ usage: number; max: number }>({ usage: 0, max: 5 });
+
+  useEffect(() => {
+    if (currentUser) {
+      api.getAIUsage().then((res) => {
+        if (res) setDailyUsage(res);
+      }).catch(() => {});
+    }
+  }, [currentUser, aiJobs.length]);
 
   const completedJobs = aiJobs.filter((j) => j.status === 'completed');
   const pendingJobs = aiJobs.filter(
@@ -60,6 +77,31 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
   return (
     <div className="py-8 sm:py-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in-50 duration-300">
+      {/* Guest Mode Call-to-Action Banner */}
+      {!currentUser && (
+        <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#FFF5F7] via-white to-[#FCE7EC] border-2 border-dashed border-[#F4C2CE] p-8 sm:p-10 text-center shadow-xs space-y-4">
+          <div className="w-16 h-16 rounded-full bg-[#FFF0F4] border border-[#F4C2CE] text-[#C84B69] mx-auto flex items-center justify-center">
+            <User className="w-8 h-8" />
+          </div>
+          <div className="max-w-xl mx-auto space-y-2">
+            <h2 className="text-2xl font-serif font-bold text-[#1C1917]">
+              Bạn đang xem với tư cách Khách
+            </h2>
+            <p className="text-xs sm:text-sm text-[#57534E] font-light leading-relaxed">
+              Khách có thể tự do khám phá kho tàng phục, tìm hiểu điển lệ và phối thử trang phục không giới hạn trong Studio. Để sở hữu tủ đồ riêng, lưu bản phác thảo và tạo tác phẩm hoàn thiện cùng AI, vui lòng đăng nhập hoặc tạo tài khoản miễn phí.
+            </p>
+          </div>
+          <div className="pt-2 flex items-center justify-center gap-3">
+            <button
+              onClick={onOpenAuth}
+              className="px-6 py-2.5 bg-[#C84B69] hover:bg-[#B33B58] text-white rounded-xl text-xs font-serif font-bold shadow-xs transition-colors cursor-pointer"
+            >
+              Đăng nhập / Tạo tài khoản
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Editorial Header - Pink Heritage Theme */}
       <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#FFF5F7] via-white to-[#FCE7EC] border border-[#F4C2CE] p-6 sm:p-8 md:p-10 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div className="space-y-2 max-w-2xl">
@@ -68,11 +110,29 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             <span>Không Gian Sáng Tạo Cá Nhân</span>
           </div>
           <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-[#1C1917] tracking-tight">
-            Tủ Đồ Của Tôi
+            {currentUser ? `Tủ Đồ Của ${currentUser.name}` : 'Tủ Đồ Của Tôi'}
           </h1>
           <p className="text-xs sm:text-sm text-[#57534E] font-light leading-relaxed">
-            Lưu trữ bản phác thảo y phục, quản lý tác phẩm hoàn thiện AI và theo dõi các tiến trình sáng tạo.
+            {currentUser
+              ? `Tài khoản: ${currentUser.email} • Lưu trữ bản phác thảo độc bản và quản lý các tác phẩm AI.`
+              : 'Lưu trữ bản phác thảo y phục, quản lý tác phẩm hoàn thiện AI và theo dõi các tiến trình sáng tạo.'}
           </p>
+
+          {/* Daily Quota Indicator */}
+          {currentUser && (
+            <div className="inline-flex items-center gap-2 pt-2">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white border border-[#F4C2CE] text-[#1C1917] shadow-2xs">
+                <Zap className="w-3.5 h-3.5 text-amber-500" />
+                <span>Hạn mức AI hôm nay:</span>
+                <span className={`font-bold ${dailyUsage.usage >= dailyUsage.max ? 'text-rose-600' : 'text-[#C84B69]'}`}>
+                  {dailyUsage.usage} / {dailyUsage.max} lượt
+                </span>
+              </span>
+              <span className="text-[11px] text-[#78716C] font-light">
+                (Tối đa 1 tác vụ cùng lúc)
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Tab Switcher */}

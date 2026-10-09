@@ -10,28 +10,86 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
     <script>
-      // Ignore WebSocket and HMR errors per AI Studio environment constraints
-      window.addEventListener('unhandledrejection', function (e) {
-        if (
-          e.reason &&
-          (String(e.reason).includes('WebSocket') ||
-            String(e.reason.message || '').includes('WebSocket') ||
-            String(e.reason.message || '').includes('closed without opened'))
-        ) {
-          e.preventDefault();
-          e.stopPropagation();
+      // Stub WebSocket for Vite HMR per AI Studio environment constraints (HMR disabled in Cloud Run iframe)
+      (function() {
+        if (typeof window !== 'undefined') {
+          const OriginalWebSocket = window.WebSocket;
+          if (OriginalWebSocket) {
+            window.WebSocket = function (url, protocols) {
+              const urlStr = String(url || '');
+              const protoStr = String(protocols || '');
+              if (
+                protoStr.includes('vite-hmr') ||
+                urlStr.includes('vite-hmr') ||
+                urlStr.includes('token=')
+              ) {
+                const target = new EventTarget();
+                const mock = {
+                  readyState: 1,
+                  OPEN: 1,
+                  CLOSED: 3,
+                  CLOSING: 2,
+                  CONNECTING: 0,
+                  send: function () {},
+                  close: function () {},
+                  addEventListener: function (event, handler, options) {
+                    target.addEventListener(event, handler, options);
+                    if (event === 'open') {
+                      setTimeout(function () {
+                        target.dispatchEvent(new Event('open'));
+                      }, 0);
+                    }
+                  },
+                  removeEventListener: function (event, handler, options) {
+                    target.removeEventListener(event, handler, options);
+                  },
+                  dispatchEvent: function (event) {
+                    return target.dispatchEvent(event);
+                  }
+                };
+                return mock;
+              }
+              return new OriginalWebSocket(url, protocols);
+            };
+            window.WebSocket.prototype = OriginalWebSocket.prototype;
+            window.WebSocket.OPEN = 1;
+            window.WebSocket.CLOSED = 3;
+            window.WebSocket.CLOSING = 2;
+            window.WebSocket.CONNECTING = 0;
+          }
+
+          // Global silence for any residual WebSocket/HMR rejection
+          window.addEventListener('unhandledrejection', function (e) {
+            const str = String(e.reason && (e.reason.stack || e.reason.message || e.reason) || '');
+            if (
+              str.includes('WebSocket') ||
+              str.includes('closed without opened') ||
+              str.includes('@vite/client') ||
+              str.includes('vite-hmr')
+            ) {
+              e.preventDefault();
+              e.stopPropagation();
+              e.stopImmediatePropagation && e.stopImmediatePropagation();
+              return false;
+            }
+          }, true);
+
+          window.addEventListener('error', function (e) {
+            const str = String((e.message || '') + ' ' + (e.filename || '') + ' ' + (e.error || ''));
+            if (
+              str.includes('WebSocket') ||
+              str.includes('closed without opened') ||
+              str.includes('@vite/client') ||
+              str.includes('vite-hmr')
+            ) {
+              e.preventDefault();
+              e.stopPropagation();
+              e.stopImmediatePropagation && e.stopImmediatePropagation();
+              return false;
+            }
+          }, true);
         }
-      });
-      window.addEventListener('error', function (e) {
-        if (
-          e.message &&
-          (e.message.includes('WebSocket') ||
-            e.message.includes('closed without opened'))
-        ) {
-          e.preventDefault();
-          e.stopPropagation();
-        }
-      });
+      })();
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

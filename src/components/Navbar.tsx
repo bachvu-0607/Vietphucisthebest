@@ -1,19 +1,26 @@
 import React from 'react';
 import { ChimLacIcon, TrienSonSeal, PubSeal } from './VietnameseMotifs';
-import { Bookmark, Compass, BookOpen, Layers, Home, Sparkles } from 'lucide-react';
+import { Bookmark, Compass, BookOpen, Layers, Home, Sparkles, User, LogOut } from 'lucide-react';
+import { UserProfile } from '../services/api';
 
 interface NavbarProps {
   currentView: string;
   onNavigate: (view: string) => void;
   draftsCount: number;
   onOpenCultureGuide: () => void;
+  user?: UserProfile | null;
+  onOpenAuth?: () => void;
+  onLogout?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentView,
   onNavigate,
   draftsCount,
-  onOpenCultureGuide
+  onOpenCultureGuide,
+  user,
+  onOpenAuth,
+  onLogout
 }) => {
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-[#FFF5F7]/95 border-b border-[#F7D6DE] transition-colors">
@@ -110,11 +117,37 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </nav>
 
-        {/* Action Button: "Phối Thử Ngay" */}
-        <div className="flex items-center gap-3">
+        {/* Action Button: "Phối Thử Ngay" & User Auth */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {user ? (
+            <div className="flex items-center gap-2 bg-white border border-[#F4C2CE] pl-2 pr-1.5 py-1 rounded-full shadow-2xs">
+              <div className="w-6 h-6 rounded-full bg-[#C84B69] text-white flex items-center justify-center text-xs font-serif font-bold uppercase shrink-0">
+                {user.name.charAt(0)}
+              </div>
+              <span className="text-xs font-serif font-semibold text-[#1C1917] hidden lg:inline max-w-[90px] truncate">
+                {user.name}
+              </span>
+              <button
+                onClick={onLogout}
+                className="text-[#78716C] hover:text-[#991B1B] p-1 rounded-full hover:bg-rose-50 transition-colors cursor-pointer"
+                title="Đăng xuất"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={onOpenAuth}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-full border border-[#C84B69] text-[#C84B69] hover:bg-[#C84B69]/8 text-xs font-serif font-semibold transition-colors cursor-pointer"
+            >
+              <User className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Đăng nhập</span>
+            </button>
+          )}
+
           <button
             onClick={() => onNavigate('studio')}
-            className="flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-md bg-[#C84B69] hover:bg-[#B33B57] text-[#FFFFFF] font-medium text-xs sm:text-sm tracking-wide shadow-xs transition-all hover:shadow-md active:scale-[0.98]"
+            className="flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-md bg-[#C84B69] hover:bg-[#B33B57] text-[#FFFFFF] font-medium text-xs sm:text-sm tracking-wide shadow-xs transition-all hover:shadow-md active:scale-[0.98] cursor-pointer"
           >
             <Sparkles className="w-3.5 h-3.5 text-amber-300" />
             <span>Phối Thử Ngay</span>

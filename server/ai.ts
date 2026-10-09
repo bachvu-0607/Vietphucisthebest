@@ -2,6 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
 import { db } from './db.ts';
+import { sqliteDb } from './sqlite.ts';
 import sharp from 'sharp';
 import fs from 'fs';
 import path from 'path';
@@ -31,7 +32,9 @@ function getOpenAIClient(): { client: OpenAI | null; key: string } {
 
   try {
     const client = new OpenAI({
-      apiKey: key.trim()
+      apiKey: key.trim(),
+      maxRetries: 0, // No SDK backoff retries on quota limit
+      timeout: 15000 // 15s timeout
     });
     return { client, key: key.trim() };
   } catch (err) {
@@ -409,10 +412,12 @@ export function processJobInBackground(jobId: string, options: {
 }): void {
   // Update to queued immediately
   db.updateAIJob(jobId, { status: 'queued', progress: 10 });
+  sqliteDb.updateDetailedAIJob(jobId, { status: 'queued', progress: 10 });
 
   setTimeout(async () => {
     try {
       db.updateAIJob(jobId, { status: 'processing', progress: 35 });
+      sqliteDb.updateDetailedAIJob(jobId, { status: 'processing', progress: 35 });
       const prompt = buildCostumePrompt(options);
 
       let finalImageUrl = '';
@@ -434,10 +439,14 @@ export function processJobInBackground(jobId: string, options: {
           try {
             console.log(`[AI Job ${jobId}] Generating via OpenAI model: ${modelName} (1024x1536)...`);
             db.updateAIJob(jobId, { status: 'processing', progress: 55 });
+            sqliteDb.updateDetailedAIJob(jobId, { status: 'processing', progress: 55 });
             
+            // Truncate prompt safely if too long for OpenAI image API
+            const trimmedPrompt = prompt.length > 3500 ? prompt.substring(0, 3500) : prompt;
+
             const dalleResponse = await dynamicOpenAI.images.generate({
               model: modelName,
-              prompt: prompt,
+              prompt: trimmedPrompt,
               n: 1,
               size: '1024x1536'
             });
@@ -461,6 +470,11 @@ export function processJobInBackground(jobId: string, options: {
             }
           } catch (err: any) {
             console.warn(`[AI Job ${jobId}] Model ${modelName} encountered (${err?.status} ${err?.message}), trying next model...`);
+            // If OpenAI quota/credits are exhausted or invalid auth, exit OpenAI immediately
+            if (err?.status === 429 || err?.status === 401 || (err?.message && err.message.toLowerCase().includes('credit'))) {
+              console.warn(`[AI Job ${jobId}] OpenAI API quota/credit limit reached, switching to fallback compositor.`);
+              break;
+            }
           }
         }
       }
@@ -548,8 +562,19 @@ export function processJobInBackground(jobId: string, options: {
         resultImageUrl: finalImageUrl,
         completedAt: new Date().toISOString()
       });
+      sqliteDb.updateDetailedAIJob(jobId, {
+        status: 'completed',
+        progress: 100,
+        resultImageUrl: finalImageUrl,
+        completedAt: new Date().toISOString()
+      });
     } catch (err: any) {
       db.updateAIJob(jobId, {
+        status: 'failed',
+        progress: 100,
+        errorMessage: err?.message || 'Quá trình hoàn thiện trang phục gặp sự cố. Vui lòng thử lại.'
+      });
+      sqliteDb.updateDetailedAIJob(jobId, {
         status: 'failed',
         progress: 100,
         errorMessage: err?.message || 'Quá trình hoàn thiện trang phục gặp sự cố. Vui lòng thử lại.'
