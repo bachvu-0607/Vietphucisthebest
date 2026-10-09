@@ -10,7 +10,7 @@ import {
   createPasswordResetToken,
   requireAuth,
   optionalAuth,
-  AuthenticatedRequest
+  type AuthenticatedRequest
 } from './auth.ts';
 
 export const apiRouter = express.Router();
@@ -67,7 +67,8 @@ apiRouter.post('/auth/register', async (req: Request, res: Response) => {
           id: newUser.id,
           email: newUser.email,
           name: newUser.name,
-          role: newUser.role
+          role: newUser.role,
+          recoveryCode: newUser.recoveryCode
         }
       }
     });
@@ -117,7 +118,8 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role
+          role: user.role,
+          recoveryCode: user.recoveryCode
         }
       }
     });
@@ -151,29 +153,34 @@ apiRouter.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res: Response
   });
 });
 
-// POST /api/auth/forgot-password
+// POST /api/auth/forgot-password (Strictly requires recovery code; NO reset allowed by email alone)
 apiRouter.post('/auth/forgot-password', async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
-    if (!email) {
+    const { email, recoveryCode } = req.body;
+    if (!email || typeof email !== 'string') {
       return res.status(400).json({ success: false, error: 'Vui lòng cung cấp địa chỉ email.' });
     }
 
+    if (!recoveryCode || typeof recoveryCode !== 'string' || recoveryCode.trim() === '') {
+      return res.status(400).json({
+        success: false,
+        error: 'Vui lòng cung cấp mã xác minh khôi phục (Recovery Code). Hệ thống bảo mật không cho phép đặt lại mật khẩu chỉ bằng email.'
+      });
+    }
+
     const user = sqliteDb.getUserByEmail(email);
-    if (!user) {
-      // Return ambiguous success for security, prevent email enumeration
-      return res.json({
-        success: true,
-        message: 'Nếu email tồn tại trong hệ thống, mã xác nhận khôi phục mật khẩu đã được tạo.'
+    if (!user || user.recoveryCode.toLowerCase().trim() !== recoveryCode.toLowerCase().trim()) {
+      return res.status(401).json({
+        success: false,
+        error: 'Email hoặc mã xác minh khôi phục không chính xác. Vì lý do bảo mật, bạn không thể đặt lại mật khẩu nếu thiếu mã xác minh hợp lệ.'
       });
     }
 
     const { rawToken, expiresAt } = createPasswordResetToken(user);
 
-    // In production without external SMTP, return the reset token directly to client for demo UX
     res.json({
       success: true,
-      message: 'Mã khôi phục mật khẩu hợp lệ trong 60 phút.',
+      message: 'Xác minh thành công. Mã khôi phục mật khẩu hợp lệ trong 60 phút.',
       resetToken: rawToken,
       expiresAt
     });
@@ -339,10 +346,10 @@ apiRouter.delete('/drafts/:id', requireAuth, (req: AuthenticatedRequest, res: Re
 // 4. AI JOBS (STRICT AUTH, RATE LIMIT 5/DAY, 1 CONCURRENT)
 // ========================================================
 
-// GET /api/ai/jobs/usage (Quota indicator)
+// GET /api/ai/jobs/usage (Daily & Total Quota indicator)
 apiRouter.get('/ai/jobs/usage', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
-    const usage = sqliteDb.getUserDailyAIUsage(req.user!.id);
+    const usage = sqliteDb.getUserAIUsage(req.user!.id);
     res.json({ success: true, data: usage });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
@@ -375,14 +382,14 @@ apiRouter.get('/ai/jobs/:id', requireAuth, (req: AuthenticatedRequest, res: Resp
   }
 });
 
-// DELETE /api/ai/jobs/:id (Allow cleaning up completed/failed AI jobs)
+// DELETE /api/ai/jobs/:id (Allow cleaning up completed/failed AI jobs, prevents deleting active jobs)
 apiRouter.delete('/ai/jobs/:id', requireAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
-    const deleted = sqliteDb.deleteUserAIJob(req.params.id, req.user!.id);
-    if (!deleted) {
-      return res.status(404).json({
+    const result = sqliteDb.deleteUserAIJob(req.params.id, req.user!.id);
+    if (!result.success) {
+      return res.status(result.statusCode || 400).json({
         success: false,
-        error: 'Tác vụ AI không tồn tại hoặc bạn không có quyền xóa.'
+        error: result.error || 'Không thể xóa tác vụ AI.'
       });
     }
     res.json({ success: true, message: 'Đã xóa tác vụ AI khỏi tủ đồ.' });
@@ -522,15 +529,42 @@ apiRouter.post('/ai/jobs/:id/retry', requireAuth, (req: AuthenticatedRequest, re
 apiRouter.get('/system/durability-status', (_req: Request, res: Response) => {
   try {
     const backupPath = sqliteDb.performBackup();
+    const backups = sqliteDb.getBackups();
     res.json({
       success: true,
       data: {
         databaseEngine: 'SQLite with WAL journal mode',
         persistenceMechanism: 'Local disk SQLite (requires Cloud Storage FUSE on Cloud Run for persistence)',
         latestBackupPath: backupPath ? 'data/backups/' + backupPath.split('/').pop() : null,
+        totalBackups: backups.length,
+        backups: backups.slice(0, 5),
         timestamp: new Date().toISOString()
       }
     });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// GET /api/system/backups (List available backup snapshots)
+apiRouter.get('/system/backups', (_req: Request, res: Response) => {
+  try {
+    const backups = sqliteDb.getBackups();
+    res.json({ success: true, data: backups });
+  } catch (err: any) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// POST /api/system/restore (Genuine restoration of SQLite database from snapshot)
+apiRouter.post('/system/restore', (req: Request, res: Response) => {
+  try {
+    const { backupFilename } = req.body || {};
+    const result = sqliteDb.restoreBackup(backupFilename);
+    if (!result.success) {
+      return res.status(400).json({ success: false, error: result.message, details: result.error });
+    }
+    res.json({ success: true, message: result.message, data: result.details });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
   }

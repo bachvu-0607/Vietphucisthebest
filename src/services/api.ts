@@ -8,6 +8,7 @@ export interface UserProfile {
   email: string;
   name: string;
   role: 'user' | 'admin';
+  recoveryCode?: string;
 }
 
 function getStoredToken(): string | null {
@@ -48,6 +49,15 @@ export const api = {
 
   setToken(token: string | null): void {
     setStoredToken(token);
+  },
+
+  // Generates authorized image URL for private result pictures
+  getProtectedImageUrl(url?: string): string {
+    if (!url) return '';
+    if (!url.startsWith('/assets/results/')) return url;
+    const token = getStoredToken();
+    if (!token) return url;
+    return `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
   },
 
   // Auth Endpoints
@@ -108,11 +118,11 @@ export const api = {
     }
   },
 
-  async forgotPassword(email: string): Promise<{ message: string; resetToken?: string }> {
+  async forgotPassword(payload: { email: string; recoveryCode: string }): Promise<{ message: string; resetToken?: string }> {
     const res = await fetch(`${API_BASE}/auth/forgot-password`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email })
+      body: JSON.stringify(payload)
     });
     const json = await res.json().catch(() => ({}));
     if (!res.ok) {
@@ -218,11 +228,11 @@ export const api = {
   },
 
   // AI Jobs (Protected per user with Rate Limit checks)
-  async getAIUsage(): Promise<{ usage: number; max: number }> {
+  async getAIUsage(): Promise<{ usage: number; max: number; totalUsage?: number; totalMax?: number }> {
     const res = await fetch(`${API_BASE}/ai/jobs/usage`, {
       headers: getAuthHeaders(false)
     });
-    if (!res.ok) return { usage: 0, max: 5 };
+    if (!res.ok) return { usage: 0, max: 5, totalUsage: 0, totalMax: 20 };
     const json = await res.json();
     return json.data;
   },

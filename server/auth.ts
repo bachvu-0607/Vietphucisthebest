@@ -2,9 +2,9 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
 import type { Request, Response, NextFunction } from 'express';
-import { sqliteDb, UserRecord } from './sqlite.ts';
+import { sqliteDb, type UserRecord } from './sqlite.ts';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'vietphuc-remix-secure-jwt-key-2026';
+export const JWT_SECRET = process.env.JWT_SECRET || 'vietphuc-remix-secure-jwt-key-2026';
 const TOKEN_EXPIRY_DAYS = 7;
 
 export interface TokenPayload {
@@ -20,6 +20,7 @@ export interface AuthenticatedRequest extends Request {
     email: string;
     name: string;
     role: 'user' | 'admin';
+    recoveryCode?: string;
   };
   tokenHash?: string;
 }
@@ -93,12 +94,15 @@ export function createPasswordResetToken(user: UserRecord): { rawToken: string; 
 }
 
 /**
- * Extract token from Authorization header or Cookie
+ * Extract token from Authorization header or Query parameter
  */
-function extractToken(req: Request): string | null {
+export function extractToken(req: Request): string | null {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     return authHeader.substring(7).trim();
+  }
+  if (req.query && typeof req.query.token === 'string' && req.query.token.trim()) {
+    return req.query.token.trim();
   }
   return null;
 }
@@ -142,7 +146,8 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role
+      role: user.role,
+      recoveryCode: user.recoveryCode
     };
     req.tokenHash = tokenHash;
     next();
@@ -173,7 +178,8 @@ export function optionalAuth(req: AuthenticatedRequest, _res: Response, next: Ne
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role
+          role: user.role,
+          recoveryCode: user.recoveryCode
         };
         req.tokenHash = tokenHash;
       }

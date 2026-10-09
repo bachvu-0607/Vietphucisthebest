@@ -44,7 +44,12 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   onOpenAuth
 }) => {
   const [activeTab, setActiveTab] = useState<'drafts' | 'completed' | 'processing'>('drafts');
-  const [dailyUsage, setDailyUsage] = useState<{ usage: number; max: number }>({ usage: 0, max: 5 });
+  const [dailyUsage, setDailyUsage] = useState<{ usage: number; max: number; totalUsage?: number; totalMax?: number }>({
+    usage: 0,
+    max: 5,
+    totalUsage: 0,
+    totalMax: 20
+  });
 
   useEffect(() => {
     if (currentUser) {
@@ -118,18 +123,30 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               : 'Lưu trữ bản phác thảo y phục, quản lý tác phẩm hoàn thiện AI và theo dõi các tiến trình sáng tạo.'}
           </p>
 
-          {/* Daily Quota Indicator */}
+          {/* Quota & Security Indicators */}
           {currentUser && (
-            <div className="inline-flex items-center gap-2 pt-2">
+            <div className="flex flex-wrap items-center gap-2 pt-2">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white border border-[#F4C2CE] text-[#1C1917] shadow-2xs">
                 <Zap className="w-3.5 h-3.5 text-amber-500" />
-                <span>Hạn mức AI hôm nay:</span>
+                <span>Hôm nay:</span>
                 <span className={`font-bold ${dailyUsage.usage >= dailyUsage.max ? 'text-rose-600' : 'text-[#C84B69]'}`}>
-                  {dailyUsage.usage} / {dailyUsage.max} lượt
+                  {dailyUsage.usage}/{dailyUsage.max}
                 </span>
               </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono font-semibold bg-white border border-[#F4C2CE] text-[#1C1917] shadow-2xs">
+                <span>Tổng AI tài khoản:</span>
+                <span className={`font-bold ${(dailyUsage.totalUsage || 0) >= (dailyUsage.totalMax || 20) ? 'text-rose-600' : 'text-[#881337]'}`}>
+                  {dailyUsage.totalUsage || 0}/{dailyUsage.totalMax || 20}
+                </span>
+              </span>
+              {currentUser.recoveryCode && (
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-mono bg-[#FFF5F7] border border-[#F4C2CE] text-[#9F1239] shadow-2xs" title="Mã bảo mật dùng khi cần khôi phục mật khẩu tài khoản">
+                  <span className="font-serif font-bold">Mã khôi phục:</span>
+                  <span className="font-bold underline">{currentUser.recoveryCode}</span>
+                </span>
+              )}
               <span className="text-[11px] text-[#78716C] font-light">
-                (Tối đa 1 tác vụ cùng lúc)
+                (Tối đa 1 tác vụ chạy đồng thời)
               </span>
             </div>
           )}
@@ -287,7 +304,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                 >
                   <div className="relative h-64 bg-gradient-to-b from-[#FAF7F2] to-[#FFF5F7] overflow-hidden">
                     <img
-                      src={job.resultImageUrl || job.sketchDataUrl}
+                      src={api.getProtectedImageUrl(job.resultImageUrl) || job.sketchDataUrl}
                       alt={job.costumeName}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

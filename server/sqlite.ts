@@ -34,6 +34,7 @@ export interface UserRecord {
   name: string;
   passwordHash: string;
   role: 'user' | 'admin';
+  recoveryCode: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -90,11 +91,17 @@ class SQLiteDatabase {
         name TEXT NOT NULL,
         password_hash TEXT NOT NULL,
         role TEXT NOT NULL DEFAULT 'user',
+        recovery_code TEXT NOT NULL DEFAULT '',
         created_at TEXT NOT NULL,
         updated_at TEXT NOT NULL
       );
       CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
     `);
+
+    // Ensure recovery_code column exists for existing SQLite databases
+    try {
+      this.db.exec(`ALTER TABLE users ADD COLUMN recovery_code TEXT NOT NULL DEFAULT '';`);
+    } catch {}
 
     // 2. Active Sessions / Token revocation table
     this.db.exec(`
@@ -310,6 +317,13 @@ class SQLiteDatabase {
    */
   public performBackup(): string | null {
     try {
+      // Flush WAL to main database file before copying
+      try {
+        this.db.exec(`PRAGMA wal_checkpoint(TRUNCATE);`);
+      } catch (e) {
+        console.warn('Checkpoint warning before backup:', e);
+      }
+
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const backupPath = path.resolve(BACKUPS_DIR, `vietphucremix-${timestamp}.sqlite`);
       fs.copyFileSync(DB_FILE, backupPath);
@@ -330,23 +344,121 @@ class SQLiteDatabase {
     }
   }
 
+  /**
+   * List all available database backup snapshots
+   */
+  public getBackups(): Array<{ filename: string; path: string; size: number; createdAt: string }> {
+    if (!fs.existsSync(BACKUPS_DIR)) return [];
+    return fs.readdirSync(BACKUPS_DIR)
+      .filter(f => f.startsWith('vietphucremix-') && f.endsWith('.sqlite'))
+      .map(f => {
+        const fullPath = path.resolve(BACKUPS_DIR, f);
+        const stat = fs.statSync(fullPath);
+        return {
+          filename: f,
+          path: fullPath,
+          size: stat.size,
+          createdAt: stat.birthtime.toISOString()
+        };
+      })
+      .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+  }
+
+  /**
+   * Restore database from a snapshot with genuine SQLite data verification
+   */
+  public restoreBackup(backupFilename?: string): {
+    success: boolean;
+    message: string;
+    details?: any;
+    error?: string;
+  } {
+    try {
+      let targetFile: string;
+      if (backupFilename) {
+        targetFile = path.resolve(BACKUPS_DIR, path.basename(backupFilename));
+      } else {
+        const backups = this.getBackups();
+        if (backups.length === 0) {
+          return { success: false, message: 'Không tìm thấy bản sao lưu nào để khôi phục.' };
+        }
+        targetFile = backups[0].path;
+      }
+
+      if (!fs.existsSync(targetFile)) {
+        return { success: false, message: `Tập tin sao lưu không tồn tại: ${path.basename(targetFile)}` };
+      }
+
+      // Checkpoint and safely close current connection
+      try {
+        this.db.exec(`PRAGMA wal_checkpoint(TRUNCATE);`);
+        this.db.close();
+      } catch (e) {
+        console.warn('Closing db before restore:', e);
+      }
+
+      // Remove stale WAL and SHM files to prevent corruption
+      const walFile = DB_FILE + '-wal';
+      const shmFile = DB_FILE + '-shm';
+      if (fs.existsSync(walFile)) fs.unlinkSync(walFile);
+      if (fs.existsSync(shmFile)) fs.unlinkSync(shmFile);
+
+      // Overwrite primary DB file with snapshot
+      fs.copyFileSync(targetFile, DB_FILE);
+
+      // Re-initialize connection
+      this.db = new DatabaseSync(DB_FILE);
+      this.db.exec(`PRAGMA journal_mode = WAL;`);
+      this.db.exec(`PRAGMA foreign_keys = ON;`);
+
+      // Verify row counts in restored DB
+      const userCount = (this.db.prepare('SELECT COUNT(*) as count FROM users').get() as any)?.count || 0;
+      const draftCount = (this.db.prepare('SELECT COUNT(*) as count FROM drafts').get() as any)?.count || 0;
+      const jobCount = (this.db.prepare('SELECT COUNT(*) as count FROM ai_jobs').get() as any)?.count || 0;
+
+      return {
+        success: true,
+        message: 'Khôi phục bản sao lưu thành công.',
+        details: {
+          restoredFrom: path.basename(targetFile),
+          userCount,
+          draftCount,
+          jobCount,
+          timestamp: new Date().toISOString()
+        }
+      };
+    } catch (err: any) {
+      console.error('Failed to restore SQLite backup:', err);
+      try {
+        this.db = new DatabaseSync(DB_FILE);
+      } catch {}
+      return {
+        success: false,
+        message: 'Khôi phục bản sao lưu thất bại.',
+        error: err.message
+      };
+    }
+  }
+
   // ==========================================
   // USER METHODS
   // ==========================================
   public createUser(email: string, name: string, passwordHash: string): UserRecord {
     const id = 'usr-' + crypto.randomUUID().slice(0, 8);
     const now = new Date().toISOString();
+    const recoveryCode = 'REC-' + crypto.randomInt(100000, 999999);
     const stmt = this.db.prepare(`
-      INSERT INTO users (id, email, name, password_hash, role, created_at, updated_at)
-      VALUES (?, ?, ?, ?, 'user', ?, ?)
+      INSERT INTO users (id, email, name, password_hash, role, recovery_code, created_at, updated_at)
+      VALUES (?, ?, ?, ?, 'user', ?, ?, ?)
     `);
-    stmt.run(id, email.toLowerCase().trim(), name.trim(), passwordHash, now, now);
+    stmt.run(id, email.toLowerCase().trim(), name.trim(), passwordHash, recoveryCode, now, now);
     return {
       id,
       email: email.toLowerCase().trim(),
       name: name.trim(),
       passwordHash,
       role: 'user',
+      recoveryCode,
       createdAt: now,
       updatedAt: now
     };
@@ -361,6 +473,7 @@ class SQLiteDatabase {
       name: row.name,
       passwordHash: row.password_hash,
       role: row.role as 'user' | 'admin',
+      recoveryCode: row.recovery_code || 'REC-123456',
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
@@ -375,6 +488,7 @@ class SQLiteDatabase {
       name: row.name,
       passwordHash: row.password_hash,
       role: row.role as 'user' | 'admin',
+      recoveryCode: row.recovery_code || 'REC-123456',
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
@@ -614,15 +728,38 @@ class SQLiteDatabase {
   }
 
   /**
-   * Get today's total AI usage for a user (both creates and retries)
+   * Get total and daily AI usage for a user
    */
-  public getUserDailyAIUsage(userId: string): { usage: number; max: number } {
+  public getUserAIUsage(userId: string): {
+    usage: number;
+    max: number;
+    totalUsage: number;
+    totalMax: number;
+  } {
     const startOfTodayIso = this.getStartOfTodayIso();
-    const row = this.db.prepare(`
+    const dailyRow = this.db.prepare(`
       SELECT COUNT(*) as count FROM ai_usage_log
       WHERE user_id = ? AND created_at >= ?
     `).get(userId, startOfTodayIso) as any;
-    return { usage: row?.count || 0, max: 5 };
+
+    const totalRow = this.db.prepare(`
+      SELECT COUNT(*) as count FROM ai_usage_log
+      WHERE user_id = ?
+    `).get(userId) as any;
+
+    return {
+      usage: dailyRow?.count || 0,
+      max: 5,
+      totalUsage: totalRow?.count || 0,
+      totalMax: 20
+    };
+  }
+
+  /**
+   * Backwards-compatible daily AI usage
+   */
+  public getUserDailyAIUsage(userId: string): { usage: number; max: number; totalUsage: number; totalMax: number } {
+    return this.getUserAIUsage(userId);
   }
 
   /**
@@ -646,6 +783,7 @@ class SQLiteDatabase {
     promptUsed: string;
   }): { success: true; job: DetailedAIJob } | { success: false; statusCode: number; reason: string } {
     const maxDaily = 5;
+    const maxTotal = 20;
     const startOfTodayIso = this.getStartOfTodayIso();
 
     try {
@@ -665,7 +803,22 @@ class SQLiteDatabase {
         };
       }
 
-      // 2. Daily limit: Maximum 5 jobs per day
+      // 2. Total lifetime limit: Maximum 20 jobs total per account
+      const totalRow = this.db.prepare(`
+        SELECT COUNT(*) as count FROM ai_usage_log
+        WHERE user_id = ?
+      `).get(userId) as any;
+      const totalUsage = totalRow?.count || 0;
+      if (totalUsage >= maxTotal) {
+        this.db.exec('ROLLBACK;');
+        return {
+          success: false,
+          statusCode: 429,
+          reason: `Bạn đã đạt giới hạn tổng cộng tối đa ${maxTotal} lượt tạo ảnh AI cho tài khoản này. Vui lòng liên hệ quản trị viên để mở rộng hạn mức.`
+        };
+      }
+
+      // 3. Daily limit: Maximum 5 jobs per day
       const usageRow = this.db.prepare(`
         SELECT COUNT(*) as count FROM ai_usage_log
         WHERE user_id = ? AND created_at >= ?
@@ -680,7 +833,7 @@ class SQLiteDatabase {
         };
       }
 
-      // 3. Global system safety cap: Max 5 concurrent jobs system-wide
+      // 4. Global system safety cap: Max 5 concurrent jobs system-wide
       const globalActive = this.db.prepare(`
         SELECT COUNT(*) as count FROM ai_jobs
         WHERE status IN ('queued', 'processing')
@@ -754,6 +907,7 @@ class SQLiteDatabase {
   public atomicRetryAIJob(jobId: string, userId: string):
     { success: true; job: DetailedAIJob } | { success: false; statusCode: number; reason: string } {
     const maxDaily = 5;
+    const maxTotal = 20;
     const startOfTodayIso = this.getStartOfTodayIso();
 
     try {
@@ -786,7 +940,22 @@ class SQLiteDatabase {
         };
       }
 
-      // 3. Daily limit: Maximum 5 jobs per day (applies to retries)
+      // 3. Total lifetime limit: Maximum 20 jobs
+      const totalRow = this.db.prepare(`
+        SELECT COUNT(*) as count FROM ai_usage_log
+        WHERE user_id = ?
+      `).get(userId) as any;
+      const totalUsage = totalRow?.count || 0;
+      if (totalUsage >= maxTotal) {
+        this.db.exec('ROLLBACK;');
+        return {
+          success: false,
+          statusCode: 429,
+          reason: `Bạn đã đạt giới hạn tổng cộng tối đa ${maxTotal} lượt tạo ảnh AI cho tài khoản này.`
+        };
+      }
+
+      // 4. Daily limit: Maximum 5 jobs per day (applies to retries)
       const usageRow = this.db.prepare(`
         SELECT COUNT(*) as count FROM ai_usage_log
         WHERE user_id = ? AND created_at >= ?
@@ -969,9 +1138,42 @@ class SQLiteDatabase {
     return this.getDetailedAIJobById(id);
   }
 
-  public deleteUserAIJob(id: string, userId: string): boolean {
+  public deleteUserAIJob(id: string, userId: string): {
+    success: boolean;
+    statusCode?: number;
+    error?: string;
+  } {
+    const job = this.db.prepare(`
+      SELECT id, status, user_id FROM ai_jobs WHERE id = ? AND user_id = ?
+    `).get(id, userId) as any;
+
+    if (!job) {
+      return {
+        success: false,
+        statusCode: 404,
+        error: 'Tác vụ AI không tồn tại hoặc bạn không có quyền xóa.'
+      };
+    }
+
+    // STRICT CHECK: Cannot delete running or queued job to bypass concurrency limit
+    if (job.status === 'queued' || job.status === 'processing') {
+      return {
+        success: false,
+        statusCode: 409,
+        error: 'Không thể xóa tác vụ AI đang thực hiện (đang chờ hoặc đang xử lý). Vui lòng đợi tác vụ hoàn tất trước khi xóa khỏi tủ đồ.'
+      };
+    }
+
     const res = this.db.prepare(`DELETE FROM ai_jobs WHERE id = ? AND user_id = ?`).run(id, userId);
-    return (res as any).changes > 0;
+    return { success: (res as any).changes > 0 };
+  }
+
+  public getAIJobByResultFilename(filename: string): DetailedAIJob | null {
+    const row = this.db.prepare(`
+      SELECT * FROM ai_jobs WHERE result_image_url LIKE ? OR id = ?
+    `).get(`%${filename}%`, filename.replace(/^ai-|^remix-|\.png$|\.jpg$/g, '')) as any;
+    if (!row) return null;
+    return this.mapRowToDetailedJob(row);
   }
 
   private mapRowToDetailedJob(r: any): DetailedAIJob {

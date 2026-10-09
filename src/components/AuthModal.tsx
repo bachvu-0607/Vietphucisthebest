@@ -22,12 +22,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [password, setPassword] = useState('');
+  const [recoveryCode, setRecoveryCode] = useState('');
   const [resetToken, setResetToken] = useState('');
   const [newPassword, setNewPassword] = useState('');
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [createdRecoveryCode, setCreatedRecoveryCode] = useState<string | null>(null);
 
   if (!isOpen) return null;
 
@@ -57,6 +59,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
     try {
       const data = await api.register({ email, name, password });
+      if (data.user.recoveryCode) {
+        setCreatedRecoveryCode(data.user.recoveryCode);
+      }
       onSuccess(data.user);
       onClose();
     } catch (err: any) {
@@ -71,7 +76,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     resetFormState();
     setLoading(true);
     try {
-      const data = await api.forgotPassword(email);
+      const data = await api.forgotPassword({ email, recoveryCode });
       setSuccessMsg(data.message);
       if (data.resetToken) {
         setResetToken(data.resetToken);
@@ -289,9 +294,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {/* 3. FORGOT PASSWORD FORM */}
           {mode === 'forgot' && (
             <form onSubmit={handleForgotPassword} className="space-y-4">
-              <p className="text-xs text-[#57534E] leading-relaxed">
-                Nhập email của bạn để nhận mã khôi phục mật khẩu tài khoản.
-              </p>
+              <div className="p-3 bg-[#FFF5F7] rounded-xl border border-[#F4C2CE] text-xs text-[#881337] leading-relaxed">
+                Để bảo vệ an toàn cho tủ đồ và tác phẩm của bạn, hệ thống yêu cầu mã xác minh khôi phục (Recovery Code) được cấp khi đăng ký (không cho phép đổi mật khẩu chỉ bằng email).
+              </div>
               <div className="space-y-1.5">
                 <label className="text-xs font-serif font-bold text-[#1C1917]">Email đăng ký</label>
                 <div className="relative">
@@ -303,6 +308,21 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="ban@example.com"
                     className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#F4C2CE] focus:border-[#C84B69] focus:outline-hidden text-sm bg-[#FFFBF8]"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-serif font-bold text-[#1C1917]">Mã xác minh khôi phục (Recovery Code)</label>
+                <div className="relative">
+                  <KeyRound className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-[#A8A29E]" />
+                  <input
+                    type="text"
+                    required
+                    value={recoveryCode}
+                    onChange={(e) => setRecoveryCode(e.target.value)}
+                    placeholder="REC-XXXXXX"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#F4C2CE] focus:border-[#C84B69] focus:outline-hidden text-sm bg-[#FFFBF8] font-mono"
                   />
                 </div>
               </div>
@@ -320,7 +340,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   disabled={loading}
                   className="px-5 py-2.5 rounded-xl bg-[#C84B69] hover:bg-[#B33B58] text-white font-serif font-bold text-xs shadow-xs transition-all cursor-pointer disabled:opacity-50"
                 >
-                  {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Lấy mã khôi phục'}
+                  {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : 'Xác thực & Đặt lại'}
                 </button>
               </div>
             </form>

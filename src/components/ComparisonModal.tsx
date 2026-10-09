@@ -1,5 +1,6 @@
 import React from 'react';
 import { AIJob } from '../types';
+import { api } from '../services/api';
 import { TrienSonSeal, ChimLacIcon } from './VietnameseMotifs';
 import { X, Download, RotateCcw, Sparkles, CheckCircle2, BookmarkCheck } from 'lucide-react';
 
@@ -14,6 +15,8 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
   onClose,
   onReopenStudio
 }) => {
+  const protectedResultUrl = api.getProtectedImageUrl(job.resultImageUrl);
+
   const handleDownload = (dataUrl: string, filename: string) => {
     const link = document.createElement('a');
     link.href = dataUrl;
@@ -101,7 +104,7 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
                 <button
                   onClick={() =>
                     handleDownload(
-                      job.resultImageUrl!,
+                      protectedResultUrl,
                       `vietphuc-remix-${job.costumeName.toLowerCase().replace(/\s+/g, '-')}.jpg`
                     )
                   }
@@ -117,7 +120,7 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
             <div className="p-3 sm:p-4 flex items-center justify-center bg-[#FFF5F7] min-h-[440px] md:min-h-[560px]">
               {job.resultImageUrl ? (
                 <img
-                  src={job.resultImageUrl}
+                  src={protectedResultUrl}
                   alt="Tác phẩm di sản hoàn thiện"
                   className="max-h-[520px] md:max-h-[600px] w-auto max-w-full object-contain rounded-md shadow-md border border-[#F4C2CE]"
                 />
