@@ -1,10 +1,21 @@
+import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'node:crypto';
 import type { Request, Response, NextFunction } from 'express';
 import { sqliteDb, type UserRecord } from './sqlite.ts';
 
-export const JWT_SECRET = process.env.JWT_SECRET || 'vietphuc-remix-secure-jwt-key-2026';
+if (process.env.NODE_ENV === 'production' && (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32)) {
+  throw new Error('JWT_SECRET must contain at least 32 characters in production.');
+}
+export const JWT_SECRET = process.env.JWT_SECRET || crypto.randomBytes(32).toString('hex');
+export const SESSION_COOKIE = 'vietphuc_session';
+export function setSessionCookie(res: Response, token: string): void {
+  res.cookie(SESSION_COOKIE, token, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', path: '/', maxAge: 7 * 86400000 });
+}
+export function clearSessionCookie(res: Response): void {
+  res.clearCookie(SESSION_COOKIE, { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'strict', path: '/' });
+}
 const TOKEN_EXPIRY_DAYS = 7;
 
 export interface TokenPayload {
@@ -58,7 +69,8 @@ export function issueUserToken(user: UserRecord): { token: string; expiresAt: st
   const payload: TokenPayload = {
     userId: user.id,
     email: user.email,
-    role: user.role
+    role: user.role,
+    sessionId: crypto.randomUUID()
   };
 
   const token = jwt.sign(payload, JWT_SECRET, {
@@ -94,15 +106,16 @@ export function createPasswordResetToken(user: UserRecord): { rawToken: string; 
 }
 
 /**
- * Extract token from Authorization header or Query parameter
+ * Extract token from Authorization header or HttpOnly cookie
  */
 export function extractToken(req: Request): string | null {
   const authHeader = req.headers.authorization;
   if (authHeader && authHeader.startsWith('Bearer ')) {
     return authHeader.substring(7).trim();
   }
-  if (req.query && typeof req.query.token === 'string' && req.query.token.trim()) {
-    return req.query.token.trim();
+  const cookie = req.headers.cookie?.split(';').map(v => v.trim()).find(v => v.startsWith(SESSION_COOKIE + '='));
+  if (cookie) {
+    try { return decodeURIComponent(cookie.slice(SESSION_COOKIE.length + 1)); } catch { return null; }
   }
   return null;
 }
@@ -146,8 +159,7 @@ export function requireAuth(req: AuthenticatedRequest, res: Response, next: Next
       id: user.id,
       email: user.email,
       name: user.name,
-      role: user.role,
-      recoveryCode: user.recoveryCode
+      role: user.role
     };
     req.tokenHash = tokenHash;
     next();
@@ -178,8 +190,7 @@ export function optionalAuth(req: AuthenticatedRequest, _res: Response, next: Ne
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
-          recoveryCode: user.recoveryCode
+          role: user.role
         };
         req.tokenHash = tokenHash;
       }

@@ -11,23 +11,11 @@ export interface UserProfile {
   recoveryCode?: string;
 }
 
-function getStoredToken(): string | null {
-  try {
-    return localStorage.getItem(TOKEN_KEY);
-  } catch {
-    return null;
-  }
-}
-
-function setStoredToken(token: string | null): void {
-  try {
-    if (token) {
-      localStorage.setItem(TOKEN_KEY, token);
-    } else {
-      localStorage.removeItem(TOKEN_KEY);
-    }
-  } catch {}
-}
+// Cookie session survives reload; bearer token is only kept in memory.
+let memoryToken: string | null = null;
+try { localStorage.removeItem(TOKEN_KEY); } catch {}
+function getStoredToken(): string | null { return memoryToken; }
+function setStoredToken(token: string | null): void { memoryToken = token; }
 
 function getAuthHeaders(includeContentType = true): HeadersInit {
   const headers: Record<string, string> = {};
@@ -55,9 +43,7 @@ export const api = {
   getProtectedImageUrl(url?: string): string {
     if (!url) return '';
     if (!url.startsWith('/assets/results/')) return url;
-    const token = getStoredToken();
-    if (!token) return url;
-    return `${url}${url.includes('?') ? '&' : '?'}token=${encodeURIComponent(token)}`;
+    return url;
   },
 
   // Auth Endpoints
@@ -90,18 +76,12 @@ export const api = {
   },
 
   async logout(): Promise<void> {
-    try {
-      await fetch(`${API_BASE}/auth/logout`, {
-        method: 'POST',
-        headers: getAuthHeaders(false)
-      });
-    } catch {}
+    const res = await fetch(`${API_BASE}/auth/logout`, { method: 'POST', headers: getAuthHeaders(false) });
+    if (!res.ok) throw new Error('Chưa đăng xuất được. Vui lòng thử lại.');
     setStoredToken(null);
   },
 
   async getMe(): Promise<UserProfile | null> {
-    const token = getStoredToken();
-    if (!token) return null;
 
     try {
       const res = await fetch(`${API_BASE}/auth/me`, {
@@ -141,6 +121,19 @@ export const api = {
     if (!res.ok) {
       throw new Error(json.error || 'Đặt lại mật khẩu thất bại.');
     }
+  },
+
+  async changePassword(oldPassword: string, newPassword: string): Promise<void> {
+    const res = await fetch(`${API_BASE}/auth/change-password`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ oldPassword, newPassword }) });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Không thể đổi mật khẩu.');
+    setStoredToken(null);
+  },
+  async issueRecoveryCode(password: string): Promise<string> {
+    const res = await fetch(`${API_BASE}/auth/recovery-code`, { method: 'POST', headers: getAuthHeaders(), body: JSON.stringify({ password }) });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error || 'Không thể tạo mã.');
+    return json.data.recoveryCode;
   },
 
   // Events (Public)

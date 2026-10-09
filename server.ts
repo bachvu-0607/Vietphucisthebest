@@ -1,132 +1,77 @@
+import 'dotenv/config';
 import express from 'express';
-import { createServer as createViteServer } from 'vite';
-import path from 'path';
+import path from 'node:path';
 import fs from 'node:fs';
-import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-import jwt from 'jsonwebtoken';
+import { fileURLToPath } from 'node:url';
 import { apiRouter } from './server/routes.ts';
 import { sqliteDb } from './server/sqlite.ts';
-import { JWT_SECRET, hashToken } from './server/auth.ts';
+import { requireAuth, type AuthenticatedRequest } from './server/auth.ts';
+import { RESULTS_DIR, DATA_DIR } from './server/storage.ts';
 
-dotenv.config();
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-async function startServer() {
+const root = path.dirname(fileURLToPath(import.meta.url));
+export async function createApp() {
   const app = express();
-  const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-
-  // Increase payload limit for base64 canvas export
-  app.use(express.json({ limit: '50mb' }));
-  app.use(express.urlencoded({ extended: true, limit: '50mb' }));
-
-  // API router
+  sqliteDb.recoverInterruptedJobs();
+  app.disable('x-powered-by');
+  app.use((_req, res, next) => { res.setHeader('Referrer-Policy', 'no-referrer'); next(); });
+  app.use(express.json({ limit: '12mb' }));
   app.use('/api', apiRouter);
+  app.use('/api', (_req, res) => { res.status(404).json({ success: false, error: 'Không tìm thấy API.' }); });
+  app.get('/healthz', (_req, res) => { res.json({ ok: true }); });
 
-  // 1. PUBLIC CULTURAL ASSETS: Open to all visitors
-  app.use('/assets/costumes', express.static(path.resolve(__dirname, 'public/assets/costumes')));
-  app.use('/assets/events', express.static(path.resolve(__dirname, 'public/assets/events')));
-  app.use('/assets/backgrounds', express.static(path.resolve(__dirname, 'public/assets/backgrounds')));
-
-  // 2. PRIVATE USER AI CREATIONS: Strictly protected by token authentication & ownership
-  app.get('/assets/results/:filename', (req, res) => {
+  app.get('/assets/results/:filename', requireAuth, (req: AuthenticatedRequest, res) => {
     const filename = req.params.filename;
-    if (!filename || filename.includes('..') || filename.includes('/') || filename.includes('\\')) {
-      return res.status(400).json({ success: false, error: 'Tên tệp không hợp lệ.' });
-    }
-
-    // Extract auth token from Authorization header or query param
-    let token: string | null = null;
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      token = authHeader.substring(7).trim();
-    } else if (typeof req.query.token === 'string' && req.query.token.trim()) {
-      token = req.query.token.trim();
-    }
-
-    if (!token) {
-      return res.status(401).json({
-        success: false,
-        error: 'Ảnh này thuộc tủ đồ riêng tư. Vui lòng đăng nhập để xem ảnh.'
-      });
-    }
-
-    try {
-      const decoded = jwt.verify(token, JWT_SECRET) as any;
-      const tokenHash = hashToken(token);
-      if (!sqliteDb.isSessionActive(tokenHash)) {
-        return res.status(401).json({
-          success: false,
-          error: 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.'
-        });
-      }
-
-      // Verify ownership: Is this image owned by the user?
-      const job = sqliteDb.getAIJobByResultFilename(filename);
-      if (job && job.userId !== decoded.userId && decoded.role !== 'admin') {
-        return res.status(403).json({
-          success: false,
-          error: 'Quyền truy cập bị từ chối: Ảnh thuộc tủ đồ riêng của người dùng khác.'
-        });
-      }
-
-      const filePath = path.resolve(__dirname, 'public/assets/results', filename);
-      if (!fs.existsSync(filePath)) {
-        return res.status(404).json({ success: false, error: 'Không tìm thấy tệp ảnh.' });
-      }
-
-      res.sendFile(filePath);
-    } catch {
-      return res.status(401).json({
-        success: false,
-        error: 'Mã xác thực không hợp lệ để xem ảnh riêng tư.'
-      });
-    }
+    if (!/^[a-zA-Z0-9_-]+\.(png|jpe?g|webp)$/.test(filename)) return res.sendStatus(404);
+    const job = sqliteDb.getAIJobByResultFilename(filename);
+    if (!job || job.userId !== req.user!.id) return res.sendStatus(404);
+    // Legacy results are allowed only with a matching owned database record.
+    const candidates = [path.join(RESULTS_DIR, filename), path.join(root, 'public/assets/results', filename)];
+    const file = candidates.find(f => fs.existsSync(f));
+    if (!file) return res.sendStatus(404);
+    res.setHeader('Cache-Control', 'private, no-store');
+    res.sendFile(file);
   });
-
-  // Default fallback for any other general public assets (excluding results)
-  app.use('/assets', (req, res, next) => {
-    if (req.path.startsWith('/results')) {
-      return res.status(401).json({ success: false, error: 'Ảnh riêng tư yêu cầu xác thực.' });
-    }
-    express.static(path.resolve(__dirname, 'public/assets'))(req, res, next);
+  // Never allow fallback static handlers (including Vite) to expose private files.
+  app.use((req, res, next) => {
+    let decoded: string;
+    try { decoded = decodeURIComponent(req.path); } catch { return res.sendStatus(400); }
+    if (/(?:^|\/)results(?:\/|$)/i.test(decoded) || decoded.startsWith('/@fs/')) return res.sendStatus(404);
+    next();
   });
-
-  const isProduction = process.env.NODE_ENV === 'production';
-
-  if (!isProduction) {
-    const vite = await createViteServer({
-      server: {
-        middlewareMode: true,
-        hmr: false,
-      },
-      appType: 'spa',
-    });
-    app.use(vite.middlewares);
+  app.use('/assets', express.static(path.join(root, 'public/assets')));
+  if (process.env.NODE_ENV === 'production') {
+    if (!fs.existsSync(path.join(root, 'dist/index.html'))) throw new Error('Run npm run build before npm start.');
+    app.use(express.static(path.join(root, 'dist')));
+    app.get('*', (_req, res) => { res.sendFile(path.join(root, 'dist/index.html')); });
   } else {
-    const distPath = path.resolve(__dirname, 'dist');
-    if (fs.existsSync(distPath)) {
-      app.use(express.static(distPath));
-      app.get('*', (_req, res) => {
-        res.sendFile(path.resolve(distPath, 'index.html'));
-      });
-    } else {
-      const vite = await createViteServer({
-        server: { middlewareMode: true, hmr: false },
-        appType: 'spa',
-      });
-      app.use(vite.middlewares);
-    }
+    const { createServer } = await import('vite');
+    const vite = await createServer({ server: { middlewareMode: true, hmr: false }, publicDir: false, appType: 'spa' });
+    app.use(vite.middlewares);
   }
-
-  app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Việt Phục Remix server running on port ${PORT}`);
+  app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
+    console.error('Request failed:', err.message);
+    res.status(err.status || 500).json({ success: false, error: 'Yêu cầu không hợp lệ hoặc máy chủ không xử lý được.' });
   });
+  return app;
 }
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+    const pidFile = path.join(DATA_DIR, 'server.pid');
+    if (fs.existsSync(pidFile)) {
+      const pid = Number(fs.readFileSync(pidFile, 'utf8'));
+      try { process.kill(pid, 0); throw new Error('Only one server may use this SQLite database.'); }
+      catch (err: any) { if (err.code !== 'ESRCH') throw err; fs.unlinkSync(pidFile); }
+    }
+    fs.writeFileSync(pidFile, String(process.pid), { flag: 'wx' });
+  process.once('exit', () => { if (fs.existsSync(pidFile)) fs.unlinkSync(pidFile); });
+  createApp().then(app => {
+    const server = app.listen(Number(process.env.PORT || 3000), process.env.HOST || '0.0.0.0', () => console.log('Việt Phục Remix server started.'));
+    const backupTimer = setInterval(() => {
+      try { sqliteDb.performBackup(); } catch (err) { console.error('Periodic backup failed:', err); }
+    }, 60 * 60 * 1000);
+    backupTimer.unref();
 
-startServer().catch((err) => {
-  console.error('Fatal error starting server:', err);
-  process.exit(1);
-});
+    for (const signal of ['SIGINT', 'SIGTERM'] as const) process.once(signal, () => {
+      clearInterval(backupTimer); server.close(() => { sqliteDb.close(); process.exit(0); });
+    });
+  }).catch(err => { console.error(err); process.exit(1); });
+}

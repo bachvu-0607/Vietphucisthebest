@@ -499,6 +499,8 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
     );
   };
 
+  const [savedDraftId, setSavedDraftId] = useState(existingDraft?.id?.startsWith('preset-') ? undefined : existingDraft?.id);
+
   // ACTION 1: Save Draft (No AI)
   const handleSaveDraft = async () => {
     if (!currentUser) {
@@ -516,7 +518,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
       const sketchDataUrl = canvasExporterRef.current ? canvasExporterRef.current() : '';
 
       const draftPayload: Partial<FittingDraft> = {
-        id: existingDraft?.id,
+        id: savedDraftId,
         title: `Phác thảo ${costume.name} • ${selectedColor.name}`,
         eventId: selectedEventItem?.id || event?.id || 'evt-tet',
         costumeId: costume.id,
@@ -533,6 +535,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
       };
 
       const saved = await api.saveDraft(draftPayload);
+      setSavedDraftId(saved.id);
       onDraftSaved(saved);
       setSaveSuccessMsg('Đã lưu bản phác thảo vào Bộ sưu tập cá nhân.');
       setTimeout(() => setSaveSuccessMsg(null), 3500);

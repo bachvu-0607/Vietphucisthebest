@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
-import { db } from './db.ts';
+import { RESULTS_DIR } from './storage.ts';
 import { sqliteDb } from './sqlite.ts';
 import sharp from 'sharp';
 import fs from 'fs';
@@ -411,12 +411,10 @@ export function processJobInBackground(jobId: string, options: {
   sketchDataUrl?: string;
 }): void {
   // Update to queued immediately
-  db.updateAIJob(jobId, { status: 'queued', progress: 10 });
   sqliteDb.updateDetailedAIJob(jobId, { status: 'queued', progress: 10 });
 
   setTimeout(async () => {
     try {
-      db.updateAIJob(jobId, { status: 'processing', progress: 35 });
       sqliteDb.updateDetailedAIJob(jobId, { status: 'processing', progress: 35 });
       const prompt = buildCostumePrompt(options);
 
@@ -438,7 +436,6 @@ export function processJobInBackground(jobId: string, options: {
         for (const modelName of candidateModels) {
           try {
             console.log(`[AI Job ${jobId}] Generating via OpenAI model: ${modelName} (1024x1536)...`);
-            db.updateAIJob(jobId, { status: 'processing', progress: 55 });
             sqliteDb.updateDetailedAIJob(jobId, { status: 'processing', progress: 55 });
             
             // Truncate prompt safely if too long for OpenAI image API
@@ -453,7 +450,7 @@ export function processJobInBackground(jobId: string, options: {
 
             if (dalleResponse.data?.[0]?.b64_json) {
               const b64 = dalleResponse.data[0].b64_json;
-              const outDir = path.resolve(process.cwd(), 'public/assets/results');
+              const outDir = RESULTS_DIR;
               if (!fs.existsSync(outDir)) {
                 fs.mkdirSync(outDir, { recursive: true });
               }
@@ -483,7 +480,6 @@ export function processJobInBackground(jobId: string, options: {
       if (!finalImageUrl && dynamicGemini && activeGeminiKey) {
         try {
           console.log(`[AI Job ${jobId}] Attempting generation via Google Imagen 3 / Gemini...`);
-          db.updateAIJob(jobId, { status: 'processing', progress: 65 });
           // Format image input if sketchDataUrl is provided as base64
           let contentsPart: any;
           if (options.sketchDataUrl && options.sketchDataUrl.includes('base64,')) {
@@ -544,24 +540,17 @@ export function processJobInBackground(jobId: string, options: {
         }
       }
 
-      // If no image from real API, invoke Dynamic Heritage Compositor (Direction A)
-      if (!finalImageUrl) {
-        db.updateAIJob(jobId, { status: 'processing', progress: 85 });
-        // Simulating realistic image processing
-        await new Promise((r) => setTimeout(r, 1200));
-        try {
-          finalImageUrl = await generateCustomCompositedArtwork(jobId, options);
-        } catch {
-          finalImageUrl = getCostumeMasterpieceImage(options.costumeName);
-        }
+      if (!finalImageUrl) throw new Error('Không tạo được ảnh từ dịch vụ AI. Hãy kiểm tra cấu hình hoặc thử lại sau.');
+      if (finalImageUrl.startsWith('data:image/')) {
+        const match = /^data:image\/(png|jpeg);base64,(.+)$/.exec(finalImageUrl);
+        if (!match) throw new Error('Định dạng ảnh AI không hợp lệ.');
+        fs.mkdirSync(RESULTS_DIR, { recursive: true });
+        const filename = `ai-${jobId}.${match[1] === 'jpeg' ? 'jpg' : 'png'}`;
+        fs.writeFileSync(path.join(RESULTS_DIR, filename), Buffer.from(match[2], 'base64'));
+        finalImageUrl = `/assets/results/${filename}`;
       }
+      if (!finalImageUrl.startsWith('/assets/results/')) throw new Error('Dịch vụ AI không trả ảnh có thể lưu riêng tư.');
 
-      db.updateAIJob(jobId, {
-        status: 'completed',
-        progress: 100,
-        resultImageUrl: finalImageUrl,
-        completedAt: new Date().toISOString()
-      });
       sqliteDb.updateDetailedAIJob(jobId, {
         status: 'completed',
         progress: 100,
@@ -569,16 +558,11 @@ export function processJobInBackground(jobId: string, options: {
         completedAt: new Date().toISOString()
       });
     } catch (err: any) {
-      db.updateAIJob(jobId, {
+      try { sqliteDb.updateDetailedAIJob(jobId, {
         status: 'failed',
         progress: 100,
         errorMessage: err?.message || 'Quá trình hoàn thiện trang phục gặp sự cố. Vui lòng thử lại.'
-      });
-      sqliteDb.updateDetailedAIJob(jobId, {
-        status: 'failed',
-        progress: 100,
-        errorMessage: err?.message || 'Quá trình hoàn thiện trang phục gặp sự cố. Vui lòng thử lại.'
-      });
+      }); } catch (storageError) { console.error('Cannot persist AI failure; restart recovery required:', storageError); }
     }
   }, 800);
 }
@@ -645,7 +629,7 @@ export async function generateCustomCompositedArtwork(
   }
 
   const outFileName = `remix-${jobId}.jpg`;
-  const outDir = path.resolve(process.cwd(), 'public/assets/results');
+  const outDir = RESULTS_DIR;
   if (!fs.existsSync(outDir)) {
     fs.mkdirSync(outDir, { recursive: true });
   }

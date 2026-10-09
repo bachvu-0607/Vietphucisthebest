@@ -15,8 +15,7 @@ import {
   INITIAL_BACKGROUNDS
 } from './db.ts';
 
-const DATA_DIR = path.resolve(process.cwd(), 'data');
-const BACKUPS_DIR = path.resolve(DATA_DIR, 'backups');
+import { DATA_DIR, BACKUPS_DIR, positiveLimit } from './storage.ts';
 const DB_FILE = path.resolve(DATA_DIR, 'vietphucremix.sqlite');
 const LEGACY_JSON_FILE = path.resolve(DATA_DIR, 'vietphucremix.json');
 
@@ -78,7 +77,13 @@ class SQLiteDatabase {
     this.performBackup();
   }
 
+  public close(): void { this.db.close(); }
+  public recoverInterruptedJobs(): void {
+    this.db.prepare("UPDATE ai_jobs SET status = 'failed', progress = 100, error_message = 'Máy chủ đã khởi động lại. Hãy kiểm tra và thử lại nếu cần.' WHERE status IN ('queued', 'processing')").run();
+  }
+
   private initSchema() {
+    this.db.exec(`PRAGMA busy_timeout = 5000;`);
     // Enable WAL mode for better concurrency and data durability
     this.db.exec(`PRAGMA journal_mode = WAL;`);
     this.db.exec(`PRAGMA foreign_keys = ON;`);
@@ -103,6 +108,7 @@ class SQLiteDatabase {
       this.db.exec(`ALTER TABLE users ADD COLUMN recovery_code TEXT NOT NULL DEFAULT '';`);
     } catch {}
 
+    this.db.exec(`CREATE TABLE IF NOT EXISTS auth_attempts (key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires_at INTEGER NOT NULL);`);
     // 2. Active Sessions / Token revocation table
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS sessions (
@@ -202,6 +208,17 @@ class SQLiteDatabase {
       );
       CREATE INDEX IF NOT EXISTS idx_ai_usage_user_time ON ai_usage_log(user_id, created_at);
     `);
+    const draftColumns = this.db.prepare('PRAGMA table_info(drafts)').all() as any[];
+    for (const [name, fallback] of [['selected_hairstyle', 'Búi tóc đội khăn'], ['selected_footwear', 'Guốc mộc truyền thống'], ['selected_details_json', '{}']]) {
+      if (!draftColumns.some(c => c.name === name)) this.db.exec(`ALTER TABLE drafts ADD COLUMN ${name} TEXT NOT NULL DEFAULT '${fallback}'`);
+    }
+    // Remove weak/shared recovery codes. Existing users may issue a fresh code after login.
+    const users = this.db.prepare('SELECT id, recovery_code FROM users').all() as any[];
+    for (const u of users) {
+      if (u.recovery_code && !u.recovery_code.startsWith('sha256:')) {
+        this.db.prepare('UPDATE users SET recovery_code = ? WHERE id = ?').run('', u.id);
+      }
+    }
   }
 
   /**
@@ -215,6 +232,7 @@ class SQLiteDatabase {
       const legacyData = JSON.parse(content);
       const now = new Date().toISOString();
 
+      this.db.exec('BEGIN IMMEDIATE');
       // Ensure a default system migration user exists if needed
       let legacyUserId = 'usr-legacy-archive';
       const checkUser = this.db.prepare('SELECT id FROM users WHERE id = ?').get(legacyUserId);
@@ -246,9 +264,9 @@ class SQLiteDatabase {
 
         for (const d of legacyData.drafts) {
           if (!d.id) continue;
-          insertDraft.run(
+          const inserted = insertDraft.run(
             d.id,
-            d.userId || legacyUserId,
+            legacyUserId,
             d.title || 'Phác thảo Việt phục lưu trữ',
             d.eventId || 'evt-tet',
             d.costumeId || 'cos-nhat-binh',
@@ -265,6 +283,10 @@ class SQLiteDatabase {
             d.createdAt || now,
             d.updatedAt || now
           );
+          if (inserted.changes > 0) {
+            this.db.prepare('UPDATE drafts SET selected_hairstyle = ?, selected_footwear = ?, selected_details_json = ? WHERE id = ? AND user_id = ?')
+              .run(d.selectedHairstyle || 'Búi tóc đội khăn', d.selectedFootwear || 'Guốc mộc truyền thống', JSON.stringify(d.selectedDetails || {}), d.id, legacyUserId);
+          }
         }
       }
 
@@ -283,7 +305,7 @@ class SQLiteDatabase {
           if (!j.id) continue;
           insertJob.run(
             j.id,
-            j.userId || legacyUserId,
+            legacyUserId,
             j.draftId || null,
             j.status || 'completed',
             j.costumeId || 'cos-nhat-binh',
@@ -307,8 +329,10 @@ class SQLiteDatabase {
           );
         }
       }
+      this.db.exec('COMMIT');
     } catch (err) {
-      console.error('Error during legacy JSON migration to SQLite:', err);
+      try { this.db.exec('ROLLBACK'); } catch {}
+      throw new Error('Legacy migration failed; original JSON preserved. ' + String(err));
     }
   }
 
@@ -317,16 +341,14 @@ class SQLiteDatabase {
    */
   public performBackup(): string | null {
     try {
-      // Flush WAL to main database file before copying
-      try {
-        this.db.exec(`PRAGMA wal_checkpoint(TRUNCATE);`);
-      } catch (e) {
-        console.warn('Checkpoint warning before backup:', e);
-      }
-
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-      const backupPath = path.resolve(BACKUPS_DIR, `vietphucremix-${timestamp}.sqlite`);
-      fs.copyFileSync(DB_FILE, backupPath);
+      const backupPath = path.resolve(BACKUPS_DIR, `vietphucremix-${timestamp}-${crypto.randomUUID()}.sqlite`);
+      this.db.prepare('VACUUM INTO ?').run(backupPath);
+      const snapshot = new DatabaseSync(backupPath, { readOnly: true });
+      try {
+        if ((snapshot.prepare('PRAGMA integrity_check').get() as any).integrity_check !== 'ok') throw new Error('Backup integrity check failed');
+        snapshot.prepare('SELECT COUNT(*) FROM users').get();
+      } finally { snapshot.close(); }
 
       // Keep only last 10 backups to preserve disk space
       const files = fs.readdirSync(BACKUPS_DIR)
@@ -340,7 +362,7 @@ class SQLiteDatabase {
       return backupPath;
     } catch (err) {
       console.error('Failed to perform SQLite backup:', err);
-      return null;
+      throw err;
     }
   }
 
@@ -364,94 +386,19 @@ class SQLiteDatabase {
       .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
   }
 
-  /**
-   * Restore database from a snapshot with genuine SQLite data verification
-   */
-  public restoreBackup(backupFilename?: string): {
-    success: boolean;
-    message: string;
-    details?: any;
-    error?: string;
-  } {
-    try {
-      let targetFile: string;
-      if (backupFilename) {
-        targetFile = path.resolve(BACKUPS_DIR, path.basename(backupFilename));
-      } else {
-        const backups = this.getBackups();
-        if (backups.length === 0) {
-          return { success: false, message: 'Không tìm thấy bản sao lưu nào để khôi phục.' };
-        }
-        targetFile = backups[0].path;
-      }
-
-      if (!fs.existsSync(targetFile)) {
-        return { success: false, message: `Tập tin sao lưu không tồn tại: ${path.basename(targetFile)}` };
-      }
-
-      // Checkpoint and safely close current connection
-      try {
-        this.db.exec(`PRAGMA wal_checkpoint(TRUNCATE);`);
-        this.db.close();
-      } catch (e) {
-        console.warn('Closing db before restore:', e);
-      }
-
-      // Remove stale WAL and SHM files to prevent corruption
-      const walFile = DB_FILE + '-wal';
-      const shmFile = DB_FILE + '-shm';
-      if (fs.existsSync(walFile)) fs.unlinkSync(walFile);
-      if (fs.existsSync(shmFile)) fs.unlinkSync(shmFile);
-
-      // Overwrite primary DB file with snapshot
-      fs.copyFileSync(targetFile, DB_FILE);
-
-      // Re-initialize connection
-      this.db = new DatabaseSync(DB_FILE);
-      this.db.exec(`PRAGMA journal_mode = WAL;`);
-      this.db.exec(`PRAGMA foreign_keys = ON;`);
-
-      // Verify row counts in restored DB
-      const userCount = (this.db.prepare('SELECT COUNT(*) as count FROM users').get() as any)?.count || 0;
-      const draftCount = (this.db.prepare('SELECT COUNT(*) as count FROM drafts').get() as any)?.count || 0;
-      const jobCount = (this.db.prepare('SELECT COUNT(*) as count FROM ai_jobs').get() as any)?.count || 0;
-
-      return {
-        success: true,
-        message: 'Khôi phục bản sao lưu thành công.',
-        details: {
-          restoredFrom: path.basename(targetFile),
-          userCount,
-          draftCount,
-          jobCount,
-          timestamp: new Date().toISOString()
-        }
-      };
-    } catch (err: any) {
-      console.error('Failed to restore SQLite backup:', err);
-      try {
-        this.db = new DatabaseSync(DB_FILE);
-      } catch {}
-      return {
-        success: false,
-        message: 'Khôi phục bản sao lưu thất bại.',
-        error: err.message
-      };
-    }
-  }
-
   // ==========================================
   // USER METHODS
   // ==========================================
   public createUser(email: string, name: string, passwordHash: string): UserRecord {
-    const id = 'usr-' + crypto.randomUUID().slice(0, 8);
+    const id = 'usr-' + crypto.randomUUID();
     const now = new Date().toISOString();
-    const recoveryCode = 'REC-' + crypto.randomInt(100000, 999999);
+    const recoveryCode = 'REC-' + crypto.randomBytes(24).toString('hex');
+    const recoveryHash = 'sha256:' + crypto.createHash('sha256').update(recoveryCode).digest('hex');
     const stmt = this.db.prepare(`
       INSERT INTO users (id, email, name, password_hash, role, recovery_code, created_at, updated_at)
       VALUES (?, ?, ?, ?, 'user', ?, ?, ?)
     `);
-    stmt.run(id, email.toLowerCase().trim(), name.trim(), passwordHash, recoveryCode, now, now);
+    stmt.run(id, email.toLowerCase().trim(), name.trim(), passwordHash, recoveryHash, now, now);
     return {
       id,
       email: email.toLowerCase().trim(),
@@ -473,7 +420,7 @@ class SQLiteDatabase {
       name: row.name,
       passwordHash: row.password_hash,
       role: row.role as 'user' | 'admin',
-      recoveryCode: row.recovery_code || 'REC-123456',
+      recoveryCode: '',
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
@@ -488,13 +435,50 @@ class SQLiteDatabase {
       name: row.name,
       passwordHash: row.password_hash,
       role: row.role as 'user' | 'admin',
-      recoveryCode: row.recovery_code || 'REC-123456',
+      recoveryCode: '',
       createdAt: row.created_at,
       updatedAt: row.updated_at
     };
   }
 
-  public updateUserPassword(userId: string, newPasswordHash: string): void {
+  public verifyRecoveryCode(userId: string, code: string): boolean {
+    const row = this.db.prepare('SELECT recovery_code FROM users WHERE id = ?').get(userId) as any;
+    const digest = 'sha256:' + crypto.createHash('sha256').update(code.trim()).digest('hex');
+    if (!row?.recovery_code || row.recovery_code.length !== digest.length) return false;
+    return crypto.timingSafeEqual(Buffer.from(row.recovery_code), Buffer.from(digest));
+  }
+
+  public rotateRecoveryCode(userId: string): string {
+    const code = 'REC-' + crypto.randomBytes(24).toString('hex');
+    const digest = 'sha256:' + crypto.createHash('sha256').update(code).digest('hex');
+    this.db.prepare('UPDATE users SET recovery_code = ? WHERE id = ?').run(digest, userId);
+    this.db.prepare('DELETE FROM password_resets WHERE user_id = ?').run(userId);
+    return code;
+  }
+
+  public allowAuthAttempt(key: string, limit: number): boolean {
+    const now = Date.now();
+    this.db.prepare('DELETE FROM auth_attempts WHERE expires_at <= ?').run(now);
+    this.db.prepare(`INSERT INTO auth_attempts (key, count, expires_at) VALUES (?, 1, ?)
+      ON CONFLICT(key) DO UPDATE SET count = count + 1`).run(key, now + 15 * 60000);
+    const row = this.db.prepare('SELECT count FROM auth_attempts WHERE key = ?').get(key) as any;
+    return row.count <= limit;
+  }
+
+  public resetPasswordWithToken(tokenHash: string, passwordHash: string): boolean {
+    this.db.exec('BEGIN IMMEDIATE');
+    try {
+      const userId = this.verifyAndConsumeResetToken(tokenHash);
+      if (!userId) { this.db.exec('ROLLBACK'); return false; }
+      this.updateUserPassword(userId, passwordHash, true);
+      this.db.prepare('DELETE FROM password_resets WHERE user_id = ?').run(userId);
+      this.db.exec('COMMIT'); return true;
+    } catch (err) { this.db.exec('ROLLBACK'); throw err; }
+  }
+
+  public updateUserPassword(userId: string, newPasswordHash: string, inTransaction = false): void {
+    if (!inTransaction) this.db.exec('BEGIN IMMEDIATE');
+    try {
     const now = new Date().toISOString();
     this.db.prepare(`
       UPDATE users SET password_hash = ?, updated_at = ? WHERE id = ?
@@ -502,13 +486,15 @@ class SQLiteDatabase {
 
     // Invalidate all existing sessions on password change
     this.db.prepare(`UPDATE sessions SET is_revoked = 1 WHERE user_id = ?`).run(userId);
+    if (!inTransaction) this.db.exec('COMMIT');
+    } catch (err) { if (!inTransaction) this.db.exec('ROLLBACK'); throw err; }
   }
 
   // ==========================================
   // SESSION & TOKEN METHODS
   // ==========================================
   public createSession(userId: string, tokenHash: string, expiresAt: string): SessionRecord {
-    const id = 'ses-' + crypto.randomUUID().slice(0, 8);
+    const id = 'ses-' + crypto.randomUUID();
     const now = new Date().toISOString();
     this.db.prepare(`
       INSERT INTO sessions (id, user_id, token_hash, is_revoked, expires_at, created_at)
@@ -543,7 +529,7 @@ class SQLiteDatabase {
   // PASSWORD RESET METHODS
   // ==========================================
   public createPasswordReset(userId: string, tokenHash: string, expiresAt: string): PasswordResetRecord {
-    const id = 'rst-' + crypto.randomUUID().slice(0, 8);
+    const id = 'rst-' + crypto.randomUUID();
     const now = new Date().toISOString();
     this.db.prepare(`
       INSERT INTO password_resets (id, user_id, token_hash, used, expires_at, created_at)
@@ -591,7 +577,7 @@ class SQLiteDatabase {
       selectedAccessories: JSON.parse(r.selected_accessories_json || '[]'),
       selectedHairstyle: r.selected_hairstyle || 'Búi tóc đội khăn',
       selectedFootwear: r.selected_footwear || 'Guốc mộc truyền thống',
-      selectedDetails: {},
+      selectedDetails: JSON.parse(r.selected_details_json || '{}'),
       selectedBackgroundId: r.selected_background_id,
       remixStyle: r.remix_style,
       customPrompt: r.custom_prompt,
@@ -620,7 +606,7 @@ class SQLiteDatabase {
       selectedAccessories: JSON.parse(r.selected_accessories_json || '[]'),
       selectedHairstyle: r.selected_hairstyle || 'Búi tóc đội khăn',
       selectedFootwear: r.selected_footwear || 'Guốc mộc truyền thống',
-      selectedDetails: {},
+      selectedDetails: JSON.parse(r.selected_details_json || '{}'),
       selectedBackgroundId: r.selected_background_id,
       remixStyle: r.remix_style,
       customPrompt: r.custom_prompt,
@@ -632,14 +618,19 @@ class SQLiteDatabase {
   }
 
   public saveUserDraft(userId: string, input: Partial<FittingDraft>): FittingDraft {
+    if (!INITIAL_COSTUMES.some(c => c.id === input.costumeId)) throw new Error('Bộ trang phục không hợp lệ.');
+    if (input.title !== undefined && (typeof input.title !== 'string' || input.title.length > 200)) throw new Error('Tiêu đề không hợp lệ.');
+    if (input.selectedAccessories !== undefined && (!Array.isArray(input.selectedAccessories) || input.selectedAccessories.some(a => typeof a !== 'string'))) throw new Error('Phụ kiện không hợp lệ.');
     const now = new Date().toISOString();
-    const id = input.id || ('draft-' + crypto.randomUUID().slice(0, 8));
+    const id = input.id || ('draft-' + crypto.randomUUID());
 
     const existing = this.db.prepare(`SELECT id, user_id FROM drafts WHERE id = ?`).get(id) as any;
     if (existing && existing.user_id !== userId) {
       throw new Error('Bạn không có quyền sửa bản phác thảo của người khác.');
     }
 
+    this.db.exec('BEGIN IMMEDIATE');
+    try {
     if (existing) {
       this.db.prepare(`
         UPDATE drafts SET
@@ -705,7 +696,12 @@ class SQLiteDatabase {
       );
     }
 
+    const saved = this.getDraftById(id, userId)!;
+    this.db.prepare('UPDATE drafts SET selected_hairstyle = ?, selected_footwear = ?, selected_details_json = ? WHERE id = ? AND user_id = ?')
+      .run(input.selectedHairstyle ?? saved.selectedHairstyle ?? '', input.selectedFootwear ?? saved.selectedFootwear ?? '', JSON.stringify(input.selectedDetails ?? saved.selectedDetails ?? {}), id, userId);
+    this.db.exec('COMMIT');
     return this.getDraftById(id, userId)!;
+    } catch (err) { this.db.exec('ROLLBACK'); throw err; }
   }
 
   public deleteUserDraft(id: string, userId: string): boolean {
@@ -749,9 +745,9 @@ class SQLiteDatabase {
 
     return {
       usage: dailyRow?.count || 0,
-      max: 5,
+      max: positiveLimit('AI_DAILY_LIMIT', 5),
       totalUsage: totalRow?.count || 0,
-      totalMax: 20
+      totalMax: positiveLimit('AI_ACCOUNT_TOTAL_LIMIT', 20)
     };
   }
 
@@ -782,13 +778,19 @@ class SQLiteDatabase {
     sketchDataUrl: string;
     promptUsed: string;
   }): { success: true; job: DetailedAIJob } | { success: false; statusCode: number; reason: string } {
-    const maxDaily = 5;
-    const maxTotal = 20;
+    const maxDaily = positiveLimit('AI_DAILY_LIMIT', 5);
+    const maxTotal = positiveLimit('AI_ACCOUNT_TOTAL_LIMIT', 20);
     const startOfTodayIso = this.getStartOfTodayIso();
 
     try {
       this.db.exec('BEGIN IMMEDIATE;');
 
+      const globalUsage = this.db.prepare('SELECT COUNT(*) AS n FROM ai_usage_log WHERE created_at >= ?').get(startOfTodayIso) as any;
+      const globalLimit = positiveLimit('AI_GLOBAL_DAILY_LIMIT', 100);
+      if (process.env.AI_ENABLED === 'false' || globalUsage.n >= globalLimit) {
+        this.db.exec('ROLLBACK');
+        return { success: false, statusCode: 503, reason: 'Tính năng AI đang tạm dừng hoặc đã hết hạn mức toàn hệ thống trong ngày.' };
+      }
       // 1. Concurrency limit: Exactly 1 active job per user
       const activeRow = this.db.prepare(`
         SELECT COUNT(*) as count FROM ai_jobs
@@ -848,7 +850,7 @@ class SQLiteDatabase {
       }
 
       // 4. Insert AI job
-      const jobId = 'job-' + crypto.randomUUID().slice(0, 8);
+      const jobId = 'job-' + crypto.randomUUID();
       const now = new Date().toISOString();
 
       this.db.prepare(`
@@ -879,7 +881,7 @@ class SQLiteDatabase {
       );
 
       // 5. Insert usage log
-      const usageId = 'usg-' + crypto.randomUUID().slice(0, 8);
+      const usageId = 'usg-' + crypto.randomUUID();
       this.db.prepare(`
         INSERT INTO ai_usage_log (id, user_id, job_id, action_type, created_at)
         VALUES (?, ?, ?, 'create', ?)
@@ -906,8 +908,8 @@ class SQLiteDatabase {
    */
   public atomicRetryAIJob(jobId: string, userId: string):
     { success: true; job: DetailedAIJob } | { success: false; statusCode: number; reason: string } {
-    const maxDaily = 5;
-    const maxTotal = 20;
+    const maxDaily = positiveLimit('AI_DAILY_LIMIT', 5);
+    const maxTotal = positiveLimit('AI_ACCOUNT_TOTAL_LIMIT', 20);
     const startOfTodayIso = this.getStartOfTodayIso();
 
     try {
@@ -926,6 +928,11 @@ class SQLiteDatabase {
         };
       }
 
+      const globalUsage = this.db.prepare('SELECT COUNT(*) AS n FROM ai_usage_log WHERE created_at >= ?').get(startOfTodayIso) as any;
+      if (process.env.AI_ENABLED === 'false' || globalUsage.n >= positiveLimit('AI_GLOBAL_DAILY_LIMIT', 100)) {
+        this.db.exec('ROLLBACK');
+        return { success: false, statusCode: 503, reason: 'Tính năng AI đang tạm dừng hoặc đã hết hạn mức toàn hệ thống trong ngày.' };
+      }
       // 2. Concurrency limit: Exactly 1 active job per user
       const activeRow = this.db.prepare(`
         SELECT COUNT(*) as count FROM ai_jobs
@@ -992,7 +999,7 @@ class SQLiteDatabase {
       `).run(jobId, userId);
 
       // 6. Log retry in ai_usage_log
-      const usageId = 'usg-' + crypto.randomUUID().slice(0, 8);
+      const usageId = 'usg-' + crypto.randomUUID();
       const now = new Date().toISOString();
       this.db.prepare(`
         INSERT INTO ai_usage_log (id, user_id, job_id, action_type, created_at)
@@ -1021,7 +1028,7 @@ class SQLiteDatabase {
     maxDaily: number;
     activeCount: number;
   } {
-    const maxDaily = 5;
+    const maxDaily = positiveLimit('AI_DAILY_LIMIT', 5);
     const startOfTodayIso = this.getStartOfTodayIso();
 
     const activeRow = this.db.prepare(`
@@ -1170,8 +1177,8 @@ class SQLiteDatabase {
 
   public getAIJobByResultFilename(filename: string): DetailedAIJob | null {
     const row = this.db.prepare(`
-      SELECT * FROM ai_jobs WHERE result_image_url LIKE ? OR id = ?
-    `).get(`%${filename}%`, filename.replace(/^ai-|^remix-|\.png$|\.jpg$/g, '')) as any;
+      SELECT * FROM ai_jobs WHERE result_image_url = ?
+    `).get(`/assets/results/${filename}`) as any;
     if (!row) return null;
     return this.mapRowToDetailedJob(row);
   }

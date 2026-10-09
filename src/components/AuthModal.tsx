@@ -63,7 +63,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         setCreatedRecoveryCode(data.user.recoveryCode);
       }
       onSuccess(data.user);
-      onClose();
+      if (!data.user.recoveryCode) onClose();
     } catch (err: any) {
       setError(err.message || 'Đăng ký không thành công.');
     } finally {
@@ -104,6 +104,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setLoading(false);
     }
   };
+
+  if (createdRecoveryCode) return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4">
+      <div className="max-w-md rounded-3xl bg-white p-8 space-y-4">
+        <h3 className="text-xl font-bold">Lưu mã khôi phục tài khoản</h3>
+        <p>Mã này chỉ hiển thị một lần. Hãy lưu ở nơi riêng tư để dùng khi quên mật khẩu.</p>
+        <code className="block break-all select-all">{createdRecoveryCode}</code>
+        <button onClick={() => { setCreatedRecoveryCode(''); onClose(); }} className="rounded-xl bg-[#C84B69] px-4 py-2 text-white">Tôi đã lưu mã</button>
+      </div>
+    </div>
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200">
@@ -271,7 +282,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <input
                     type="password"
                     required
-                    minLength={6}
+                    minLength={8}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
@@ -371,7 +382,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   <input
                     type="password"
                     required
-                    minLength={6}
+                    minLength={8}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="••••••••"

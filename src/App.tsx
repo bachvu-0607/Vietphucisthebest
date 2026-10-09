@@ -119,7 +119,7 @@ export default function App() {
     setSelectedCostume(costume);
     if (preset) {
       const newDraft: FittingDraft = {
-        id: `draft-${Date.now()}`,
+        id: `preset-${Date.now()}`,
         title: preset.customPrompt || 'Bản phối Áo Dài Đề Xuất',
         eventId: selectedEvent?.id || 'evt-tet',
         costumeId: costume.id,
@@ -199,6 +199,19 @@ export default function App() {
     }
   };
 
+  const hasActiveJobs = aiJobs.some(job => job.status === 'queued' || job.status === 'processing');
+  useEffect(() => {
+    if (!currentUser || currentView !== 'profile' || !hasActiveJobs) return;
+    let cancelled = false;
+    const timer = window.setInterval(async () => {
+      try {
+        const jobs = await api.getAIJobs();
+        if (!cancelled) setAIJobs(jobs);
+      } catch {}
+    }, 2000);
+    return () => { cancelled = true; window.clearInterval(timer); };
+  }, [currentUser?.id, currentView, hasActiveJobs]);
+
   const handleOpenAuth = (mode: 'login' | 'register' = 'login', prompt?: string) => {
     setAuthModalMode(mode);
     setAuthPromptMessage(prompt || null);
@@ -220,7 +233,7 @@ export default function App() {
   const handleLogout = async () => {
     try {
       await api.logout();
-    } catch {}
+    } catch (err: any) { alert(err.message || 'Chưa đăng xuất được.'); return; }
     setCurrentUser(null);
     setDrafts([]);
     setAIJobs([]);

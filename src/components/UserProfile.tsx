@@ -51,13 +51,34 @@ export const UserProfile: React.FC<UserProfileProps> = ({
     totalMax: 20
   });
 
+  const [accountMode, setAccountMode] = useState<'password' | 'recovery' | null>(null);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [accountMessage, setAccountMessage] = useState('');
+  const [newRecoveryCode, setNewRecoveryCode] = useState('');
+  const [accountBusy, setAccountBusy] = useState(false);
+  const submitAccount = async (e: React.FormEvent) => {
+    e.preventDefault(); setAccountBusy(true); setAccountMessage('');
+    try {
+      if (accountMode === 'password') {
+        await api.changePassword(oldPassword, newPassword);
+        window.location.reload();
+      } else {
+        setNewRecoveryCode(await api.issueRecoveryCode(oldPassword));
+        setAccountMode(null);
+      }
+      setOldPassword(''); setNewPassword('');
+    } catch (err: any) { setAccountMessage(err.message); }
+    finally { setAccountBusy(false); }
+  };
+
   useEffect(() => {
     if (currentUser) {
       api.getAIUsage().then((res) => {
         if (res) setDailyUsage(res);
       }).catch(() => {});
     }
-  }, [currentUser, aiJobs.length]);
+  }, [currentUser, aiJobs]);
 
   const completedJobs = aiJobs.filter((j) => j.status === 'completed');
   const pendingJobs = aiJobs.filter(
@@ -104,6 +125,23 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               Đăng nhập / Tạo tài khoản
             </button>
           </div>
+        </div>
+      )}
+
+      {currentUser && (
+        <div className="rounded-2xl border border-[#F4C2CE] bg-white p-4 space-y-3">
+          <div className="flex gap-4 text-sm">
+            <button onClick={() => { setAccountMode('password'); setAccountMessage(''); }}>Đổi mật khẩu</button>
+            <button onClick={() => { setAccountMode('recovery'); setAccountMessage(''); }}>Tạo mã khôi phục mới</button>
+          </div>
+          {accountMode && <form onSubmit={submitAccount} className="flex flex-wrap gap-3">
+            <input type="password" autoComplete="current-password" required placeholder="Mật khẩu hiện tại" value={oldPassword} onChange={e => setOldPassword(e.target.value)} className="rounded-lg border p-2" />
+            {accountMode === 'password' && <input type="password" autoComplete="new-password" required minLength={8} placeholder="Mật khẩu mới (từ 8 ký tự)" value={newPassword} onChange={e => setNewPassword(e.target.value)} className="rounded-lg border p-2" />}
+            <button disabled={accountBusy} className="rounded-lg bg-[#C84B69] px-4 py-2 text-white">{accountBusy ? 'Đang xử lý…' : 'Xác nhận'}</button>
+            <button type="button" onClick={() => { setAccountMode(null); setOldPassword(''); setNewPassword(''); }}>Hủy</button>
+          </form>}
+          {accountMessage && <p role="alert">{accountMessage}</p>}
+          {newRecoveryCode && <div className="space-y-2"><p>Lưu mã này ở nơi riêng tư. Mã cũ không còn dùng được.</p><code className="block break-all select-all">{newRecoveryCode}</code><button onClick={() => setNewRecoveryCode('')}>Tôi đã lưu mã</button></div>}
         </div>
       )}
 

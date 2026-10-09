@@ -3,6 +3,9 @@ import type { Request, Response } from 'express';
 import { sqliteDb } from './sqlite.ts';
 import { processJobInBackground } from './ai.ts';
 import {
+  setSessionCookie,
+  clearSessionCookie,
+  extractToken,
   hashPassword,
   verifyPassword,
   issueUserToken,
@@ -13,7 +16,25 @@ import {
   type AuthenticatedRequest
 } from './auth.ts';
 
-export const apiRouter = express.Router();
+export const apiRouter = express.Router({ caseSensitive: true, strict: true });
+
+apiRouter.use((req, res, next) => {
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && req.headers.cookie && !req.headers.authorization?.startsWith('Bearer ')) {
+    const allowed = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+    if (!req.get('origin') || req.get('origin') !== allowed.replace(/\/$/, '')) {
+      return res.status(403).json({ success: false, error: 'Yêu cầu không cùng nguồn với website.' });
+    }
+  }
+  if (req.method === 'POST' && req.path.startsWith('/auth/')) {
+    const limits: Record<string, number> = { '/auth/register': 15, '/auth/login': 30, '/auth/forgot-password': 5, '/auth/reset-password': 10, '/auth/change-password': 10, '/auth/recovery-code': 5 };
+    const limit = limits[req.path];
+    const ip = req.socket.remoteAddress || 'unknown';
+    if (limit && !sqliteDb.allowAuthAttempt(`${req.path}:${ip}`, limit)) {
+      return res.status(429).json({ success: false, error: 'Bạn đã thử quá nhiều lần. Vui lòng đợi 15 phút.' });
+    }
+  }
+  next();
+});
 
 // ========================================================
 // 1. AUTHENTICATION ROUTES (Register, Login, Logout, Forgot)
@@ -38,10 +59,10 @@ apiRouter.post('/auth/register', async (req: Request, res: Response) => {
       });
     }
 
-    if (!password || typeof password !== 'string' || password.length < 6) {
+    if (!password || typeof password !== 'string' || password.length < 8 || Buffer.byteLength(password) > 72) {
       return res.status(400).json({
         success: false,
-        error: 'Mật khẩu phải có độ dài tối thiểu 6 ký tự.'
+        error: 'Mật khẩu phải có độ dài từ 8 ký tự (tối đa 72 byte).'
       });
     }
 
@@ -56,6 +77,7 @@ apiRouter.post('/auth/register', async (req: Request, res: Response) => {
     const passwordHash = await hashPassword(password);
     const newUser = sqliteDb.createUser(email, name, passwordHash);
     const { token, expiresAt } = issueUserToken(newUser);
+    setSessionCookie(res, token);
 
     res.status(201).json({
       success: true,
@@ -83,7 +105,7 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    if (!email || !password) {
+    if (typeof email !== 'string' || typeof password !== 'string' || Buffer.byteLength(password) > 72) {
       return res.status(400).json({
         success: false,
         error: 'Vui lòng nhập đầy đủ email và mật khẩu.'
@@ -107,6 +129,7 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
     }
 
     const { token, expiresAt } = issueUserToken(user);
+    setSessionCookie(res, token);
 
     res.json({
       success: true,
@@ -118,8 +141,7 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
           id: user.id,
           email: user.email,
           name: user.name,
-          role: user.role,
-          recoveryCode: user.recoveryCode
+          role: user.role
         }
       }
     });
@@ -130,13 +152,11 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
 });
 
 // POST /api/auth/logout
-apiRouter.post('/auth/logout', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+apiRouter.post('/auth/logout', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
   try {
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const rawToken = authHeader.substring(7).trim();
-      revokeUserToken(rawToken);
-    }
+    const token = extractToken(req);
+    if (token) revokeUserToken(token);
+    clearSessionCookie(res);
     res.json({ success: true, message: 'Đăng xuất thành công, phiên làm việc đã bị thu hồi.' });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
@@ -151,6 +171,29 @@ apiRouter.get('/auth/me', requireAuth, (req: AuthenticatedRequest, res: Response
       user: req.user
     }
   });
+});
+
+apiRouter.post('/auth/change-password', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+  const { oldPassword, newPassword } = req.body || {};
+  if (typeof oldPassword !== 'string' || typeof newPassword !== 'string' || newPassword.length < 8 || Buffer.byteLength(newPassword) > 72) {
+    return res.status(400).json({ success: false, error: 'Mật khẩu mới cần ít nhất 8 ký tự, tối đa 72 byte.' });
+  }
+  const user = sqliteDb.getUserById(req.user!.id)!;
+  if (!await verifyPassword(oldPassword, user.passwordHash)) return res.status(401).json({ success: false, error: 'Mật khẩu hiện tại không đúng.' });
+  sqliteDb.updateUserPassword(user.id, await hashPassword(newPassword));
+  clearSessionCookie(res);
+  res.json({ success: true, message: 'Đã đổi mật khẩu. Vui lòng đăng nhập lại.' });
+  } catch (err) { console.error('Account update failed:', err); res.status(500).json({ success: false, error: 'Không thể cập nhật tài khoản. Vui lòng thử lại.' }); }
+});
+apiRouter.post('/auth/recovery-code', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
+  try {
+  const user = sqliteDb.getUserById(req.user!.id)!;
+  if (typeof req.body?.password !== 'string' || !await verifyPassword(req.body.password, user.passwordHash)) {
+    return res.status(401).json({ success: false, error: 'Mật khẩu hiện tại không đúng.' });
+  }
+  res.json({ success: true, data: { recoveryCode: sqliteDb.rotateRecoveryCode(user.id) } });
+  } catch (err) { console.error('Account update failed:', err); res.status(500).json({ success: false, error: 'Không thể cập nhật tài khoản. Vui lòng thử lại.' }); }
 });
 
 // POST /api/auth/forgot-password (Strictly requires recovery code; NO reset allowed by email alone)
@@ -169,7 +212,7 @@ apiRouter.post('/auth/forgot-password', async (req: Request, res: Response) => {
     }
 
     const user = sqliteDb.getUserByEmail(email);
-    if (!user || user.recoveryCode.toLowerCase().trim() !== recoveryCode.toLowerCase().trim()) {
+    if (!user || user.id === 'usr-legacy-archive' || !sqliteDb.verifyRecoveryCode(user.id, recoveryCode)) {
       return res.status(401).json({
         success: false,
         error: 'Email hoặc mã xác minh khôi phục không chính xác. Vì lý do bảo mật, bạn không thể đặt lại mật khẩu nếu thiếu mã xác minh hợp lệ.'
@@ -194,25 +237,15 @@ apiRouter.post('/auth/reset-password', async (req: Request, res: Response) => {
   try {
     const { resetToken, newPassword } = req.body;
 
-    if (!resetToken || !newPassword || newPassword.length < 6) {
-      return res.status(400).json({
-        success: false,
-        error: 'Mã khôi phục không hợp lệ hoặc mật khẩu mới dưới 6 ký tự.'
-      });
+    if (typeof resetToken !== 'string' || typeof newPassword !== 'string' || newPassword.length < 8 || Buffer.byteLength(newPassword) > 72) {
+      return res.status(400).json({ success: false, error: 'Mật khẩu cần ít nhất 8 ký tự, tối đa 72 byte.' });
     }
-
     const tokenHash = (await import('./auth.ts')).hashToken(resetToken);
-    const userId = sqliteDb.verifyAndConsumeResetToken(tokenHash);
-
-    if (!userId) {
-      return res.status(400).json({
-        success: false,
-        error: 'Mã khôi phục không hợp lệ hoặc đã hết hạn.'
-      });
-    }
-
     const passwordHash = await hashPassword(newPassword);
-    sqliteDb.updateUserPassword(userId, passwordHash);
+    if (!sqliteDb.resetPasswordWithToken(tokenHash, passwordHash)) {
+      return res.status(400).json({ success: false, error: 'Mã khôi phục không hợp lệ hoặc đã hết hạn.' });
+    }
+    clearSessionCookie(res);
 
     res.json({
       success: true,
@@ -315,6 +348,9 @@ apiRouter.post('/drafts', requireAuth, (req: AuthenticatedRequest, res: Response
       });
     }
 
+    if (draftData.id && !sqliteDb.getDraftById(draftData.id, req.user!.id)) {
+      return res.status(404).json({ success: false, error: 'Không tìm thấy bản phối của bạn.' });
+    }
     const saved = sqliteDb.saveUserDraft(req.user!.id, draftData);
     res.json({
       success: true,
@@ -525,47 +561,14 @@ apiRouter.post('/ai/jobs/:id/retry', requireAuth, (req: AuthenticatedRequest, re
   }
 });
 
-// GET /api/system/durability-status (Checks SQLite WAL mode, database size, and backups)
-apiRouter.get('/system/durability-status', (_req: Request, res: Response) => {
-  try {
-    const backupPath = sqliteDb.performBackup();
-    const backups = sqliteDb.getBackups();
-    res.json({
-      success: true,
-      data: {
-        databaseEngine: 'SQLite with WAL journal mode',
-        persistenceMechanism: 'Local disk SQLite (requires Cloud Storage FUSE on Cloud Run for persistence)',
-        latestBackupPath: backupPath ? 'data/backups/' + backupPath.split('/').pop() : null,
-        totalBackups: backups.length,
-        backups: backups.slice(0, 5),
-        timestamp: new Date().toISOString()
-      }
-    });
-  } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
-  }
+apiRouter.get('/system/durability-status', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  if (req.user?.role !== 'admin') return res.status(403).json({ success: false, error: 'Chỉ quản trị viên được truy cập.' });
+  res.json({ success: true, data: { databaseEngine: 'SQLite', persistenceMechanism: 'Persistent local disk required; see DEPLOYMENT.md', totalBackups: sqliteDb.getBackups().length } });
 });
-
-// GET /api/system/backups (List available backup snapshots)
-apiRouter.get('/system/backups', (_req: Request, res: Response) => {
-  try {
-    const backups = sqliteDb.getBackups();
-    res.json({ success: true, data: backups });
-  } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
-  }
+apiRouter.get('/system/backups', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  if (req.user?.role !== 'admin') return res.status(403).json({ success: false, error: 'Chỉ quản trị viên được truy cập.' });
+  res.json({ success: true, data: sqliteDb.getBackups().map(({ filename, size, createdAt }) => ({ filename, size, createdAt })) });
 });
-
-// POST /api/system/restore (Genuine restoration of SQLite database from snapshot)
-apiRouter.post('/system/restore', (req: Request, res: Response) => {
-  try {
-    const { backupFilename } = req.body || {};
-    const result = sqliteDb.restoreBackup(backupFilename);
-    if (!result.success) {
-      return res.status(400).json({ success: false, error: result.message, details: result.error });
-    }
-    res.json({ success: true, message: result.message, data: result.details });
-  } catch (err: any) {
-    res.status(500).json({ success: false, error: err.message });
-  }
+apiRouter.post('/system/restore', requireAuth, (_req: Request, res: Response) => {
+  res.status(403).json({ success: false, error: 'Khôi phục phải thực hiện ngoại tuyến khi máy chủ đã dừng. Xem DEPLOYMENT.md.' });
 });
