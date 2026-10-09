@@ -113,6 +113,16 @@ test('security, ownership, quota and recoverability',async t=>{
   assert.deepEqual(original,fs.readFileSync(path.join(dir,'results','ai-test.png')));
 
  });
+ await t.test('monitor restricted to admins; response contains no personal data',async()=>{
+  assert.equal((await req('/api/system/monitor')).status,401);
+  assert.equal((await req('/api/system/monitor','GET',undefined,b.token)).status,403);
+  const admin=await reg('monitor-admin');
+  sqliteDb.db.prepare("UPDATE users SET role='admin' WHERE id=?").run(admin.user.id);
+  const r=await req('/api/system/monitor','GET',undefined,admin.token);
+  assert.equal(r.status,200);assert.ok(r.json.data.ai.dailyLimit>0);
+  const body=JSON.stringify(r.json);
+  for(const secret of [admin.token,admin.user.email,admin.user.recoveryCode]) assert.ok(!body.includes(secret));
+ });
  await t.test('maintenance cannot be invoked by guests or ordinary users',async()=>{
   assert.equal((await req('/api/system/restore','POST',{})).status,401);
   assert.equal((await req('/api/system/restore','POST',{},b.token)).status,403);
@@ -187,6 +197,6 @@ test('security, ownership, quota and recoverability',async t=>{
   const live=new DatabaseSync(path.join(dir,'vietphucremix.sqlite'));assert.equal(live.prepare("SELECT COUNT(*) AS n FROM ai_jobs WHERE status IN ('queued','processing')").get().n,0);live.close();
   // Restoring while the server is running must be refused.
   const refused=spawnSync(process.execPath,['scripts/storage.mjs','restore',backup],{env:process.env,encoding:'utf8'});assert.notEqual(refused.status,0);
- } finally {child.kill('SIGTERM');await new Promise(r=>child.once('exit',r));}
+ } finally {if(child.exitCode===null && child.signalCode===null){child.kill('SIGTERM');await new Promise(r=>child.once('exit',r));}}
  } finally {server.close();fs.rmSync(dir,{recursive:true,force:true});}
 });

@@ -1,3 +1,4 @@
+import { SystemMonitor } from './SystemMonitor';
 import React, { useState, useEffect } from 'react';
 import { FittingDraft, AIJob, Costume } from '../types';
 import { TrienSonSeal, ChimLacIcon, TrongDongWatermark } from './VietnameseMotifs';
@@ -103,6 +104,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
   return (
     <div className="py-8 sm:py-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in-50 duration-300">
+      {currentUser?.role === 'admin' && <SystemMonitor />}
       {/* Guest Mode Call-to-Action Banner */}
       {!currentUser && (
         <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#FFF5F7] via-white to-[#FCE7EC] border-2 border-dashed border-[#F4C2CE] p-8 sm:p-10 text-center shadow-xs space-y-4">

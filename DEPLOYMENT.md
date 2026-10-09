@@ -73,3 +73,16 @@ Lệnh kiểm tra file trước khi thay database, tạo snapshot trước resto
 ## Khóa tiến trình khi deploy
 
 Máy chủ lấy khóa `.server.lock` trong DATA_DIR trước khi mở SQLite. Khóa được cập nhật mỗi 5 giây, hết hạn sau 30 giây nếu container chết; khởi động mới chờ tối đa khoảng 40 giây. Không dùng file `server.pid` cũ vì PID có thể trùng trong container mới. Restore dùng cùng khóa và từ chối khi máy chủ còn chạy. Vẫn chỉ triển khai một replica; không xóa khóa thủ công khi máy chủ đang hoạt động.
+
+## Giám sát nhẹ và giới hạn lưu giữ
+
+Trong **Tủ đồ**, tài khoản admin có bảng Theo dõi hệ thống. Đăng ký tài khoản của chủ website trước, rồi trên terminal/SSH của service Railway chạy `npm run admin -- email-cua-chu-website`. Lệnh chỉ nâng quyền tài khoản đã tồn tại, không tự cấp quyền cho người đăng ký đầu tiên. Không đưa lệnh hoặc quyền này ra HTTP công khai. Reload trang sau khi cấp quyền.
+
+- `DATA_DIR/monitor.sqlite` chỉ chứa bộ đếm theo phút và mã sự kiện cố định; không chứa email, token, cookie, mật khẩu, prompt, ảnh base64 hay nội dung lỗi thô của provider. Log JSON cũng xuất ra Railway Logs.
+- Request bình thường chỉ tăng bộ đếm trong RAM. Ghi gộp mỗi phút; tối đa 60 phút đang chờ trong RAM nếu ổ đĩa hỏng. Khi tiến trình bị kill đột ngột có thể mất thống kê chưa flush. Bộ đếm phục vụ quan sát, không dùng để tính phí hoặc thực thi quota.
+- Giữ 7 ngày, tối đa 1.000 sự kiện, API trả tối đa 50 dòng. Mỗi mã sự kiện in tối đa một lần/phút; các dòng log được giảm lặp nên không dùng số dòng làm tổng số lỗi. Tổng số nằm ở bảng thống kê. File thống kê giới hạn 4.096 page (mặc định 16MiB) và dùng rollback journal; SQLite tái sử dụng page đã xóa, file có thể không co ngay. Không ghi log request thành công, payload, stack hoặc từng bước tiến độ.
+- Cảnh báo khi filesystem dùng >=80%, backup database cũ hơn 2 giờ, AI thất bại >=3 và >=50% kết quả trong 15 phút, HTTP 5xx >=5/15 phút, lượt AI chạm 80% quota ngày, hoặc bộ lưu thống kê lỗi. Chỉ log lúc chuyển trạng thái cảnh báo/khôi phục; không gửi lặp mỗi phút. 429 và 503 do chủ động giới hạn AI không bị tính là lỗi máy chủ.
+- Ngày quota theo mốc đang dùng trong backend; kết quả là cửa sổ 24 giờ, không phải cùng khái niệm. Kết quả được đếm độc lập, xóa job không xóa số liệu. Lượt gọi OpenAI/Google có thể nhiều hơn job do fallback; chưa có thống kê chi phí. Dữ liệu trước khi bật giám sát không được dựng lại.
+- Dung lượng dùng `statfs`: có thể phản ánh filesystem lớn hơn quota Volume Railway, cần đối chiếu dashboard Railway. Không quét tất cả ảnh mỗi phút. Backup gần nhất chỉ xác minh file snapshot database có mặt, không bao gồm ảnh, không chứng minh restore thành công.
+- Giữ nguyên `ai_usage_log`: đây là sổ thực thi quota toàn thời gian, KHÔNG xóa theo hạn 7 ngày của thống kê. Không có request AI phát sinh từ dashboard.
+- Backend chết hoàn toàn không thể tự gửi cảnh báo. Cần thêm dịch vụ uptime ngoài ứng dụng kiểm tra `https://vietphucisthebest-production.up.railway.app/healthz` mỗi 1–5 phút và kênh nhận cảnh báo của chủ website. Phần đó chưa được kết nối; hiện cảnh báo chỉ ở dashboard và Railway Logs. Trang sẽ báo lỗi đọc thống kê khi backend không trả lời, nhưng chỉ khi người dùng đang mở trang.

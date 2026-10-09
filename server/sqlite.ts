@@ -1,4 +1,5 @@
 import './instance-lock.mjs';
+import { monitor } from './monitor.ts';
 import { DatabaseSync } from 'node:sqlite';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -78,9 +79,16 @@ class SQLiteDatabase {
     this.performBackup();
   }
 
+  public operationalStats() {
+    const usage = this.db.prepare('SELECT COUNT(*) AS n FROM ai_usage_log WHERE created_at >= ?').get(this.getStartOfTodayIso()) as any;
+    const active = this.db.prepare("SELECT COUNT(*) AS n FROM ai_jobs WHERE status IN ('queued','processing')").get() as any;
+    return {dailyUsage:usage.n, dailyLimit:positiveLimit('AI_GLOBAL_DAILY_LIMIT',100), active:active.n, enabled:process.env.AI_ENABLED!=='false'};
+  }
+
   public close(): void { this.db.close(); }
   public recoverInterruptedJobs(): void {
-    this.db.prepare("UPDATE ai_jobs SET status = 'failed', progress = 100, error_message = 'Máy chủ đã khởi động lại. Hãy kiểm tra và thử lại nếu cần.' WHERE status IN ('queued', 'processing')").run();
+    const recovered = this.db.prepare("UPDATE ai_jobs SET status = 'failed', progress = 100, error_message = 'Máy chủ đã khởi động lại. Hãy kiểm tra và thử lại nếu cần.' WHERE status IN ('queued', 'processing')").run();
+    if (recovered.changes) { monitor.count('interrupted', Number(recovered.changes)); monitor.event('ai_interrupted', 'warn', Number(recovered.changes)); }
   }
 
   private initSchema() {
@@ -362,7 +370,7 @@ class SQLiteDatabase {
       }
       return backupPath;
     } catch (err) {
-      console.error('Failed to perform SQLite backup:', err);
+      monitor.event('backup_failed', 'error');
       throw err;
     }
   }

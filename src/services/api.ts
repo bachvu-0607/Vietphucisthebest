@@ -30,6 +30,11 @@ function getAuthHeaders(includeContentType = true): HeadersInit {
 }
 
 export const api = {
+  async getSystemMonitor() {
+    const res = await fetch(`${API_BASE}/system/monitor`, {headers:getAuthHeaders(false)});
+    if (!res.ok) throw new Error('Không đọc được thống kê hệ thống.');
+    return (await res.json()).data;
+  },
   // Auth Token helpers
   getToken(): string | null {
     return getStoredToken();

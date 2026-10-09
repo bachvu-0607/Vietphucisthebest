@@ -1,3 +1,5 @@
+import { monitor, recordFailure } from './monitor.ts';
+import { systemStatus } from './status.ts';
 import express from 'express';
 import type { Request, Response } from 'express';
 import { sqliteDb } from './sqlite.ts';
@@ -100,7 +102,7 @@ apiRouter.post('/auth/register', async (req: Request, res: Response) => {
       }
     });
   } catch (err: any) {
-    console.error('Register error:', err);
+    recordFailure('api', err);
     res.status(500).json({ success: false, error: 'Lỗi máy chủ khi đăng ký tài khoản.' });
   }
 });
@@ -151,7 +153,7 @@ apiRouter.post('/auth/login', async (req: Request, res: Response) => {
       }
     });
   } catch (err: any) {
-    console.error('Login error:', err);
+    recordFailure('api', err);
     res.status(500).json({ success: false, error: 'Lỗi máy chủ khi đăng nhập.' });
   }
 });
@@ -189,7 +191,7 @@ apiRouter.post('/auth/change-password', requireAuth, async (req: AuthenticatedRe
   sqliteDb.updateUserPassword(user.id, await hashPassword(newPassword));
   clearSessionCookie(res);
   res.json({ success: true, message: 'Đã đổi mật khẩu. Vui lòng đăng nhập lại.' });
-  } catch (err) { console.error('Account update failed:', err); res.status(500).json({ success: false, error: 'Không thể cập nhật tài khoản. Vui lòng thử lại.' }); }
+  } catch (err) { recordFailure('api', err); res.status(500).json({ success: false, error: 'Không thể cập nhật tài khoản. Vui lòng thử lại.' }); }
 });
 apiRouter.post('/auth/recovery-code', requireAuth, async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -198,7 +200,7 @@ apiRouter.post('/auth/recovery-code', requireAuth, async (req: AuthenticatedRequ
     return res.status(401).json({ success: false, error: 'Mật khẩu hiện tại không đúng.' });
   }
   res.json({ success: true, data: { recoveryCode: sqliteDb.rotateRecoveryCode(user.id) } });
-  } catch (err) { console.error('Account update failed:', err); res.status(500).json({ success: false, error: 'Không thể cập nhật tài khoản. Vui lòng thử lại.' }); }
+  } catch (err) { recordFailure('api', err); res.status(500).json({ success: false, error: 'Không thể cập nhật tài khoản. Vui lòng thử lại.' }); }
 });
 
 // POST /api/auth/forgot-password (Strictly requires recovery code; NO reset allowed by email alone)
@@ -493,6 +495,7 @@ apiRouter.post('/ai/jobs', requireAuth, (req: AuthenticatedRequest, res: Respons
     });
 
     if (!result.success) {
+      res.locals.expectedLimit = result.statusCode === 503 || result.statusCode === 429;
       return res.status(result.statusCode).json({
         success: false,
         error: result.reason
@@ -533,6 +536,7 @@ apiRouter.post('/ai/jobs/:id/retry', requireAuth, (req: AuthenticatedRequest, re
     const result = sqliteDb.atomicRetryAIJob(req.params.id, userId);
 
     if (!result.success) {
+      res.locals.expectedLimit = result.statusCode === 503 || result.statusCode === 429;
       return res.status(result.statusCode).json({
         success: false,
         error: result.reason
@@ -576,4 +580,9 @@ apiRouter.get('/system/backups', requireAuth, (req: AuthenticatedRequest, res: R
 });
 apiRouter.post('/system/restore', requireAuth, (_req: Request, res: Response) => {
   res.status(403).json({ success: false, error: 'Khôi phục phải thực hiện ngoại tuyến khi máy chủ đã dừng. Xem DEPLOYMENT.md.' });
+});
+
+apiRouter.get('/system/monitor', requireAuth, (req: AuthenticatedRequest, res: Response) => {
+  if (req.user?.role !== 'admin') return res.status(403).json({ success: false, error: 'Chỉ quản trị viên được truy cập.' });
+  try {res.json({success:true,data:systemStatus()});} catch {res.status(503).json({success:false,error:'Chưa đọc được thống kê hệ thống.'});}
 });

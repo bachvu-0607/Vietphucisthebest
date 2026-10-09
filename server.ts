@@ -1,3 +1,5 @@
+import { monitor, recordFailure } from './server/monitor.ts';
+import { systemStatus } from './server/status.ts';
 import 'dotenv/config';
 import { sendPreview } from './server/images.ts';
 import express from 'express';
@@ -17,6 +19,13 @@ export async function createApp() {
   app.use((_req, res, next) => { res.setHeader('Referrer-Policy', 'no-referrer'); next(); });
   app.use(express.json({ limit: '12mb' }));
   app.use('/api', (_req, res, next) => { res.setHeader('Cache-Control', 'private, no-store'); next(); });
+  app.use('/api', (_req, res, next) => {
+    res.once('finish', () => {
+      monitor.count('requests');
+      if (res.statusCode === 429 || res.locals.expectedLimit) monitor.count('limited');
+      else if (res.statusCode >= 500) { monitor.count('errors'); monitor.event('http_server_error','error'); }
+    }); next();
+  });
   app.use('/api', apiRouter);
   app.use('/api', (_req, res) => { res.status(404).json({ success: false, error: 'Không tìm thấy API.' }); });
   app.get('/healthz', (_req, res) => { res.json({ ok: true }); });
@@ -60,7 +69,7 @@ export async function createApp() {
     app.use(vite.middlewares);
   }
   app.use((err: any, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-    console.error('Request failed:', err.message);
+    if (!err.status || err.status >= 500) recordFailure('http', err);
     res.status(err.status || 500).json({ success: false, error: 'Yêu cầu không hợp lệ hoặc máy chủ không xử lý được.' });
   });
   return app;
@@ -68,13 +77,16 @@ export async function createApp() {
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   createApp().then(app => {
     const server = app.listen(Number(process.env.PORT || 3000), process.env.HOST || '0.0.0.0', () => console.log('Việt Phục Remix server started.'));
+    monitor.event('server_started');
+    const monitorTimer=setInterval(()=>{try{systemStatus();}catch{monitor.event('monitor_sample_failed','error');}},60000);
+    monitorTimer.unref();
     const backupTimer = setInterval(() => {
-      try { sqliteDb.performBackup(); } catch (err) { console.error('Periodic backup failed:', err); }
+      try { sqliteDb.performBackup(); } catch (err) { monitor.event('backup_failed','error'); }
     }, 60 * 60 * 1000);
     backupTimer.unref();
 
     for (const signal of ['SIGINT', 'SIGTERM'] as const) process.once(signal, () => {
-      clearInterval(backupTimer); server.close(() => { sqliteDb.close(); process.exit(0); });
+      clearInterval(backupTimer); clearInterval(monitorTimer); monitor.flush(); server.close(() => { sqliteDb.close(); process.exit(0); });
     });
   }).catch(err => { console.error(err); process.exit(1); });
 }

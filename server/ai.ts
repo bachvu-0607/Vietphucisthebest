@@ -1,3 +1,4 @@
+import { monitor, recordFailure } from './monitor.ts';
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
@@ -38,7 +39,7 @@ function getOpenAIClient(): { client: OpenAI | null; key: string } {
     });
     return { client, key: key.trim() };
   } catch (err) {
-    console.error('Failed to initialize OpenAI client:', err);
+    monitor.event('ai_client_init_failed','error');
     return { client: null, key };
   }
 }
@@ -410,6 +411,7 @@ export function processJobInBackground(jobId: string, options: {
   referenceImageUrl?: string;
   sketchDataUrl?: string;
 }): void {
+  const startedAt = Date.now();
   // Update to queued immediately
   sqliteDb.updateDetailedAIJob(jobId, { status: 'queued', progress: 10 });
 
@@ -435,12 +437,13 @@ export function processJobInBackground(jobId: string, options: {
         
         for (const modelName of candidateModels) {
           try {
-            console.log(`[AI Job ${jobId}] Generating via OpenAI model: ${modelName} (1024x1536)...`);
+            monitor.event('ai_provider_attempt');
             sqliteDb.updateDetailedAIJob(jobId, { status: 'processing', progress: 55 });
             
             // Truncate prompt safely if too long for OpenAI image API
             const trimmedPrompt = prompt.length > 3500 ? prompt.substring(0, 3500) : prompt;
 
+            monitor.count('openaiCalls');
             const dalleResponse = await dynamicOpenAI.images.generate({
               model: modelName,
               prompt: trimmedPrompt,
@@ -458,18 +461,18 @@ export function processJobInBackground(jobId: string, options: {
               const outPath = path.resolve(outDir, outFileName);
               fs.writeFileSync(outPath, Buffer.from(b64, 'base64'));
               finalImageUrl = `/assets/results/${outFileName}`;
-              console.log(`[AI Job ${jobId}] OpenAI model ${modelName} image saved to ${finalImageUrl}`);
+
               break;
             } else if (dalleResponse.data?.[0]?.url) {
               finalImageUrl = dalleResponse.data[0].url;
-              console.log(`[AI Job ${jobId}] OpenAI model ${modelName} successfully returned image URL!`);
+
               break;
             }
           } catch (err: any) {
-            console.warn(`[AI Job ${jobId}] Model ${modelName} encountered (${err?.status} ${err?.message}), trying next model...`);
+            recordFailure('ai_provider', err);
             // If OpenAI quota/credits are exhausted or invalid auth, exit OpenAI immediately
             if (err?.status === 429 || err?.status === 401 || (err?.message && err.message.toLowerCase().includes('credit'))) {
-              console.warn(`[AI Job ${jobId}] OpenAI API quota/credit limit reached, switching to fallback compositor.`);
+
               break;
             }
           }
@@ -479,7 +482,7 @@ export function processJobInBackground(jobId: string, options: {
       // 2. Check if Google Gemini / Imagen 3 image generation is possible
       if (!finalImageUrl && dynamicGemini && activeGeminiKey) {
         try {
-          console.log(`[AI Job ${jobId}] Attempting generation via Google Imagen 3 / Gemini...`);
+          monitor.event('ai_provider_attempt');
           // Format image input if sketchDataUrl is provided as base64
           let contentsPart: any;
           if (options.sketchDataUrl && options.sketchDataUrl.includes('base64,')) {
@@ -503,6 +506,7 @@ export function processJobInBackground(jobId: string, options: {
 
           // Try Imagen 3 image generation
           try {
+            monitor.count('googleCalls');
             const imgResponse = await (dynamicGemini.models as any).generateImages({
               model: 'imagen-3.0-generate-002',
               prompt: prompt,
@@ -519,6 +523,7 @@ export function processJobInBackground(jobId: string, options: {
             }
           } catch {
             // If Imagen is unavailable or quota limited, try generateContent
+            monitor.count('googleCalls');
             const response = await dynamicGemini.models.generateContent({
               model: 'gemini-2.5-flash',
               contents: contentsPart
@@ -535,7 +540,7 @@ export function processJobInBackground(jobId: string, options: {
             }
           }
         } catch (err: any) {
-          console.error(`[AI Job ${jobId}] Gemini/Imagen generation error:`, err?.message || err);
+          recordFailure('ai_provider', err);
           finalImageUrl = '';
         }
       }
@@ -557,12 +562,14 @@ export function processJobInBackground(jobId: string, options: {
         resultImageUrl: finalImageUrl,
         completedAt: new Date().toISOString()
       });
+      monitor.count('completed'); monitor.count('durationMs', Date.now()-startedAt); monitor.event('ai_completed');
     } catch (err: any) {
+      monitor.count('failed'); monitor.event('ai_failed', 'error');
       try { sqliteDb.updateDetailedAIJob(jobId, {
         status: 'failed',
         progress: 100,
         errorMessage: err?.message || 'Quá trình hoàn thiện trang phục gặp sự cố. Vui lòng thử lại.'
-      }); } catch (storageError) { console.error('Cannot persist AI failure; restart recovery required:', storageError); }
+      }); } catch (storageError) { monitor.event('ai_result_save_failed','error'); }
     }
   }, 800);
 }
