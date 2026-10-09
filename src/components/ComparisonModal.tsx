@@ -104,7 +104,7 @@ export const ComparisonModal: React.FC<ComparisonModalProps> = ({
                 <button
                   onClick={() =>
                     handleDownload(
-                      protectedResultUrl,
+                      api.getProtectedImageUrl(job.resultImageUrl, 'original'),
                       `vietphuc-remix-${job.costumeName.toLowerCase().replace(/\s+/g, '-')}.jpg`
                     )
                   }

@@ -342,7 +342,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                 >
                   <div className="relative h-64 bg-gradient-to-b from-[#FAF7F2] to-[#FFF5F7] overflow-hidden">
                     <img
-                      src={api.getProtectedImageUrl(job.resultImageUrl) || job.sketchDataUrl}
+                      src={api.getProtectedImageUrl(job.resultImageUrl, 'thumb') || job.sketchDataUrl}
                       alt={job.costumeName}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />

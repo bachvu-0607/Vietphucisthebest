@@ -40,10 +40,10 @@ export const api = {
   },
 
   // Generates authorized image URL for private result pictures
-  getProtectedImageUrl(url?: string): string {
+  getProtectedImageUrl(url?: string, size: 'thumb' | 'detail' | 'original' = 'detail'): string {
     if (!url) return '';
-    if (!url.startsWith('/assets/results/')) return url;
-    return url;
+    if (!url.startsWith('/assets/results/') || size === 'original') return url;
+    return `${url}?preview=1&size=${size}`;
   },
 
   // Auth Endpoints

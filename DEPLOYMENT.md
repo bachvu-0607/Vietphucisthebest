@@ -65,3 +65,7 @@ Lệnh kiểm tra file trước khi thay database, tạo snapshot trước resto
 - Backend mặc định cho phép cookie request từ đúng `https://vietphucisthebest.vercel.app`. Khi đổi domain frontend, đặt `FRONTEND_ORIGIN` trên Railway thành origin HTTPS mới (không có đường dẫn). `APP_URL` vẫn là origin khi mở ứng dụng trực tiếp. Không tự cho phép mọi domain preview.
 - Khi đổi domain Railway, sửa các destination trong `vercel.json` và deploy lại Vercel.
 - Sau khi cả hai deploy xong, kiểm tra `/healthz`, `/api/events` trên domain Vercel; đăng nhập, tải lại trang, lưu/xóa bản phối và xem ảnh đã có. Không cần tạo ảnh AI có phí để kiểm tra kết nối.
+
+## Ảnh hiển thị
+
+Ảnh công khai trong costumes/events được phục vụ bằng WebP chất lượng 85, cạnh dài tối đa 1600px; `?size=thumb` dùng 640px. `?original=1` lấy nguyên bản. Ảnh AI chỉ nén khi gọi `?preview=1` (640px cho tủ đồ, 1600px cho xem chi tiết); tải về vẫn lấy file gốc. Ảnh nhỏ không được phóng lớn và chỉ dùng bản nén khi nhẹ hơn. Không sửa file gốc, kể cả ảnh đầu vào AI. Cache nén nằm trong RAM tối đa 32MB; tối đa 2 tác vụ nén đồng thời, còn lại trả bản gốc. Quyền sở hữu ảnh được kiểm tra trước khi truy cập cache, ảnh riêng tư vẫn có Cache-Control private, no-store.

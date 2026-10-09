@@ -1,4 +1,5 @@
 import test from 'node:test';
+import sharp from 'sharp';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
@@ -32,6 +33,17 @@ const input={costumeId:'cos-nhat-binh',costumeName:'Áo Nhật Bình',eventName:
 test('security, ownership, quota and recoverability',async t=>{
  try {
  const a=await reg('a'),b=await reg('b');
+ await t.test('public image preview is smaller while original stays intact',async()=>{
+  const image='/assets/costumes/ao-nhat-binh-nam-phuong.jpg';
+  const result=await fetch(base+image+'?size=thumb');
+  assert.equal(result.status,200);
+  const bytes=Buffer.from(await result.arrayBuffer());
+  const meta=await sharp(bytes).metadata();assert.equal(meta.format,'webp');assert.ok(meta.height<=640);
+  const source=fs.readFileSync(new URL('../public'+image,import.meta.url));
+  assert.ok(bytes.length<source.length);
+  const original=Buffer.from(await (await fetch(base+image+'?original=1')).arrayBuffer());
+  assert.deepEqual(original,source);
+ });
  await t.test('legacy data preserved in locked archive, never assigned to first account',()=>{
   assert.equal(fs.readFileSync(path.join(dir,'vietphucremix.json'),'utf8'),legacy);
   const old=sqliteDb.getDraftById('legacy-test','usr-legacy-archive');assert.equal(old.selectedHairstyle,'legacy hair');assert.deepEqual(old.selectedDetails,{old:'kept'});
@@ -80,7 +92,7 @@ test('security, ownership, quota and recoverability',async t=>{
   assert.notEqual(one.token,two.token);assert.equal(sqliteDb.isSessionActive(hashToken(one.token)),false);
  });
  await t.test('images require exact ownership; orphan files and encoded paths denied',async()=>{
-  fs.mkdirSync(path.join(dir,'results'),{recursive:true});fs.writeFileSync(path.join(dir,'results','ai-test.png'),'fake');
+  fs.mkdirSync(path.join(dir,'results'),{recursive:true});fs.writeFileSync(path.join(dir,'results','ai-test.png'), await sharp({create:{width:1800,height:2400,channels:3,background:'#cc8899'}}).png().toBuffer());
   const created=sqliteDb.atomicCreateAIJob(b.user.id,input);assert.ok(created.success);
   sqliteDb.updateDetailedAIJob(created.job.id,{status:'completed',resultImageUrl:'/assets/results/ai-test.png'});
   assert.equal((await req('/assets/results/ai-test.png')).status,401);
@@ -90,6 +102,16 @@ test('security, ownership, quota and recoverability',async t=>{
   assert.equal((await req('/assets/%72esults/remix-job-08751cc3.jpg')).status,404);
   assert.equal((await req('/assets/results/ai-test.png','GET',undefined,undefined,{Cookie:b.cookie})).status,200);
   assert.equal((await req('/assets/results/ai-test.png?token='+b.token)).status,401);
+  const imageUrl=base+'/assets/results/ai-test.png?preview=1&size=thumb';
+  const preview=await fetch(imageUrl,{headers:{Cookie:b.cookie}});
+  assert.equal(preview.status,200);assert.equal(preview.headers.get('cache-control'),'private, no-store');
+  const data=Buffer.from(await preview.arrayBuffer());
+  const meta=await sharp(data).metadata();assert.equal(meta.format,'webp');assert.ok(meta.height<=640);
+  assert.equal((await fetch(imageUrl)).status,401);
+  assert.equal((await fetch(imageUrl,{headers:{Cookie:c.cookie}})).status,404);
+  const original=Buffer.from(await (await fetch(base+'/assets/results/ai-test.png',{headers:{Cookie:b.cookie}})).arrayBuffer());
+  assert.deepEqual(original,fs.readFileSync(path.join(dir,'results','ai-test.png')));
+
  });
  await t.test('maintenance cannot be invoked by guests or ordinary users',async()=>{
   assert.equal((await req('/api/system/restore','POST',{})).status,401);

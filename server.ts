@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import { sendPreview } from './server/images.ts';
 import express from 'express';
 import path from 'node:path';
 import fs from 'node:fs';
@@ -30,7 +31,8 @@ export async function createApp() {
     const file = candidates.find(f => fs.existsSync(f));
     if (!file) return res.sendStatus(404);
     res.setHeader('Cache-Control', 'private, no-store');
-    res.sendFile(file);
+    if (req.query.preview === '1') { void sendPreview(file, res, req.query.size === 'thumb' ? 640 : 1600); }
+    else res.sendFile(file);
   });
   // Never allow fallback static handlers (including Vite) to expose private files.
   app.use((req, res, next) => {
@@ -38,6 +40,14 @@ export async function createApp() {
     try { decoded = decodeURIComponent(req.path); } catch { return res.sendStatus(400); }
     if (/(?:^|\/)results(?:\/|$)/i.test(decoded) || decoded.startsWith('/@fs/')) return res.sendStatus(404);
     next();
+  });
+  app.get('/assets/:category/:filename', (req, res, next) => {
+    if (!['costumes', 'events'].includes(req.params.category) || !/^[a-zA-Z0-9_-]+\.(png|jpe?g|webp)$/i.test(req.params.filename)) return next();
+    const file = path.join(root, 'public/assets', req.params.category, req.params.filename);
+    if (!fs.existsSync(file)) return next();
+    if (req.query.original === '1') return res.sendFile(file);
+    res.setHeader('Cache-Control', 'public, max-age=3600');
+    void sendPreview(file, res, req.query.size === 'thumb' ? 640 : 1600);
   });
   app.use('/assets', express.static(path.join(root, 'public/assets')));
   if (process.env.NODE_ENV === 'production') {
