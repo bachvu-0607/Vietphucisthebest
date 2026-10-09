@@ -341,13 +341,13 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
   return (
     <div className="space-y-8 animate-fade-in pb-12">
       {/* Hero Header: Tinh thần Tảng Băng Chìm */}
-      <div className="bg-gradient-to-r from-[#FAF7F2] via-[#F4EFEA] to-[#FAF7F2] border border-[#E8E2D8] rounded-2xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
+      <div className="bg-gradient-to-r from-[#FFF5F7] via-[#F4EFEA] to-[#FFF5F7] border border-[#F4C2CE] rounded-2xl p-6 sm:p-8 shadow-xs relative overflow-hidden">
         <div className="absolute right-0 top-0 translate-x-12 -translate-y-8 opacity-10 pointer-events-none">
           <TrienSonSeal text="Áo Dài" size="lg" />
         </div>
 
         <div className="max-w-3xl space-y-3 relative z-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#9B2C2C]/10 border border-[#9B2C2C]/20 text-[#9B2C2C] text-xs font-serif font-bold">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C84B69]/10 border border-[#C84B69]/20 text-[#C84B69] text-xs font-serif font-bold">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Việt Phục Remix Engine • Cỗ Máy Gợi Ý Áo Dài</span>
           </div>
@@ -363,13 +363,13 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
       {/* 3-Step Filter Panel: Tinh gọn, trực quan, không chữ thừa */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Step 1: Dịp đi đâu? */}
-        <div className="bg-[#FFFFFF] border border-[#E8E2D8] rounded-xl p-4.5 space-y-3 shadow-xs">
+        <div className="bg-[#FFFFFF] border border-[#F4C2CE] rounded-xl p-4.5 space-y-3 shadow-xs">
           <div className="flex items-center justify-between pb-2 border-b border-[#F0EBE3]">
             <span className="text-xs font-serif font-bold text-[#1C1917] uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-full bg-[#9B2C2C] text-white flex items-center justify-center text-[10px]">1</span>
+              <span className="w-5 h-5 rounded-full bg-[#C84B69] text-white flex items-center justify-center text-[10px]">1</span>
               Dịp Bạn Tham Gia?
             </span>
-            <span className="text-[10px] text-[#9B2C2C] font-semibold">{occasionGuidance.badge}</span>
+            <span className="text-[10px] text-[#C84B69] font-semibold">{occasionGuidance.badge}</span>
           </div>
 
           <div className="grid grid-cols-1 gap-1.5">
@@ -385,8 +385,8 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
                 onClick={() => setSelectedOccasion(occ.id as OccasionKey)}
                 className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all flex items-center justify-between ${
                   selectedOccasion === occ.id
-                    ? 'bg-[#9B2C2C] text-white font-medium shadow-xs'
-                    : 'bg-[#FAF7F2] hover:bg-[#F0EBE3] text-[#44403C]'
+                    ? 'bg-[#C84B69] text-white font-medium shadow-xs'
+                    : 'bg-[#FFF5F7] hover:bg-[#F0EBE3] text-[#44403C]'
                 }`}
               >
                 <span>{occ.label}</span>
@@ -397,10 +397,10 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
         </div>
 
         {/* Step 2: Thời tiết thế nào? */}
-        <div className="bg-[#FFFFFF] border border-[#E8E2D8] rounded-xl p-4.5 space-y-3 shadow-xs">
+        <div className="bg-[#FFFFFF] border border-[#F4C2CE] rounded-xl p-4.5 space-y-3 shadow-xs">
           <div className="flex items-center justify-between pb-2 border-b border-[#F0EBE3]">
             <span className="text-xs font-serif font-bold text-[#1C1917] uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-full bg-[#9B2C2C] text-white flex items-center justify-center text-[10px]">2</span>
+              <span className="w-5 h-5 rounded-full bg-[#C84B69] text-white flex items-center justify-center text-[10px]">2</span>
               Thời Tiết Hôm Nay?
             </span>
             <span className="text-[10px] text-[#0F766E] font-semibold">{weatherRecommendation.tag}</span>
@@ -421,13 +421,13 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
                   onClick={() => setSelectedWeather(w.id as WeatherKey)}
                   className={`p-2.5 rounded-lg border text-left transition-all flex flex-col gap-1 ${
                     isSelected
-                      ? 'bg-[#9B2C2C]/10 border-[#9B2C2C] text-[#9B2C2C] font-semibold'
-                      : 'bg-[#FAF7F2] border-[#E8E2D8] hover:bg-[#F5EFEA] text-[#57534E]'
+                      ? 'bg-[#C84B69]/10 border-[#C84B69] text-[#C84B69] font-semibold'
+                      : 'bg-[#FFF5F7] border-[#F4C2CE] hover:bg-[#F5EFEA] text-[#57534E]'
                   }`}
                 >
                   <div className="flex items-center justify-between">
-                    <IconComp className={`w-4 h-4 ${isSelected ? 'text-[#9B2C2C]' : w.color}`} />
-                    {isSelected && <Check className="w-3.5 h-3.5 text-[#9B2C2C]" />}
+                    <IconComp className={`w-4 h-4 ${isSelected ? 'text-[#C84B69]' : w.color}`} />
+                    {isSelected && <Check className="w-3.5 h-3.5 text-[#C84B69]" />}
                   </div>
                   <span className="text-xs font-medium">{w.label}</span>
                   <span className="text-[10px] text-[#A8A29E] font-light">{w.sub}</span>
@@ -436,17 +436,17 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
             })}
           </div>
 
-          <div className="p-2.5 rounded-lg bg-[#FAF7F2] border border-[#E8E2D8] text-[11px] text-[#78716C] leading-relaxed">
+          <div className="p-2.5 rounded-lg bg-[#FFF5F7] border border-[#F4C2CE] text-[11px] text-[#78716C] leading-relaxed">
             <span className="font-semibold text-[#1C1917]">Khuyên dùng: </span>
             {weatherRecommendation.fabricTip}
           </div>
         </div>
 
         {/* Step 3: Gu của bạn là gì? */}
-        <div className="bg-[#FFFFFF] border border-[#E8E2D8] rounded-xl p-4.5 space-y-3 shadow-xs">
+        <div className="bg-[#FFFFFF] border border-[#F4C2CE] rounded-xl p-4.5 space-y-3 shadow-xs">
           <div className="flex items-center justify-between pb-2 border-b border-[#F0EBE3]">
             <span className="text-xs font-serif font-bold text-[#1C1917] uppercase tracking-wider flex items-center gap-1.5">
-              <span className="w-5 h-5 rounded-full bg-[#9B2C2C] text-white flex items-center justify-center text-[10px]">3</span>
+              <span className="w-5 h-5 rounded-full bg-[#C84B69] text-white flex items-center justify-center text-[10px]">3</span>
               Gu / Phong Cách?
             </span>
             <span className="text-[10px] text-[#C29B38] font-semibold">{activeVibe.name}</span>
@@ -472,7 +472,7 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
                 className={`w-full text-left px-3 py-2 rounded-lg text-xs transition-all flex items-center justify-between ${
                   selectedVibe === v.id
                     ? 'bg-[#1C1917] text-white font-medium shadow-xs'
-                    : 'bg-[#FAF7F2] hover:bg-[#F0EBE3] text-[#44403C]'
+                    : 'bg-[#FFF5F7] hover:bg-[#F0EBE3] text-[#44403C]'
                 }`}
               >
                 <span>{v.label}</span>
@@ -484,10 +484,10 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
       </div>
 
       {/* Main Result: The Outfit Recommendation Card */}
-      <div className="bg-[#FFFFFF] border-2 border-[#E8E2D8] rounded-2xl p-6 sm:p-8 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+      <div className="bg-[#FFFFFF] border-2 border-[#F4C2CE] rounded-2xl p-6 sm:p-8 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* Left: Visual Verified Lookbook Photo */}
         <div className="lg:col-span-5 relative group">
-          <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FAF7F2] border border-[#E8E2D8] shadow-md">
+          <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FFF5F7] border border-[#F4C2CE] shadow-md">
             <img
               src={activeVibe.imageUrl}
               alt={activeVibe.imageAlt}
@@ -538,14 +538,14 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
           </div>
 
           {/* Công Thức Phối 3 Món Chuẩn */}
-          <div className="space-y-3 bg-[#FAF7F2] p-4.5 rounded-xl border border-[#E8E2D8]">
-            <span className="text-xs font-serif font-bold text-[#9B2C2C] uppercase tracking-wider block">
+          <div className="space-y-3 bg-[#FFF5F7] p-4.5 rounded-xl border border-[#F4C2CE]">
+            <span className="text-xs font-serif font-bold text-[#C84B69] uppercase tracking-wider block">
               ✦ Công thức phối đồ đề xuất:
             </span>
 
             <div className="space-y-2 text-xs">
               <div className="flex items-start gap-2.5">
-                <span className="w-5 h-5 rounded-md bg-[#9B2C2C]/10 text-[#9B2C2C] font-bold flex items-center justify-center shrink-0 mt-0.5 text-[11px]">
+                <span className="w-5 h-5 rounded-md bg-[#C84B69]/10 text-[#C84B69] font-bold flex items-center justify-center shrink-0 mt-0.5 text-[11px]">
                   Áo
                 </span>
                 <span className="text-[#1C1917] leading-relaxed">
@@ -586,7 +586,7 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
           <div className="flex items-center justify-between pt-1">
             <button
               onClick={() => setShowFactModal(!showFactModal)}
-              className="inline-flex items-center gap-1.5 text-xs text-[#9B2C2C] hover:text-[#782020] font-medium transition-colors"
+              className="inline-flex items-center gap-1.5 text-xs text-[#C84B69] hover:text-[#B33B58] font-medium transition-colors"
             >
               <Info className="w-3.5 h-3.5" />
               <span>{showFactModal ? 'Thu gọn chuyện của áo' : '💡 Đọc chuyện của chiếc áo này'}</span>
@@ -604,7 +604,7 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
           <div className="pt-2">
             <button
               onClick={handleLaunchStudio}
-              className="w-full sm:w-auto px-6 py-3 rounded-md bg-[#9B2C2C] hover:bg-[#832424] text-[#FAF7F2] font-medium text-sm tracking-wide shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 active:scale-[0.99]"
+              className="w-full sm:w-auto px-6 py-3 rounded-md bg-[#C84B69] hover:bg-[#B33B58] text-[#FFF5F7] font-medium text-sm tracking-wide shadow-sm hover:shadow-md transition-all flex items-center justify-center gap-2 active:scale-[0.99]"
             >
               <Layers className="w-4 h-4" />
               <span>Mở Trong Phối Thử Studio 2D</span>
@@ -615,11 +615,11 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
       </div>
 
       {/* 5 Heritage Color Presets: 1-Chạm Đổi Phong Cách */}
-      <div className="bg-[#FFFFFF] border border-[#E8E2D8] rounded-xl p-6 space-y-4 shadow-xs">
+      <div className="bg-[#FFFFFF] border border-[#F4C2CE] rounded-xl p-6 space-y-4 shadow-xs">
         <div className="flex items-center justify-between pb-2 border-b border-[#F0EBE3]">
           <div>
             <h3 className="text-sm sm:text-base font-serif font-bold text-[#1C1917] flex items-center gap-2">
-              <Palette className="w-4 h-4 text-[#9B2C2C]" />
+              <Palette className="w-4 h-4 text-[#C84B69]" />
               <span>Cỗ Máy Phối Màu 1-Chạm (5 Heritage Presets)</span>
             </h3>
             <p className="text-xs text-[#78716C] font-light">
@@ -637,8 +637,8 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
                 onClick={() => handleApplyPreset(preset)}
                 className={`p-3 rounded-xl border text-left transition-all space-y-2 flex flex-col justify-between ${
                   isApplied
-                    ? 'bg-[#9B2C2C]/5 border-[#9B2C2C] shadow-xs'
-                    : 'bg-[#FAF7F2] border-[#E8E2D8] hover:bg-[#F5EFEA]'
+                    ? 'bg-[#C84B69]/5 border-[#C84B69] shadow-xs'
+                    : 'bg-[#FFF5F7] border-[#F4C2CE] hover:bg-[#F5EFEA]'
                 }`}
               >
                 <div className="flex items-center justify-between">

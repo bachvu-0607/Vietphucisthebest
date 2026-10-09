@@ -278,6 +278,8 @@ export const INITIAL_COSTUMES: Costume[] = [
     ],
     colorVariants: [
       { id: 'col-nb-red', name: 'Đỏ son cung đình', hex: '#a61c1c', meaning: 'Tượng trưng cho hỷ sự, tôn nghiêm và phẩm giá Công chúa', popularity: 'Rất chuộng lễ cưới' },
+      { id: 'col-nb-ivory', name: 'Trắng ngà lụa bạch', hex: '#FAF7F0', meaning: 'Sắc trắng ngà thuần khiết, thanh thoát, phong cách cách tân cưới hoàng gia hiện đại', popularity: 'Hot cách tân cưới' },
+      { id: 'col-nb-pink', name: 'Hồng phấn pastel', hex: '#FBCFE8', meaning: 'Ngọt ngào, tươi trẻ của thiếu nữ đương đại nhưng vẫn giữ trọn nét đài các', popularity: 'Hot chụp ảnh xuân' },
       { id: 'col-nb-yellow', name: 'Hoàng yến quý phái', hex: '#d4af37', meaning: 'Sắc vàng quyền quý, ấm áp và vinh quang', popularity: 'Rất trang trọng' },
       { id: 'col-nb-teal', name: 'Xanh ngọc bích', hex: '#1b6b68', meaning: 'Thanh lịch, điềm tĩnh của bậc cung tần hiền thục', popularity: 'Chụp ảnh xuân' },
       { id: 'col-nb-purple', name: 'Tím hoa cà xứ Huế', hex: '#63326e', meaning: 'Nét trầm mặc, thủy chung của văn hóa sông Hương', popularity: 'Cổ điển đặc sắc' }
@@ -289,7 +291,7 @@ export const INITIAL_COSTUMES: Costume[] = [
     ],
     accessories: [
       { id: 'acc-nb-khanvanh', name: 'Khăn vành dây xanh lam thẫm', category: 'headwear', layerOrder: 5, description: 'Quấn tỉ mỉ theo kỹ thuật cung đình Huế', traditionalMeaning: 'Giữ nếp tóc gọn gàng tôn gương mặt đoan trang', isRecommended: true },
-      { id: 'acc-nb-tram', name: 'Trâm bạc cài hoa sen cẩn ngọc', category: 'headwear', layerOrder: 5, description: 'Cài sau búi tóc hoặc đính cạnh vành khăn', traditionalMeaning: 'Bình an và tiết hạnh', isRecommended: true },
+      { id: 'acc-nb-tram', name: 'Trâm bạc cài hoa sen cẩn ngọc', category: 'headwear', layerOrder: 5, description: 'Cài ngang giấu thân trâm sau búi tóc, chỉ để lộ đầu trâm hoa sen cẩn ngọc và chuỗi tua rua buông rủ thanh nhã', traditionalMeaning: 'Bình an, đoan trang và tiết hạnh', isRecommended: true },
       { id: 'acc-nb-kimboi', name: 'Kim bội hoàng gia rủ tua rua đỏ', category: 'jewelry', layerOrder: 6, description: 'Khóa ngọc bội vàng buông dải tua rua đỏ rủ qua vạt áo', traditionalMeaning: 'Phước lộc, quyền quý và thanh khiết', isRecommended: true },
       { id: 'acc-nb-quat-doan-phien', name: 'Quạt đoàn phiến lụa tơ thêu mẫu đơn đính ngọc', category: 'handheld', layerOrder: 6, description: 'Quạt tròn lụa tơ tằm thêu hoa mẫu đơn, chuôi gỗ quý đính hạt ngọc và dải tua rua tơ tằm rủ mềm', traditionalMeaning: 'Đoan trang, viên mãn và phú quý', isRecommended: true },
       { id: 'acc-nb-quat-nan-nga', name: 'Quạt xếp nan ngà chạm lộng thếp vàng', category: 'handheld', layerOrder: 6, description: 'Quạt nan xếp gấp ngà voi chạm khắc hoa văn thủng lộng lẫy, nan quạt dát vàng lá cung đình', traditionalMeaning: 'Đài các, uy quyền chốn hoàng cung', isRecommended: true },
@@ -926,20 +928,13 @@ function ensureDb(): DatabaseSchema {
   try {
     const content = fs.readFileSync(DB_FILE, 'utf-8');
     const dbData = JSON.parse(content) as DatabaseSchema;
-    let updated = false;
-    for (const initCostume of INITIAL_COSTUMES) {
-      if (!dbData.costumes.some((c) => c.id === initCostume.id)) {
-        dbData.costumes.push(initCostume);
-        updated = true;
-      }
-    }
-    // Update events with enriched metadata & imagery
+    
+    // Always sync canonical costumes, events, backgrounds with latest definitions in codebase while preserving user drafts and aiJobs
+    dbData.costumes = INITIAL_COSTUMES;
     dbData.events = INITIAL_EVENTS;
-    updated = true;
+    dbData.backgrounds = INITIAL_BACKGROUNDS;
 
-    if (updated) {
-      fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2), 'utf-8');
-    }
+    fs.writeFileSync(DB_FILE, JSON.stringify(dbData, null, 2), 'utf-8');
     return dbData;
   } catch (err) {
     console.error('Error reading database file, recreating initial state:', err);

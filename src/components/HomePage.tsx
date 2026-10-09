@@ -19,7 +19,8 @@ import {
   Star,
   Shirt,
   Flame,
-  Check
+  Check,
+  MapPin
 } from 'lucide-react';
 import {
   ChimLacIcon,
@@ -27,10 +28,11 @@ import {
   HoaSenDivider,
   TrienSonSeal,
   TrienXacThuc,
-  ThuyBaWaveRibbon
+  ThuyBaWaveRibbon,
+  HoaSenMiniIcon,
+  TrongDongMiniIcon,
+  AoDaiMiniIcon
 } from './VietnameseMotifs';
-import { DongSonDrumGenealogy, type GenealogyNodeId } from './DongSonDrumGenealogy';
-import { CostumeQuickViewModal } from './CostumeQuickViewModal';
 
 interface HomePageProps {
   events: EventItem[];
@@ -51,15 +53,18 @@ export const HomePage: React.FC<HomePageProps> = ({
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'intro' | 'events' | 'costumes'>('intro');
   const [justSelectedEvent, setJustSelectedEvent] = useState<EventItem | null>(null);
-  const [activeGenealogyNode, setActiveGenealogyNode] = useState<GenealogyNodeId>('all');
-  const [quickViewCostume, setQuickViewCostume] = useState<Costume | null>(null);
-  const [isDrumCollapsedMobile, setIsDrumCollapsedMobile] = useState<boolean>(false);
 
   // Horizontal scroll state & controls for Event Carousel
   const eventsScrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [activeEventIndex, setActiveEventIndex] = useState(0);
+
+  // Horizontal scroll state & controls for Costumes Carousel (dàn ra như sự kiện)
+  const costumesScrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollCostumesLeft, setCanScrollCostumesLeft] = useState(false);
+  const [canScrollCostumesRight, setCanScrollCostumesRight] = useState(true);
+  const [activeCostumeIndex, setActiveCostumeIndex] = useState(0);
 
   const updateEventsScrollState = () => {
     if (!eventsScrollRef.current) return;
@@ -71,6 +76,17 @@ export const HomePage: React.FC<HomePageProps> = ({
     const cardWidth = 360;
     const index = Math.round(scrollLeft / cardWidth);
     setActiveEventIndex(Math.min(Math.max(0, index), events.length - 1));
+  };
+
+  const updateCostumesScrollState = () => {
+    if (!costumesScrollRef.current) return;
+    const { scrollLeft, scrollWidth, clientWidth } = costumesScrollRef.current;
+    setCanScrollCostumesLeft(scrollLeft > 15);
+    setCanScrollCostumesRight(scrollLeft < scrollWidth - clientWidth - 15);
+
+    const cardWidth = 360;
+    const index = Math.round(scrollLeft / cardWidth);
+    setActiveCostumeIndex(Math.min(Math.max(0, index), costumes.length - 1));
   };
 
   useEffect(() => {
@@ -85,6 +101,18 @@ export const HomePage: React.FC<HomePageProps> = ({
     };
   }, [events.length]);
 
+  useEffect(() => {
+    const el = costumesScrollRef.current;
+    if (!el) return;
+    updateCostumesScrollState();
+    el.addEventListener('scroll', updateCostumesScrollState, { passive: true });
+    window.addEventListener('resize', updateCostumesScrollState);
+    return () => {
+      el.removeEventListener('scroll', updateCostumesScrollState);
+      window.removeEventListener('resize', updateCostumesScrollState);
+    };
+  }, [costumes.length]);
+
   const scrollEvents = (direction: 'left' | 'right') => {
     if (eventsScrollRef.current) {
       const { scrollLeft, clientWidth } = eventsScrollRef.current;
@@ -96,9 +124,32 @@ export const HomePage: React.FC<HomePageProps> = ({
     }
   };
 
+  const scrollCostumes = (direction: 'left' | 'right') => {
+    if (costumesScrollRef.current) {
+      const { scrollLeft, clientWidth } = costumesScrollRef.current;
+      const scrollAmount = clientWidth * 0.75;
+      costumesScrollRef.current.scrollTo({
+        left: direction === 'left' ? scrollLeft - scrollAmount : scrollLeft + scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
+
   const scrollToEventByIndex = (index: number) => {
     if (!eventsScrollRef.current) return;
     const children = eventsScrollRef.current.children;
+    if (children && children[index]) {
+      (children[index] as HTMLElement).scrollIntoView({
+        behavior: 'smooth',
+        inline: 'center',
+        block: 'nearest'
+      });
+    }
+  };
+
+  const scrollToCostumeByIndex = (index: number) => {
+    if (!costumesScrollRef.current) return;
+    const children = costumesScrollRef.current.children;
     if (children && children[index]) {
       (children[index] as HTMLElement).scrollIntoView({
         behavior: 'smooth',
@@ -137,55 +188,6 @@ export const HomePage: React.FC<HomePageProps> = ({
     return suitB - suitA;
   });
 
-  // Calculate counts for genealogy tree badges
-  const costumeCounts = React.useMemo(() => {
-    return {
-      all: costumes.length,
-      'giao-linh': costumes.filter(c => c.lineageCategory === 'giao-linh' || c.id === 'cos-giao-linh').length,
-      'vien-linh': costumes.filter(c => c.lineageCategory === 'vien-linh' || c.id === 'cos-vien-linh').length,
-      'lap-linh': costumes.filter(c => c.lineageCategory === 'lap-linh' || c.id === 'cos-ao-tac' || c.id === 'cos-ngu-than-tay-chen' || c.id === 'cos-ao-dai').length,
-      'ao-tac': costumes.filter(c => c.lineageSubcategory === 'ao-tac' || c.id === 'cos-ao-tac').length,
-      'tay-chen': costumes.filter(c => c.lineageSubcategory === 'tay-chen' || c.id === 'cos-ngu-than-tay-chen' || c.id === 'cos-ao-dai').length,
-      'dich-chuyen': costumes.filter(c => c.lineageCategory === 'dich-chuyen' || c.id === 'cos-nhat-binh' || c.id === 'cos-doi-kham' || c.id === 'cos-tu-than' || c.id === 'cos-ba-ba').length,
-      'nhat-binh': costumes.filter(c => c.lineageSubcategory === 'nhat-binh' || c.id === 'cos-nhat-binh' || c.id === 'cos-doi-kham').length,
-      'tu-than': costumes.filter(c => c.lineageSubcategory === 'tu-than' || c.id === 'cos-tu-than').length,
-      'ba-ba': costumes.filter(c => c.lineageSubcategory === 'ba-ba' || c.id === 'cos-ba-ba').length,
-    };
-  }, [costumes]);
-
-  // Filter costumes based on active tree node
-  const filteredCostumesByTree = React.useMemo(() => {
-    if (activeGenealogyNode === 'all') return sortedCostumes;
-    if (activeGenealogyNode === 'giao-linh') {
-      return sortedCostumes.filter(c => c.lineageCategory === 'giao-linh' || c.id === 'cos-giao-linh');
-    }
-    if (activeGenealogyNode === 'vien-linh') {
-      return sortedCostumes.filter(c => c.lineageCategory === 'vien-linh' || c.id === 'cos-vien-linh');
-    }
-    if (activeGenealogyNode === 'lap-linh') {
-      return sortedCostumes.filter(c => c.lineageCategory === 'lap-linh' || c.id === 'cos-ao-tac' || c.id === 'cos-ngu-than-tay-chen' || c.id === 'cos-ao-dai');
-    }
-    if (activeGenealogyNode === 'ao-tac') {
-      return sortedCostumes.filter(c => c.lineageSubcategory === 'ao-tac' || c.id === 'cos-ao-tac');
-    }
-    if (activeGenealogyNode === 'tay-chen') {
-      return sortedCostumes.filter(c => c.lineageSubcategory === 'tay-chen' || c.id === 'cos-ngu-than-tay-chen' || c.id === 'cos-ao-dai');
-    }
-    if (activeGenealogyNode === 'dich-chuyen') {
-      return sortedCostumes.filter(c => c.lineageCategory === 'dich-chuyen' || c.id === 'cos-nhat-binh' || c.id === 'cos-doi-kham' || c.id === 'cos-tu-than' || c.id === 'cos-ba-ba');
-    }
-    if (activeGenealogyNode === 'nhat-binh') {
-      return sortedCostumes.filter(c => c.lineageSubcategory === 'nhat-binh' || c.id === 'cos-nhat-binh' || c.id === 'cos-doi-kham');
-    }
-    if (activeGenealogyNode === 'tu-than') {
-      return sortedCostumes.filter(c => c.lineageSubcategory === 'tu-than' || c.id === 'cos-tu-than');
-    }
-    if (activeGenealogyNode === 'ba-ba') {
-      return sortedCostumes.filter(c => c.lineageSubcategory === 'ba-ba' || c.id === 'cos-ba-ba');
-    }
-    return sortedCostumes;
-  }, [sortedCostumes, activeGenealogyNode]);
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#FFF5F7] via-[#FDF0F3] to-[#FFF5F7] text-[#1C1917] relative">
       {/* Background Subtle Watermark (Trống Đồng Đông Sơn) */}
@@ -197,7 +199,7 @@ export const HomePage: React.FC<HomePageProps> = ({
       <div className="sticky top-20 z-30 w-full backdrop-blur-md bg-[#FFF5F7]/95 border-b border-[#F7D6DE] shadow-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-2 sm:py-3">
-            {/* 3 Mini-tabs styled with Thủy Ba Lotus Waves */}
+            {/* 3 Mini-tabs với 3 biểu tượng văn hóa tiêu biểu nhất của Việt Nam: Hoa sen, Trống đồng Đông Sơn, Áo dài */}
             <div className="flex items-center gap-1.5 sm:gap-3 bg-[#FCE7EC] p-1.5 rounded-full border border-[#F4C2CE] shadow-inner">
               <button
                 onClick={() => scrollToSection('intro')}
@@ -206,8 +208,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                     ? 'bg-[#C84B69] text-white shadow-sm font-semibold'
                     : 'text-[#6E2E3E] hover:text-[#C84B69] hover:bg-[#F9D6DF]'
                 }`}
+                title="1. Biểu tượng Hoa Sen"
               >
-                <span>🌸</span>
+                <HoaSenMiniIcon active={activeSubTab === 'intro'} className="w-5 h-5 shrink-0" />
                 <span className="font-serif">Trang giới thiệu</span>
               </button>
 
@@ -218,8 +221,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                     ? 'bg-[#C84B69] text-white shadow-sm font-semibold'
                     : 'text-[#6E2E3E] hover:text-[#C84B69] hover:bg-[#F9D6DF]'
                 }`}
+                title="2. Biểu tượng Trống đồng Đông Sơn"
               >
-                <span>🏮</span>
+                <TrongDongMiniIcon active={activeSubTab === 'events'} className="w-5 h-5 shrink-0" />
                 <span className="font-serif">Sự kiện</span>
               </button>
 
@@ -230,8 +234,9 @@ export const HomePage: React.FC<HomePageProps> = ({
                     ? 'bg-[#C84B69] text-white shadow-sm font-semibold'
                     : 'text-[#6E2E3E] hover:text-[#C84B69] hover:bg-[#F9D6DF]'
                 }`}
+                title="3. Biểu tượng Áo Dài"
               >
-                <span>👘</span>
+                <AoDaiMiniIcon active={activeSubTab === 'costumes'} className="w-5 h-5 shrink-0" />
                 <span className="font-serif">Loại trang phục</span>
               </button>
             </div>
@@ -590,201 +595,216 @@ export const HomePage: React.FC<HomePageProps> = ({
 
         {/* ========================================================
             5. TRANG KHÁM PHÁ CỔ PHỤC (NẰM TRONG TRANG CHỦ)
-            Phải có:
-            - Liệt kê các loại cổ phục + hình ảnh minh hoạ có màu sắc (không phải ảnh cũ)
-            - Nếu đã chọn sự kiện thì kéo xuống trang này + hiển thị độ thích hợp của cổ phục
-            - Sau khi bấm chọn trang phục -> chuyển sang tab cổ phục cùng mức với trang chủ
+            - Dàn trải thẻ cổ phục như sự kiện (Carousel trượt ngang mượt mà)
+            - Không còn phần click phóng to / modal pop-up
+            - Click vào thẻ hoặc bấm "Tìm hiểu chi tiết" -> chuyển sang tab chi tiết trang phục
+            - Bấm "Phối thử" -> chuyển sang Studio
+            - Phần lọc trống đồng đã chuyển sang tab Cổ phục
             ======================================================== */}
-        <section id="costumes-section" className="space-y-8 scroll-mt-32">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-2 border-b border-[#F4C2CE]">
+        <section id="costumes-section" className="space-y-6 scroll-mt-32">
+          {/* Header Khu Vực Cổ Phục với Nút Điều Hướng Trái / Phải Tương Tự Sự Kiện */}
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 pb-3 border-b border-[#F4C2CE]">
             <div>
               <div className="inline-flex items-center gap-2 text-xs font-serif font-bold text-[#C84B69] uppercase tracking-wider mb-1">
                 <span>👘 Khu Vực 3</span>
                 <span>•</span>
-                <span>Khám Phá Kho Cổ Phục Việt</span>
+                <span>Kho Cổ Phục Việt & Độ Tương Thích</span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#1C1917]">
-                Danh Mục Cổ Phục & Độ Tương Thích
+                Tuyển Tập Cổ Phục Di Sản
               </h2>
               <p className="text-xs sm:text-sm text-[#78716C] font-light mt-1">
                 {selectedEvent
-                  ? `Đang hiển thị đánh giá độ phù hợp với sự kiện: "${selectedEvent.name}"`
-                  : 'Bấm chọn một bộ cổ phục để chuyển sang tab Chi tiết Cổ Phục.'}
+                  ? `Đang xếp hạng theo mức độ phù hợp với dịp: "${selectedEvent.name}". Vuốt ngang để khám phá tất cả các mẫu.`
+                  : 'Vuốt ngang để chiêm ngưỡng các thiết kế cổ phục. Bấm "Tìm hiểu chi tiết" để xem bối cảnh và cẩm nang phối.'}
               </p>
             </div>
 
-            {selectedEvent && (
-              <div className="flex items-center gap-2 p-2 rounded-xl bg-[#FFF0F4] border border-[#F4C2CE] text-xs">
-                <span className="text-[11px] text-[#78716C]">Đang đối chiếu sự kiện:</span>
-                <span className="font-serif font-bold text-[#C84B69]">{selectedEvent.name}</span>
-              </div>
-            )}
-          </div>
-
-          {/* ========================================================
-              BỐ CỤC 2 CỘT: TRỐNG ĐỒNG BÊN TRÁI & KHO CỔ PHỤC BÊN PHẢI
-              ======================================================== */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
-            {/* Cột Trái: Trống Đồng Đông Sơn Tương Tác */}
-            <div className="lg:col-span-5 xl:col-span-5 lg:sticky lg:top-28 space-y-3">
-              {/* Thanh Thu Gọn / Mở Rộng Trống Đồng - CHỈ DÀNH CHO MOBILE (< lg) */}
-              <div className="lg:hidden flex items-center justify-between p-3 rounded-2xl bg-white border border-[#F4C2CE] shadow-xs">
-                <div className="flex items-center gap-2">
-                  <span className="text-base">🥁</span>
-                  <div>
-                    <span className="font-serif font-bold text-xs text-[#1C1917] block">
-                      Sơ Đồ Phân Nhánh Trống Đồng
-                    </span>
-                    <span className="text-[10px] text-[#78716C]">
-                      {activeGenealogyNode === 'all'
-                        ? 'Đang xem: Tất cả các hệ cổ phục'
-                        : `Đang lọc: ${activeGenealogyNode}`}
-                    </span>
-                  </div>
-                </div>
-
-                <button
-                  onClick={() => setIsDrumCollapsedMobile(!isDrumCollapsedMobile)}
-                  className="text-xs px-3 py-1.5 rounded-full bg-[#FFF0F4] hover:bg-[#FCE7EC] text-[#C84B69] font-medium transition-colors border border-[#F4C2CE] flex items-center gap-1 cursor-pointer shrink-0"
-                >
-                  <span>{isDrumCollapsedMobile ? 'Mở sơ đồ trống ▾' : 'Thu gọn trống ▴'}</span>
-                </button>
-              </div>
-
-              {/* Component Trống Đồng (Người dùng có thể bấm nút thu gọn trên mobile khi cần, không tự ý giật màn hình khi click) */}
-              <div className={`${isDrumCollapsedMobile ? 'hidden lg:block' : 'block'}`}>
-                <DongSonDrumGenealogy
-                  activeNode={activeGenealogyNode}
-                  onSelectNode={(nodeId) => {
-                    setActiveGenealogyNode(nodeId);
-                  }}
-                  costumeCounts={costumeCounts}
-                />
-              </div>
-            </div>
-
-            {/* Cột Phải: Danh Sách Thẻ Cổ Phục (Thu nhỏ gọn gàng, giữ chiều cao ổn định không giật trang) */}
-            <div className="lg:col-span-7 xl:col-span-7 space-y-4 min-h-[680px] sm:min-h-[740px] flex flex-col justify-between">
-              <div className="space-y-4">
-                {/* Header Cột Phải: Tiêu đề, số lượng & nút xóa lọc */}
-                <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-3.5 rounded-2xl bg-white/90 border border-[#F4C2CE] shadow-xs">
-                  <div className="flex items-center gap-2.5">
-                    <span className="w-2 h-2 rounded-full bg-[#C84B69] animate-pulse" />
-                    <div>
-                      <h3 className="font-serif font-bold text-sm sm:text-base text-[#1C1917]">
-                        Danh Sách Cổ Phục ({filteredCostumesByTree.length} mẫu)
-                      </h3>
-                      <p className="text-[10px] sm:text-[11px] text-[#78716C] font-light">
-                        Bấm vào thẻ để mở xem chi tiết & toàn bộ cấu tạo trang phục
-                      </p>
-                    </div>
-                  </div>
-
-                  {activeGenealogyNode !== 'all' && (
-                    <button
-                      onClick={() => setActiveGenealogyNode('all')}
-                      className="text-[11px] px-3 py-1 rounded-full bg-[#FCE7EC] hover:bg-[#F8D2DC] text-[#C84B69] font-medium transition-colors border border-[#F4C2CE] cursor-pointer shadow-xs active:scale-95 flex items-center gap-1.5"
-                    >
-                      <span>Xem tất cả ({costumes.length})</span>
-                    </button>
-                  )}
-                </div>
-
-                {/* Grid Thẻ Cổ Phục Bên Phải: Kích thước nhỏ gọn (Compact Grid) */}
-                <div className="grid grid-cols-2 sm:grid-cols-2 xl:grid-cols-3 gap-3 sm:gap-4">
-                  {filteredCostumesByTree.map((costume) => {
-                    // Find suitability mapping for selected event
-                    const matchSuitability = selectedEvent
-                      ? costume.suitability.find((s) => s.eventId === selectedEvent.id)
-                      : null;
-
-                    return (
-                      <div
-                        key={costume.id}
-                        onClick={() => setQuickViewCostume(costume)}
-                        className="group relative rounded-xl sm:rounded-2xl overflow-hidden border border-[#F4C2CE] bg-white shadow-xs hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between cursor-pointer"
-                      >
-                        {/* Khung Ảnh Gọn Gàng: Dùng object-contain để KHÔNG BỊ ZOOM LÀM MẤT PHỤ KIỆN BÊN TRONG */}
-                        <div className="relative aspect-[4/5] sm:aspect-[1/1] xl:aspect-[4/5] overflow-hidden bg-gradient-to-b from-[#FAF7F2] to-[#F5ECE1] flex items-center justify-center p-2 rounded-t-xl">
-                          <img
-                            src={costume.coverImage || '/assets/costumes/ao-tac-bat-bao.jpeg'}
-                            alt={costume.name}
-                            onError={(e) => {
-                              e.currentTarget.onerror = null;
-                              e.currentTarget.src = '/assets/costumes/ao-tac-bat-bao.jpeg';
-                            }}
-                            className="w-full h-full object-contain object-center drop-shadow-sm group-hover:scale-103 transition-transform duration-300"
-                          />
-
-                          {/* Top Era Tag & Suitability Score */}
-                          <div className="absolute top-1.5 left-1.5 right-1.5 flex items-center justify-between gap-1 z-10 pointer-events-none">
-                            <span className="text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-white/95 text-[#1C1917] backdrop-blur-xs shadow-xs truncate max-w-[85px] sm:max-w-[100px] border border-stone-200">
-                              {costume.era.split('(')[0].trim()}
-                            </span>
-
-                            {/* Suitability Score Badge */}
-                            {matchSuitability && (
-                              <span
-                                className={`text-[8px] sm:text-[9px] font-bold px-1.5 py-0.5 rounded-full text-white shadow-xs flex items-center gap-0.5 ${
-                                  matchSuitability.score >= 90
-                                    ? 'bg-emerald-600'
-                                    : matchSuitability.score >= 80
-                                    ? 'bg-amber-600'
-                                    : 'bg-blue-600'
-                                }`}
-                              >
-                                <Star className="w-2 h-2 fill-current" />
-                                <span>{matchSuitability.score}%</span>
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Thông Tin Tinh Gọn Trên Thẻ */}
-                        <div className="p-2 sm:p-2.5 flex-1 flex flex-col justify-between space-y-1 bg-white">
-                          <div>
-                            {costume.lineageLabel && (
-                              <span className="text-[8px] sm:text-[9px] text-[#C84B69] uppercase tracking-wider block font-semibold truncate">
-                                {costume.lineageLabel.split('•')[0]}
-                              </span>
-                            )}
-                            <h4 className="text-xs sm:text-sm font-serif font-bold text-[#1C1917] tracking-tight group-hover:text-[#C84B69] transition-colors truncate">
-                              {costume.name}
-                            </h4>
-                            <p className="text-[10px] text-[#57534E] font-light leading-snug line-clamp-1 mt-0.5">
-                              {costume.shortDescription}
-                            </p>
-                          </div>
-
-                          <div className="pt-1.5 border-t border-[#F8E5EB] flex items-center justify-between text-[10px]">
-                            <span className="text-[#C84B69] font-medium flex items-center gap-0.5 group-hover:underline">
-                              <span>Chi tiết</span>
-                              <ArrowRight className="w-2.5 h-2.5 group-hover:translate-x-0.5 transition-transform" />
-                            </span>
-                            <span className="text-[9px] text-stone-400 font-light truncate max-w-[70px]">
-                              {costume.region.split('(')[0].trim()}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-
-              {/* Gợi ý tinh tế khi đang lọc nhánh để khung bên phải luôn cân đối */}
-              {activeGenealogyNode !== 'all' && (
-                <div className="p-3 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-[11px] text-amber-900 flex items-center justify-between gap-2 mt-4">
-                  <span>✦ Đang lọc theo hệ phân nhánh: <strong>{activeGenealogyNode}</strong></span>
-                  <button
-                    onClick={() => setActiveGenealogyNode('all')}
-                    className="text-[#C84B69] font-semibold hover:underline cursor-pointer"
-                  >
-                    Xem lại toàn bộ kho (9 mẫu)
-                  </button>
+            <div className="flex items-center gap-3 self-end sm:self-auto">
+              {selectedEvent && (
+                <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#FFF0F4] border border-[#F4C2CE] text-xs">
+                  <span className="text-[11px] text-[#78716C]">Đối chiếu dịp:</span>
+                  <span className="font-serif font-bold text-[#C84B69]">{selectedEvent.name}</span>
                 </div>
               )}
+
+              {/* Nút bấm trượt ngang Trái / Phải giống như khu vực sự kiện */}
+              <div className="flex items-center gap-1.5">
+                <button
+                  onClick={() => scrollCostumes('left')}
+                  disabled={!canScrollCostumesLeft}
+                  aria-label="Cổ phục trước"
+                  className="w-9 h-9 rounded-full bg-white hover:bg-[#FFF0F4] text-[#C84B69] border border-[#F4C2CE] shadow-xs hover:shadow-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                  title="Cuộn sang trái"
+                >
+                  <ChevronLeft className="w-5 h-5" />
+                </button>
+                <button
+                  onClick={() => scrollCostumes('right')}
+                  disabled={!canScrollCostumesRight}
+                  aria-label="Cổ phục tiếp theo"
+                  className="w-9 h-9 rounded-full bg-white hover:bg-[#FFF0F4] text-[#C84B69] border border-[#F4C2CE] shadow-xs hover:shadow-md transition-all flex items-center justify-center cursor-pointer disabled:opacity-30 disabled:cursor-not-allowed active:scale-95"
+                  title="Cuộn sang phải"
+                >
+                  <ChevronRight className="w-5 h-5" />
+                </button>
+              </div>
             </div>
+          </div>
+
+          {/* Cửa Sổ Trượt Ngang Cổ Phục Dàn Ra Như Sự Kiện (Horizontal Snap Carousel) */}
+          <div
+            ref={costumesScrollRef}
+            className="flex gap-5 sm:gap-6 overflow-x-auto pb-4 pt-2 px-1 scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {sortedCostumes.map((costume) => {
+              const matchSuitability = selectedEvent
+                ? costume.suitability.find((s) => s.eventId === selectedEvent.id)
+                : costume.suitability[0];
+
+              return (
+                <div
+                  key={costume.id}
+                  className="snap-start shrink-0 w-[290px] sm:w-[330px] md:w-[350px] lg:w-[370px] min-h-[460px] sm:min-h-[490px] group relative rounded-2xl overflow-hidden border border-[#F4C2CE] bg-white transition-all duration-500 flex flex-col justify-between shadow-md hover:shadow-2xl hover:-translate-y-1.5"
+                >
+                  {/* Toàn bộ khung là ảnh y phục lớn trang nhã, không méo hình, phủ lớp bảo vệ tương phản */}
+                  <div
+                    onClick={() => onSelectCostume(costume)}
+                    className="absolute inset-0 bg-gradient-to-b from-[#FAF7F2] via-[#FFF5F7] to-[#FAF7F2] cursor-pointer"
+                  >
+                    <img
+                      src={costume.coverImage || '/assets/costumes/ao-tac-bat-bao.jpeg'}
+                      alt={costume.name}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = '/assets/costumes/ao-tac-bat-bao.jpeg';
+                      }}
+                      className="w-full h-full object-contain object-center drop-shadow-md group-hover:scale-106 transition-transform duration-700 ease-out p-4 pb-28"
+                    />
+                  </div>
+
+                  {/* Lớp gradient bảo vệ chữ ở phần đáy card */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/55 via-45% to-transparent pointer-events-none" />
+
+                  {/* Header trên ảnh: Badge Triều đại & Điểm tương thích sự kiện */}
+                  <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between gap-2 pointer-events-none">
+                    <span className="text-[11px] font-serif font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-white/95 text-[#9E2A47] shadow-sm backdrop-blur-md border border-white/60">
+                      {costume.era.split('(')[0].trim()}
+                    </span>
+
+                    {matchSuitability && (
+                      <span
+                        className={`flex items-center gap-1 text-xs font-bold px-3 py-1 rounded-full text-white shadow-md border border-white/30 backdrop-blur-sm ${
+                          matchSuitability.score >= 90
+                            ? 'bg-emerald-600'
+                            : matchSuitability.score >= 80
+                            ? 'bg-[#C84B69]'
+                            : 'bg-blue-600'
+                        }`}
+                      >
+                        <Star className="w-3.5 h-3.5 fill-current" />
+                        <span>{matchSuitability.score}% Phù hợp</span>
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Footer đè trực tiếp lên ảnh: Tên y phục + Phân loại + Nút tìm hiểu chi tiết & phối thử */}
+                  <div className="relative z-10 p-5 sm:p-6 space-y-3">
+                    <div>
+                      {costume.lineageLabel && (
+                        <span className="text-[10px] sm:text-[11px] uppercase tracking-wider text-[#FCD5DE] font-semibold block drop-shadow-xs mb-1">
+                          {costume.lineageLabel}
+                        </span>
+                      )}
+                      <h3
+                        onClick={() => onSelectCostume(costume)}
+                        className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight drop-shadow-md group-hover:text-[#FCD5DE] transition-colors leading-snug cursor-pointer line-clamp-1"
+                      >
+                        {costume.name}
+                      </h3>
+                      <p className="text-xs sm:text-sm text-stone-200/95 font-light leading-relaxed line-clamp-2 drop-shadow-xs mt-1">
+                        {costume.shortDescription}
+                      </p>
+                    </div>
+
+                    {/* Cụm 2 nút hành động trực tiếp - KHÔNG CÒN MODAL PHÓNG TO */}
+                    <div className="pt-1.5 grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => onSelectCostume(costume)}
+                        className="py-2.5 px-3 rounded-xl bg-white/95 hover:bg-white text-[#9E2A47] hover:text-[#C84B69] text-xs font-serif font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
+                      >
+                        <span>Tìm hiểu chi tiết</span>
+                        <ArrowRight className="w-3.5 h-3.5" />
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          onSelectCostume(costume);
+                          if (onStartStudio) onStartStudio();
+                        }}
+                        className="py-2.5 px-3 rounded-xl bg-gradient-to-r from-[#C84B69] to-[#9E2A47] hover:from-[#B33B58] hover:to-[#881337] text-white text-xs font-serif font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
+                      >
+                        <Shirt className="w-3.5 h-3.5 text-white" />
+                        <span>Phối thử</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Thanh Chỉ Báo Tiến Trình & Nút Chuyển Trang */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-1 px-1">
+            <span className="text-[11px] text-[#78716C] font-light hidden sm:inline-block">
+              ← Vuốt ngang để khám phá tất cả {sortedCostumes.length} mẫu cổ phục truyền thống →
+            </span>
+
+            <div className="flex items-center gap-1.5 mx-auto sm:mx-0">
+              {sortedCostumes.map((cos, idx) => (
+                <button
+                  key={cos.id}
+                  onClick={() => scrollToCostumeByIndex(idx)}
+                  aria-label={`Chuyển tới ${cos.name}`}
+                  className={`transition-all duration-300 rounded-full cursor-pointer ${
+                    activeCostumeIndex === idx
+                      ? 'w-7 h-2 bg-[#C84B69]'
+                      : 'w-2 h-2 bg-[#F4C2CE] hover:bg-[#C84B69]/60'
+                  }`}
+                  title={cos.name}
+                />
+              ))}
+            </div>
+
+            <span className="text-xs font-serif font-bold text-[#C84B69] tracking-wider">
+              {activeCostumeIndex + 1} / {sortedCostumes.length} Cổ phục
+            </span>
+          </div>
+
+          {/* Banner dẫn sang Tab Cổ Phục để xem Sơ đồ Trống Đồng */}
+          <div className="p-4 rounded-2xl bg-gradient-to-r from-[#FFF0F4] via-white to-[#FFF0F4] border border-[#F4C2CE] flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🥁</span>
+              <div>
+                <h4 className="font-serif font-bold text-xs sm:text-sm text-[#1C1917]">
+                  Muốn tra cứu phân nhánh phả hệ Trống Đồng Đông Sơn?
+                </h4>
+                <p className="text-[11px] text-[#78716C] font-light">
+                  Phần đồ họa Trống Đồng tương tác và bộ lọc chuyên sâu Nam/Nữ đã được chuyển sang tab Cổ phục.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => onSelectCostume(sortedCostumes[0])}
+              className="px-4 py-2 rounded-xl bg-[#C84B69] hover:bg-[#B33B58] text-white text-xs font-serif font-bold transition-all shadow-xs shrink-0 cursor-pointer flex items-center gap-1.5"
+            >
+              <span>Tìm hiểu thêm</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
         </section>
 
@@ -832,14 +852,6 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
           </div>
         </section>
-
-        {/* Modal Xem Nhanh Khi Tương Tác Vào Thẻ Cổ Phục */}
-        <CostumeQuickViewModal
-          costume={quickViewCostume}
-          selectedEvent={selectedEvent}
-          onClose={() => setQuickViewCostume(null)}
-          onViewDeepDetails={onSelectCostume}
-        />
 
       </div>
     </div>

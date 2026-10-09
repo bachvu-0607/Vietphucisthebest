@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { FittingDraft, AIJob, Costume } from '../types';
-import { TrienSonSeal, ChimLacIcon } from './VietnameseMotifs';
+import { TrienSonSeal, ChimLacIcon, TrongDongWatermark } from './VietnameseMotifs';
 import {
   Bookmark,
   Sparkles,
@@ -59,30 +59,30 @@ export const UserProfile: React.FC<UserProfileProps> = ({
   };
 
   return (
-    <div className="py-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-      {/* Editorial Header */}
-      <div className="mb-10 pb-6 border-b border-[#E8E2D8] flex flex-col sm:flex-row sm:items-center justify-between gap-6">
-        <div>
-          <div className="flex items-center gap-2 text-xs font-serif text-[#9B2C2C] font-semibold tracking-wider uppercase mb-1">
-            <ChimLacIcon className="w-3.5 h-3 text-[#9B2C2C]" />
-            Không Gian Sáng Tạo Cá Nhân
+    <div className="py-8 sm:py-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 animate-in fade-in-50 duration-300">
+      {/* Editorial Header - Pink Heritage Theme */}
+      <div className="relative rounded-3xl overflow-hidden bg-gradient-to-r from-[#FFF5F7] via-white to-[#FCE7EC] border border-[#F4C2CE] p-6 sm:p-8 md:p-10 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="space-y-2 max-w-2xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#FFF0F4] border border-[#F4C2CE] text-[#C84B69] text-xs font-serif font-bold">
+            <ChimLacIcon className="w-3.5 h-3 text-[#C84B69]" />
+            <span>Không Gian Sáng Tạo Cá Nhân</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[#1C1917] flex items-center gap-3">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-[#1C1917] tracking-tight">
             Tủ Đồ Của Tôi
           </h1>
-          <p className="text-xs sm:text-sm text-[#57534E] font-light mt-1">
-            Quản lý những bản phác thảo đã lưu, các tác phẩm AI đã hoàn thiện và theo dõi tiến trình xử lý.
+          <p className="text-xs sm:text-sm text-[#57534E] font-light leading-relaxed">
+            Lưu trữ bản phác thảo y phục, quản lý tác phẩm hoàn thiện AI và theo dõi các tiến trình sáng tạo.
           </p>
         </div>
 
         {/* Tab Switcher */}
-        <div className="flex items-center gap-1.5 p-1 bg-[#FFFFFF] border border-[#E8E2D8] rounded-md text-xs shadow-xs">
+        <div className="flex items-center gap-1.5 p-1.5 bg-[#FFF0F4] border border-[#F4C2CE] rounded-2xl text-xs shadow-inner shrink-0">
           <button
             onClick={() => setActiveTab('drafts')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xs transition-colors font-serif ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all font-serif cursor-pointer ${
               activeTab === 'drafts'
-                ? 'bg-[#9B2C2C] text-white font-bold'
-                : 'text-[#57534E] hover:text-[#1C1917]'
+                ? 'bg-[#C84B69] text-white font-bold shadow-xs'
+                : 'text-[#6E2E3E] hover:text-[#C84B69] hover:bg-white/60'
             }`}
           >
             <Layers className="w-3.5 h-3.5" />
@@ -91,10 +91,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
           <button
             onClick={() => setActiveTab('completed')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xs transition-colors font-serif ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all font-serif cursor-pointer ${
               activeTab === 'completed'
-                ? 'bg-[#9B2C2C] text-white font-bold'
-                : 'text-[#57534E] hover:text-[#1C1917]'
+                ? 'bg-[#C84B69] text-white font-bold shadow-xs'
+                : 'text-[#6E2E3E] hover:text-[#C84B69] hover:bg-white/60'
             }`}
           >
             <Sparkles className="w-3.5 h-3.5" />
@@ -103,10 +103,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
           <button
             onClick={() => setActiveTab('processing')}
-            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xs transition-colors font-serif ${
+            className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl transition-all font-serif cursor-pointer ${
               activeTab === 'processing'
-                ? 'bg-[#9B2C2C] text-white font-bold'
-                : 'text-[#57534E] hover:text-[#1C1917]'
+                ? 'bg-[#C84B69] text-white font-bold shadow-xs'
+                : 'text-[#6E2E3E] hover:text-[#C84B69] hover:bg-white/60'
             }`}
           >
             <Clock className="w-3.5 h-3.5" />
@@ -119,13 +119,15 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       {activeTab === 'drafts' && (
         <div>
           {drafts.length === 0 ? (
-            <div className="text-center py-20 bg-[#FFFFFF] rounded-2xl border border-[#E8E2D8] p-8 shadow-xs">
-              <Layers className="w-10 h-10 text-[#C29B38] mx-auto mb-3 opacity-60" />
-              <h3 className="text-base font-serif font-bold text-[#1C1917] mb-1">
+            <div className="text-center py-20 bg-white rounded-3xl border border-[#F4C2CE] p-8 shadow-xs space-y-3">
+              <div className="w-14 h-14 rounded-full bg-[#FFF0F4] border border-[#F4C2CE] text-[#C84B69] mx-auto flex items-center justify-center">
+                <Layers className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-serif font-bold text-[#1C1917]">
                 Chưa có bản phác thảo nào
               </h3>
-              <p className="text-xs text-[#78716C] max-w-md mx-auto font-light">
-                Hãy vào một bộ trang phục, chọn "Phối thử bộ này" và bấm "Lưu bản phác thảo" để lưu giữ cấu trúc y phục của bạn.
+              <p className="text-xs text-[#78716C] max-w-md mx-auto font-light leading-relaxed">
+                Hãy vào một bộ trang phục, chọn "Phối thử bộ này" và bấm "Lưu phác thảo" để lưu giữ cấu trúc y phục của bạn.
               </p>
             </div>
           ) : (
@@ -135,37 +137,37 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                 return (
                   <div
                     key={draft.id}
-                    className="group rounded-2xl bg-[#FFFFFF] border border-[#E8E2D8] overflow-hidden flex flex-col justify-between hover:border-[#9B2C2C]/50 hover:shadow-md transition-all shadow-xs"
+                    className="group rounded-3xl bg-white border border-[#F4C2CE] overflow-hidden flex flex-col justify-between hover:border-[#C84B69] hover:shadow-lg transition-all duration-300 shadow-xs"
                   >
                     {/* Sketch Thumbnail */}
-                    <div className="relative h-60 bg-[#FAF7F2] flex items-center justify-center overflow-hidden border-b border-[#E8E2D8]">
+                    <div className="relative h-60 bg-gradient-to-b from-[#FAF7F2] via-[#FFF5F7] to-white flex items-center justify-center overflow-hidden border-b border-[#F4C2CE] p-3">
                       {draft.sketchDataUrl ? (
                         <img
                           src={draft.sketchDataUrl}
                           alt={draft.title}
-                          className="h-full w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+                          className="h-full w-auto object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-sm"
                         />
                       ) : (
                         <div className="text-[#A8A29E] text-xs flex flex-col items-center gap-1">
-                          <Layers className="w-6 h-6" />
+                          <Layers className="w-6 h-6 text-[#C84B69]" />
                           <span>Bản phác thảo phẳng</span>
                         </div>
                       )}
 
-                      <span className="absolute top-3 left-3 text-[10px] px-2 py-0.5 rounded-xs bg-[#FFFFFF]/90 backdrop-blur-xs text-[#9B2C2C] border border-[#E8E2D8] font-serif font-semibold">
+                      <span className="absolute top-3 left-3 text-[10px] px-2.5 py-1 rounded-full bg-white/95 backdrop-blur-xs text-[#C84B69] border border-[#F4C2CE] font-serif font-semibold shadow-2xs">
                         {costume?.name || 'Việt phục'}
                       </span>
                     </div>
 
                     {/* Details */}
-                    <div className="p-5 flex-1 flex flex-col justify-between">
+                    <div className="p-5 flex-1 flex flex-col justify-between space-y-3">
                       <div>
-                        <h4 className="font-serif font-bold text-[#1C1917] text-base mb-1 group-hover:text-[#9B2C2C] transition-colors">
+                        <h4 className="font-serif font-bold text-[#1C1917] text-base group-hover:text-[#C84B69] transition-colors leading-snug">
                           {draft.title}
                         </h4>
-                        <div className="text-xs text-[#78716C] space-y-1 mb-4 font-light">
+                        <div className="text-xs text-[#78716C] space-y-1 mt-2 font-light">
                           <div className="flex items-center gap-1.5 text-[11px]">
-                            <Calendar className="w-3 h-3 text-[#C29B38]" />
+                            <Calendar className="w-3 h-3 text-[#C84B69]" />
                             <span>Cập nhật: {formatDate(draft.updatedAt)}</span>
                           </div>
                           <div className="text-[11px]">
@@ -175,10 +177,10 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                       </div>
 
                       {/* Action buttons */}
-                      <div className="flex items-center justify-between pt-3 border-t border-[#F0EBE3] text-xs">
+                      <div className="flex items-center justify-between pt-3 border-t border-[#F8E5EB] text-xs">
                         <button
                           onClick={() => onDeleteDraft(draft.id)}
-                          className="text-[#A8A29E] hover:text-[#991B1B] p-1.5 rounded transition-colors"
+                          className="text-[#A8A29E] hover:text-[#991B1B] p-2 rounded-xl hover:bg-rose-50 transition-colors cursor-pointer"
                           title="Xóa phác thảo"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -186,7 +188,7 @@ export const UserProfile: React.FC<UserProfileProps> = ({
 
                         <button
                           onClick={() => onOpenDraft(draft)}
-                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-sm bg-[#FAF7F2] hover:bg-[#9B2C2C] text-[#9B2C2C] hover:text-white font-serif font-semibold transition-all border border-[#E8E2D8]"
+                          className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#FFF0F4] hover:bg-[#C84B69] text-[#C84B69] hover:text-white font-serif font-bold transition-all border border-[#F4C2CE] cursor-pointer shadow-2xs"
                         >
                           <RotateCcw className="w-3 h-3" />
                           <span>Mở lại chỉnh sửa</span>
@@ -205,12 +207,14 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       {activeTab === 'completed' && (
         <div>
           {completedJobs.length === 0 ? (
-            <div className="text-center py-20 bg-[#FFFFFF] rounded-2xl border border-[#E8E2D8] p-8 shadow-xs">
-              <Sparkles className="w-10 h-10 text-[#C29B38] mx-auto mb-3 opacity-60" />
-              <h3 className="text-base font-serif font-bold text-[#1C1917] mb-1">
+            <div className="text-center py-20 bg-white rounded-3xl border border-[#F4C2CE] p-8 shadow-xs space-y-3">
+              <div className="w-14 h-14 rounded-full bg-[#FFF0F4] border border-[#F4C2CE] text-[#C84B69] mx-auto flex items-center justify-center">
+                <Sparkles className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-serif font-bold text-[#1C1917]">
                 Chưa có tác phẩm AI nào hoàn thành
               </h3>
-              <p className="text-xs text-[#78716C] max-w-md mx-auto font-light">
+              <p className="text-xs text-[#78716C] max-w-md mx-auto font-light leading-relaxed">
                 Hãy vào Studio, phối thử trang phục và bấm "Hoàn thiện bằng AI" để hệ thống tạo ra tác phẩm nghệ thuật.
               </p>
             </div>
@@ -219,18 +223,18 @@ export const UserProfile: React.FC<UserProfileProps> = ({
               {completedJobs.map((job) => (
                 <div
                   key={job.id}
-                  className="group rounded-2xl bg-[#FFFFFF] border border-[#E8E2D8] overflow-hidden flex flex-col justify-between hover:border-[#9B2C2C]/50 hover:shadow-md transition-all shadow-xs"
+                  className="group rounded-3xl bg-white border border-[#F4C2CE] overflow-hidden flex flex-col justify-between hover:border-[#C84B69] hover:shadow-lg transition-all duration-300 shadow-xs"
                 >
-                  <div className="relative h-64 bg-[#FAF7F2] overflow-hidden">
+                  <div className="relative h-64 bg-gradient-to-b from-[#FAF7F2] to-[#FFF5F7] overflow-hidden">
                     <img
                       src={job.resultImageUrl || job.sketchDataUrl}
                       alt={job.costumeName}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#1C1917]/75 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1C1917]/80 via-transparent to-transparent" />
 
-                    <span className="absolute top-3 right-3 text-[10px] px-2.5 py-0.5 rounded-xs bg-[#FFFFFF]/95 text-[#9B2C2C] border border-[#E8E2D8] flex items-center gap-1 font-serif font-semibold">
-                      <CheckCircle2 className="w-3 h-3 text-[#9B2C2C]" />
+                    <span className="absolute top-3 right-3 text-[10px] px-2.5 py-1 rounded-full bg-white/95 text-[#C84B69] border border-[#F4C2CE] flex items-center gap-1 font-serif font-semibold shadow-2xs">
+                      <CheckCircle2 className="w-3 h-3 text-[#C84B69]" />
                       Hoàn thành
                     </span>
 
@@ -238,22 +242,22 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                       <h4 className="font-serif font-bold text-lg drop-shadow-sm">
                         {job.costumeName}
                       </h4>
-                      <p className="text-[11px] text-[#FAF7F2]/90 font-light">
+                      <p className="text-[11px] text-stone-200 font-light">
                         {job.eventName}
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-4 flex items-center justify-between text-xs border-t border-[#E8E2D8]">
+                  <div className="p-4 flex items-center justify-between text-xs border-t border-[#F8E5EB]">
                     <span className="text-[11px] text-[#78716C] font-light">
                       {formatDate(job.completedAt || job.createdAt)}
                     </span>
 
                     <button
                       onClick={() => onViewJobResult(job)}
-                      className="flex items-center gap-1 px-3 py-1.5 rounded-sm bg-[#9B2C2C] hover:bg-[#832424] text-white font-medium transition-all"
+                      className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#C84B69] hover:bg-[#B33B58] text-white font-medium transition-all shadow-xs cursor-pointer"
                     >
-                      <Eye className="w-3 h-3" />
+                      <Eye className="w-3.5 h-3.5" />
                       <span>Xem & So sánh</span>
                     </button>
                   </div>
@@ -268,9 +272,11 @@ export const UserProfile: React.FC<UserProfileProps> = ({
       {activeTab === 'processing' && (
         <div className="space-y-4">
           {pendingJobs.length === 0 ? (
-            <div className="text-center py-20 bg-[#FFFFFF] rounded-2xl border border-[#E8E2D8] p-8 shadow-xs">
-              <Clock className="w-10 h-10 text-[#C29B38] mx-auto mb-3 opacity-60" />
-              <h3 className="text-base font-serif font-bold text-[#1C1917] mb-1">
+            <div className="text-center py-20 bg-white rounded-3xl border border-[#F4C2CE] p-8 shadow-xs space-y-3">
+              <div className="w-14 h-14 rounded-full bg-[#FFF0F4] border border-[#F4C2CE] text-[#C84B69] mx-auto flex items-center justify-center">
+                <Clock className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-serif font-bold text-[#1C1917]">
                 Không có tác vụ nào đang chờ
               </h3>
               <p className="text-xs text-[#78716C] max-w-md mx-auto font-light">
@@ -281,26 +287,26 @@ export const UserProfile: React.FC<UserProfileProps> = ({
             pendingJobs.map((job) => (
               <div
                 key={job.id}
-                className="p-5 rounded-xl bg-[#FFFFFF] border border-[#E8E2D8] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
+                className="p-5 rounded-2xl bg-white border border-[#F4C2CE] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xs"
               >
                 <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-[#FAF7F2] border border-[#E8E2D8] flex items-center justify-center shrink-0">
+                  <div className="w-12 h-12 rounded-2xl bg-[#FFF0F4] border border-[#F4C2CE] flex items-center justify-center shrink-0">
                     {job.status === 'failed' ? (
                       <AlertCircle className="w-6 h-6 text-[#991B1B]" />
                     ) : (
-                      <Loader2 className="w-6 h-6 text-[#9B2C2C] animate-spin" />
+                      <Loader2 className="w-6 h-6 text-[#C84B69] animate-spin" />
                     )}
                   </div>
                   <div>
                     <div className="font-serif font-bold text-[#1C1917] flex items-center gap-2">
-                      {job.costumeName}
-                      <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-[#FAF7F2] text-[#78716C] border border-[#E8E2D8]">
+                      <span>{job.costumeName}</span>
+                      <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-[#FFF0F4] text-[#C84B69] border border-[#F4C2CE]">
                         {job.id}
                       </span>
                     </div>
                     <div className="text-xs text-[#57534E] mt-0.5 font-light">
                       Sự kiện: {job.eventName} • Trạng thái:{' '}
-                      <span className="font-serif font-semibold text-[#9B2C2C]">{job.status}</span>
+                      <span className="font-serif font-semibold text-[#C84B69]">{job.status}</span>
                     </div>
                     {job.errorMessage && (
                       <div className="text-xs text-[#991B1B] mt-1 font-light">
@@ -314,13 +320,13 @@ export const UserProfile: React.FC<UserProfileProps> = ({
                   {job.status === 'failed' ? (
                     <button
                       onClick={() => onRetryJob(job)}
-                      className="flex items-center gap-1.5 px-4 py-2 rounded-sm bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#991B1B] text-xs font-serif font-semibold border border-[#FCA5A5]/60 transition-colors"
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-xl bg-[#FEF2F2] hover:bg-[#FEE2E2] text-[#991B1B] text-xs font-serif font-semibold border border-[#FCA5A5]/60 transition-colors cursor-pointer"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
                       <span>Thử tạo lại</span>
                     </button>
                   ) : (
-                    <div className="text-xs text-[#9B2C2C] font-mono font-semibold">
+                    <div className="text-xs text-[#C84B69] font-mono font-semibold">
                       Tiến độ: {job.progress}%
                     </div>
                   )}

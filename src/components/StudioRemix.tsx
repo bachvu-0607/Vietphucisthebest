@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Costume,
   EventItem,
@@ -33,12 +33,17 @@ import {
   Upload,
   Link as LinkIcon,
   Image as ImageIcon,
-  Trash2
+  Trash2,
+  Calendar
 } from 'lucide-react';
 
 interface StudioRemixProps {
   costume: Costume;
+  costumes?: Costume[];
+  onSelectCostume?: (costume: Costume) => void;
   event?: EventItem;
+  events?: EventItem[];
+  onSelectEvent?: (evt: EventItem) => void;
   backgrounds: BackgroundSetting[];
   existingDraft?: FittingDraft | null;
   onDraftSaved: (draft: FittingDraft) => void;
@@ -47,7 +52,11 @@ interface StudioRemixProps {
 
 export const StudioRemix: React.FC<StudioRemixProps> = ({
   costume,
+  costumes,
+  onSelectCostume,
   event,
+  events,
+  onSelectEvent,
   backgrounds,
   existingDraft,
   onDraftSaved,
@@ -55,6 +64,45 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
 }) => {
   const isFemaleOnly = costume.gender === 'female';
   const isMaleOnly = costume.gender === 'male';
+
+  // Trạng thái mở/đóng của 2 Hộp Dropdown: Cổ Phục & Dịp Lễ
+  const [isCostumeDropdownOpen, setIsCostumeDropdownOpen] = useState<boolean>(false);
+  const [isEventDropdownOpen, setIsEventDropdownOpen] = useState<boolean>(false);
+  const costumeDropdownRef = useRef<HTMLDivElement | null>(null);
+  const eventDropdownRef = useRef<HTMLDivElement | null>(null);
+
+  // Đóng dropdown khi click ra ngoài
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (costumeDropdownRef.current && !costumeDropdownRef.current.contains(e.target as Node)) {
+        setIsCostumeDropdownOpen(false);
+      }
+      if (eventDropdownRef.current && !eventDropdownRef.current.contains(e.target as Node)) {
+        setIsEventDropdownOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  const [selectedEventItem, setSelectedEventItem] = useState<EventItem | undefined>(() => {
+    if (event) return event;
+    if (existingDraft?.eventId && events) {
+      const found = events.find((e) => e.id === existingDraft.eventId);
+      if (found) return found;
+    }
+    return events && events.length > 0 ? events[0] : undefined;
+  });
+
+  const handleSelectEvent = (evt: EventItem) => {
+    setSelectedEventItem(evt);
+    if (onSelectEvent) onSelectEvent(evt);
+  };
+
+  const suitabilityForEvent = useMemo(() => {
+    if (!selectedEventItem) return null;
+    return costume.suitability?.find((s) => s.eventId === selectedEventItem.id);
+  }, [costume.suitability, selectedEventItem]);
 
   const [remixStyle, setRemixStyle] = useState<'traditional' | 'subtle_modern' | 'remix_fusion'>(
     existingDraft?.remixStyle || 'traditional'
@@ -80,6 +128,23 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
     }
   }, [costume.id, isFemaleOnly, isMaleOnly]);
 
+  // 🌟 Lọc biến thể màu sắc theo đúng phong cách:
+  // - Truyền thống (traditional): 4 màu cũ (Đỏ son, Hoàng yến, Xanh ngọc, Tím hoa cà)
+  // - Cách tân & Remix: 2 màu mới (Trắng ngà lụa bạch & Hồng phấn pastel)
+  const availableColors = useMemo<ColorVariant[]>(() => {
+    if (remixStyle === 'traditional') {
+      const trad = costume.colorVariants.filter(
+        (c: ColorVariant) => c.id !== 'col-nb-ivory' && c.id !== 'col-nb-pink' && !c.name.toLowerCase().includes('trắng') && !c.name.toLowerCase().includes('hồng')
+      );
+      return trad.length > 0 ? trad : costume.colorVariants;
+    } else {
+      const modern = costume.colorVariants.filter(
+        (c: ColorVariant) => c.id === 'col-nb-ivory' || c.id === 'col-nb-pink' || c.name.toLowerCase().includes('trắng') || c.name.toLowerCase().includes('hồng')
+      );
+      return modern.length > 0 ? modern : costume.colorVariants;
+    }
+  }, [costume.colorVariants, remixStyle]);
+
   const [selectedColor, setSelectedColor] = useState<ColorVariant>(() => {
     if (existingDraft?.selectedColorId) {
       const found = costume.colorVariants.find((c) => c.id === existingDraft.selectedColorId);
@@ -87,6 +152,13 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
     }
     return costume.colorVariants[0];
   });
+
+  // Sync selectedColor whenever availableColors changes
+  useEffect(() => {
+    if (!availableColors.some((c: ColorVariant) => c.id === selectedColor.id)) {
+      setSelectedColor(availableColors[0]);
+    }
+  }, [availableColors, selectedColor.id]);
 
   const [selectedMaterial, setSelectedMaterial] = useState<MaterialOption>(() => {
     if (existingDraft?.selectedMaterialId) {
@@ -96,6 +168,13 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
     return costume.materials[0];
   });
 
+  // Auto-sync selectedMaterial when costume changes
+  useEffect(() => {
+    if (!costume.materials.some((m) => m.id === selectedMaterial.id)) {
+      setSelectedMaterial(costume.materials[0]);
+    }
+  }, [costume.id, costume.materials, selectedMaterial.id]);
+
   // Định nghĩa cấu trúc nhóm phụ kiện theo từng bộ phận cơ thể (từ đầu đến chân)
   interface AccessoryCategoryGroup {
     id: string;
@@ -103,7 +182,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
     items: string[];
   }
 
-  // Danh mục phụ kiện phân theo 5 bộ phận cơ thể chuẩn Áo Nhật Bình (Chất lượng hơn số lượng)
+  // Danh mục phụ kiện phân theo 5 bộ phận cơ thể chuẩn y phục (Cúc áo / Kim bội đưa vào tùy chọn có thể mặc hoặc không)
   const getStyleAccessoryCategories = (
     style: 'traditional' | 'subtle_modern' | 'remix_fusion'
   ): AccessoryCategoryGroup[] => {
@@ -112,7 +191,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
         {
           id: 'head',
           name: 'Đầu và tóc',
-          items: ['Trâm bạc cài hoa sen cẩn ngọc', 'Băng đô lụa tơ tằm thêu tay']
+          items: ['Khăn vành sa lụa trắng ngà', 'Trâm bạc cài hoa sen cẩn ngọc', 'Băng đô lụa tơ tằm thêu tay']
         },
         {
           id: 'face_ears',
@@ -121,12 +200,18 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
         },
         {
           id: 'neck_chest',
-          name: 'Cổ',
-          items: ['Kiềng bạc trơn tối giản', 'Khăn lụa tơ tằm quàng cổ', 'Chuỗi ngọc trai tự nhiên']
+          name: 'Cổ và ngực (Trang sức & Cúc áo)',
+          items: [
+            'Cúc cài kim bội dải thao đỏ',
+            'Khuy xà cừ / Cúc ngọc trang nhã',
+            'Chuỗi ngọc trai hoàng gia nhiều vòng',
+            'Kiềng bạc trơn tối giản',
+            'Khăn lụa tơ tằm quàng cổ'
+          ]
         },
         {
           id: 'hands_waist',
-          name: 'Tay',
+          name: 'Tay và thắt lưng',
           items: [
             'Quạt đoàn phiến lụa tơ thêu mẫu đơn đính ngọc',
             'Dù lụa hoa sen che nắng',
@@ -136,7 +221,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
         },
         {
           id: 'feet_shoes',
-          name: 'Chân',
+          name: 'Chân và hài',
           items: ['Giày cao gót quai lụa cách tân', 'Guốc mộc quai nhung đỏ']
         }
       ];
@@ -147,21 +232,26 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
         {
           id: 'head',
           name: 'Đầu và tóc',
-          items: ['Mũ beret dạ cổ điển']
+          items: ['Tóc tết bím lệch cài hoa ngọc đào', 'Mũ beret dạ cổ điển']
         },
         {
           id: 'face_ears',
           name: 'Mắt và tai',
-          items: ['Kính râm mắt mèo retro', 'Tai nghe headphone retro']
+          items: ['Khuyên tai ngọc trai rơi', 'Kính râm mắt mèo retro', 'Tai nghe headphone retro']
         },
         {
           id: 'neck_chest',
-          name: 'Cổ',
-          items: ['Vòng choker kim loại bản to']
+          name: 'Cổ và ngực (Trang sức & Cúc áo)',
+          items: [
+            'Cúc cài kim bội dải thao đỏ',
+            'Khuy kim loại đúc phá cách',
+            'Vòng choker kim loại bản to',
+            'Chuỗi ngọc trai tự nhiên'
+          ]
         },
         {
           id: 'hands_waist',
-          name: 'Tay',
+          name: 'Tay và thắt lưng',
           items: [
             'Túi tote vải canvas streetwear',
             'Túi đeo chéo mini da bóng',
@@ -171,13 +261,13 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
         },
         {
           id: 'feet_shoes',
-          name: 'Chân',
+          name: 'Chân và giày',
           items: ['Boot da cổ lửng', 'Giày thể thao trắng']
         }
       ];
     }
 
-    // traditional: Cổ truyền cung đình chuẩn xác cho Áo Nhật Bình
+    // traditional: Cổ truyền cung đình chuẩn xác (Cúc kim bội dải thao là phụ kiện tùy chọn linh hoạt)
     return [
       {
         id: 'head',
@@ -194,16 +284,17 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
       },
       {
         id: 'neck_chest',
-        name: 'Cổ',
+        name: 'Cổ và ngực (Trang sức & Cúc áo)',
         items: [
-          'Kim bội hoàng gia rủ tua rua đỏ',
+          'Cúc cài kim bội dải thao đỏ (Ấn bội cổ truyền)',
+          'Hàng cúc ngọc / khuy xà cừ cổ phong',
           'Kiềng bạc chạm hoa mai',
           'Chuỗi ngọc trai tự nhiên'
         ]
       },
       {
         id: 'hands_waist',
-        name: 'Tay',
+        name: 'Tay và thắt lưng',
         items: [
           'Quạt đoàn phiến lụa tơ thêu mẫu đơn đính ngọc',
           'Quạt xếp nan ngà chạm lộng thếp vàng',
@@ -212,7 +303,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
       },
       {
         id: 'feet_shoes',
-        name: 'Chân',
+        name: 'Chân và hài',
         items: [
           'Hài thêu hoa sen mũi nhọn',
           'Guốc mộc quai nhung đỏ'
@@ -228,13 +319,13 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
 
   const getDefaultAccessoriesForStyle = (style: 'traditional' | 'subtle_modern' | 'remix_fusion') => {
     if (style === 'subtle_modern') {
-      return ['Kiềng bạc trơn tối giản', 'Quạt đoàn phiến lụa tơ thêu mẫu đơn đính ngọc'];
+      return ['Khăn vành sa lụa trắng ngà', 'Chuỗi ngọc trai hoàng gia nhiều vòng'];
     }
     if (style === 'remix_fusion') {
-      return ['Kính râm mắt mèo retro', 'Túi đeo chéo mini da bóng'];
+      return ['Tóc tết bím lệch cài hoa ngọc đào', 'Khuyên tai ngọc trai rơi'];
     }
-    // traditional: Áo Nhật Bình mặc định có Khăn vành sa và Kim bội rủ tua rua
-    return ['Khăn vành dây xanh lam thẫm', 'Kim bội hoàng gia rủ tua rua đỏ'];
+    // traditional: Mặc định đội Khăn vành dây; Cúc áo / Kim bội dải thao là tùy chọn người dùng có thể mặc hoặc không
+    return ['Khăn vành dây xanh lam thẫm'];
   };
 
   const [selectedAccessories, setSelectedAccessories] = useState<string[]>(() => {
@@ -264,6 +355,18 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
     setRemixStyle(newStyle);
     const newDefaults = getDefaultAccessoriesForStyle(newStyle);
     setSelectedAccessories(newDefaults);
+
+    // 🌟 Đổi phong cách -> Tự động chuyển đổi màu sắc tương ứng
+    if (newStyle === 'traditional') {
+      const redCol = costume.colorVariants.find((c) => c.id === 'col-nb-red' || c.id.includes('red') || c.name.toLowerCase().includes('đỏ')) || costume.colorVariants[0];
+      if (redCol) setSelectedColor(redCol);
+    } else if (newStyle === 'subtle_modern') {
+      const ivoryCol = costume.colorVariants.find((c) => c.id === 'col-nb-ivory' || c.id.includes('ivory') || c.name.toLowerCase().includes('trắng') || c.name.toLowerCase().includes('bạch')) || costume.colorVariants[1] || costume.colorVariants[0];
+      if (ivoryCol) setSelectedColor(ivoryCol);
+    } else if (newStyle === 'remix_fusion') {
+      const pinkCol = costume.colorVariants.find((c) => c.id === 'col-nb-pink' || c.id.includes('pink') || c.name.toLowerCase().includes('hồng')) || costume.colorVariants[2] || costume.colorVariants[0];
+      if (pinkCol) setSelectedColor(pinkCol);
+    }
   };
 
   const [selectedBackground, setSelectedBackground] = useState<BackgroundSetting>(() => {
@@ -404,7 +507,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
       const draftPayload: Partial<FittingDraft> = {
         id: existingDraft?.id,
         title: `Phác thảo ${costume.name} • ${selectedColor.name}`,
-        eventId: event?.id || 'evt-tet',
+        eventId: selectedEventItem?.id || event?.id || 'evt-tet',
         costumeId: costume.id,
         modelGender,
         modelPose: aiPose,
@@ -452,7 +555,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
         draftId: existingDraft?.id,
         costumeId: costume.id,
         costumeName: costume.name,
-        eventName: event?.name || 'Sự kiện văn hóa',
+        eventName: selectedEventItem?.name || event?.name || 'Sự kiện văn hóa',
         modelGender,
         remixStyle,
         colorName: selectedColor.name,
@@ -489,15 +592,15 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
   return (
     <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
       {/* Top Editorial Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-[#E8E2D8] gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between pb-6 border-b border-[#F4C2CE] gap-4">
         <div>
-          <div className="flex items-center gap-2 text-xs font-serif text-[#9B2C2C] font-semibold tracking-wider uppercase mb-1">
-            <ChimLacIcon className="w-3.5 h-3 text-[#9B2C2C]" />
+          <div className="flex items-center gap-2 text-xs font-serif text-[#C84B69] font-semibold tracking-wider uppercase mb-1">
+            <ChimLacIcon className="w-3.5 h-3 text-[#C84B69]" />
             Xưởng Phối Đồ & Thử Cổ Phục AI
           </div>
           <h1 className="text-2xl sm:text-4xl font-serif font-bold text-[#1C1917] flex items-center gap-3">
             {costume.name}
-            <span className="text-xs font-sans font-normal px-2.5 py-0.5 rounded-full bg-[#FAF7F2] text-[#57534E] border border-[#E8E2D8]">
+            <span className="text-xs font-sans font-normal px-2.5 py-0.5 rounded-full bg-[#FFF5F7] text-[#57534E] border border-[#F4C2CE]">
               {event?.name || 'Sự kiện tự chọn'}
             </span>
           </h1>
@@ -508,12 +611,12 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
           <button
             onClick={handleSaveDraft}
             disabled={saveLoading || aiLoading}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FFFFFF] hover:bg-[#FAF7F2] text-[#1C1917] text-xs font-serif font-semibold border border-[#E8E2D8] shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#FFFFFF] hover:bg-[#FFF5F7] text-[#1C1917] text-xs font-serif font-semibold border border-[#F4C2CE] shadow-xs transition-colors disabled:opacity-50 cursor-pointer"
           >
             {saveLoading ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#9B2C2C]" />
+              <Loader2 className="w-3.5 h-3.5 animate-spin text-[#C84B69]" />
             ) : (
-              <Save className="w-3.5 h-3.5 text-[#9B2C2C]" />
+              <Save className="w-3.5 h-3.5 text-[#C84B69]" />
             )}
             <span>Lưu phác thảo</span>
           </button>
@@ -521,7 +624,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
           <button
             onClick={handleGenerateAI}
             disabled={aiLoading}
-            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#9B2C2C] hover:bg-[#832424] text-[#FAF7F2] text-xs font-semibold tracking-wide shadow-sm transition-all hover:shadow-md disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-[#C84B69] hover:bg-[#B33B58] text-[#FFF5F7] text-xs font-semibold tracking-wide shadow-sm transition-all hover:shadow-md disabled:opacity-50 cursor-pointer"
           >
             {aiLoading ? (
               <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
@@ -535,8 +638,8 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
 
       {/* Notifications */}
       {saveSuccessMsg && (
-        <div className="p-4 rounded-xl bg-[#FAF7F2] border border-[#C29B38]/50 text-[#57534E] text-xs flex items-center gap-2.5 shadow-xs">
-          <CheckCircle2 className="w-4 h-4 text-[#9B2C2C]" />
+        <div className="p-4 rounded-xl bg-[#FFF5F7] border border-[#C29B38]/50 text-[#57534E] text-xs flex items-center gap-2.5 shadow-xs">
+          <CheckCircle2 className="w-4 h-4 text-[#C84B69]" />
           <span className="font-serif">{saveSuccessMsg}</span>
         </div>
       )}
@@ -552,13 +655,13 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
       {aiLoading && (
         <div className="p-6 rounded-2xl bg-[#FFFFFF] border border-[#C29B38]/50 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-[#FAF7F2] border border-[#C29B38]/30 flex items-center justify-center shrink-0">
-              <Loader2 className="w-6 h-6 text-[#9B2C2C] animate-spin" />
+            <div className="w-12 h-12 rounded-xl bg-[#FFF5F7] border border-[#C29B38]/30 flex items-center justify-center shrink-0">
+              <Loader2 className="w-6 h-6 text-[#C84B69] animate-spin" />
             </div>
             <div className="space-y-1">
               <div className="text-sm font-serif font-bold text-[#1C1917] flex items-center gap-2">
                 AI đang xử lý nếp lụa & hoa văn hoàng cung...
-                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#FAF7F2] text-[#9B2C2C] border border-[#E8E2D8]">
+                <span className="text-[11px] font-mono px-2 py-0.5 rounded bg-[#FFF5F7] text-[#C84B69] border border-[#F4C2CE]">
                   {aiJob?.status || 'queued'} • {aiJob?.progress || 25}%
                 </span>
               </div>
@@ -568,9 +671,9 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
             </div>
           </div>
 
-          <div className="w-full sm:w-56 bg-[#FAF7F2] rounded-full h-2.5 overflow-hidden border border-[#E8E2D8]">
+          <div className="w-full sm:w-56 bg-[#FFF5F7] rounded-full h-2.5 overflow-hidden border border-[#F4C2CE]">
             <div
-              className="bg-gradient-to-r from-[#C29B38] to-[#9B2C2C] h-full transition-all duration-300"
+              className="bg-gradient-to-r from-[#C29B38] to-[#C84B69] h-full transition-all duration-300"
               style={{ width: `${aiJob?.progress || 25}%` }}
             />
           </div>
@@ -598,9 +701,9 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
       {/* PHẦN 1: STUDIO PHÁC THẢO & PHỐI ĐỒ TRỰC QUAN (Standing Fashion Croquis) */}
       {/* ========================================================================= */}
       <section className="space-y-6">
-        <div className="flex items-center justify-between border-b border-[#E8E2D8] pb-3">
+        <div className="flex items-center justify-between border-b border-[#F4C2CE] pb-3">
           <div className="flex items-center gap-2">
-            <span className="w-6 h-6 rounded-full bg-[#9B2C2C] text-white text-xs font-bold flex items-center justify-center font-serif">
+            <span className="w-6 h-6 rounded-full bg-[#C84B69] text-white text-xs font-bold flex items-center justify-center font-serif">
               1
             </span>
             <h2 className="text-lg font-serif font-bold text-[#1C1917]">
@@ -632,38 +735,273 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
             />
 
             {/* Quy chuẩn điển chế */}
-            <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#E8E2D8] text-xs text-[#57534E] space-y-2 shadow-2xs">
+            <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#F4C2CE] text-xs text-[#57534E] space-y-2 shadow-2xs">
               <div className="font-serif font-bold text-[#1C1917] flex items-center gap-2">
-                <Compass className="w-4 h-4 text-[#9B2C2C]" />
+                <Compass className="w-4 h-4 text-[#C84B69]" />
                 Chuẩn mực phục dựng y phục hoàng triều
               </div>
               <p className="font-light leading-relaxed">
                 • Bấm vào các nút tròn bên lề trái để bật/tắt hiển thị Áo hoặc Quần. Toàn bộ phụ kiện (đầu và tóc, mắt và tai, cổ, tay, chân) được chọn và hiển thị trực tiếp thông qua các hộp chọn bên phải.
               </p>
               <p className="font-light leading-relaxed">
-                • {isFemaleOnly ? '⚠️ Lưu ý: Áo Nhật Bình và Áo Tứ Thân là y phục cung đình / dân gian thuần nữ theo điển chế, không áp dụng cho nam.' : 'Trang phục này có phom chuẩn cho cả nam (vóc dáng bệ vệ, khăn đóng 7 nếp chữ Nhân) và nữ (thanh tú, nếp khăn vành sa).'}
+                • {isFemaleOnly ? '⚠️ Lưu ý: Áo Nhật Bình và Áo Tứ Thân là y phục cung đình / dân gian thuần nữ theo điển chế, không áp dụng cho nam.' : 'Trang phục này có phom chuẩn cho cả nam (khăn đóng) và nữ (khăn vành sa).'}
               </p>
             </div>
           </div>
 
           {/* Cột Phải: Bảng điều khiển tùy chỉnh người mẫu & kiểu dáng */}
-          <div className="lg:col-span-5 bg-[#FFFFFF] border border-[#E8E2D8] rounded-3xl p-6 sm:p-7 flex flex-col gap-6 shadow-xs">
+          <div className="lg:col-span-5 bg-[#FFFFFF] border border-[#F4C2CE] rounded-3xl p-6 sm:p-7 flex flex-col gap-6 shadow-xs">
             <div className="flex items-center justify-between pb-3 border-b border-[#F0EBE3]">
               <div className="flex items-center gap-2 text-[#1C1917] font-serif font-bold text-base">
-                <Sliders className="w-4 h-4 text-[#9B2C2C]" />
+                <Sliders className="w-4 h-4 text-[#C84B69]" />
                 <span>Tùy biến hình mẫu</span>
               </div>
               <span className="text-[11px] text-[#78716C] font-serif italic">{costume.era}</span>
             </div>
 
+            {/* =======================================================
+                🌟 BỘ ĐÔI DROP DOWN TÙY BIẾN NHANH: CỔ PHỤC & DỊP LỄ
+                - Muốn chọn thì click vào hộp thả xuống là xong ngay
+                - Tự động nạp bộ cổ phục và tính điểm tương thích sự kiện
+               ======================================================= */}
+            <div className="space-y-3.5 p-4 rounded-2xl bg-[#FFF5F7] border border-[#F4C2CE] shadow-2xs">
+              {/* 1. HỘP DROP DOWN CHỌN CỔ PHỤC */}
+              {costumes && costumes.length > 0 && (
+                <div className="space-y-1.5 relative" ref={costumeDropdownRef}>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-serif font-bold text-[#1C1917] flex items-center gap-1.5">
+                      <Layers className="w-3.5 h-3.5 text-[#C84B69]" />
+                      Cổ phục đang phối:
+                    </label>
+                    <span className="text-[10px] font-serif font-medium text-[#78716C] bg-white/80 px-2 py-0.5 rounded-full border border-[#F4C2CE]">
+                      {costume.era} • {costume.gender === 'female' ? 'Nữ' : costume.gender === 'male' ? 'Nam' : 'Nam & Nữ'}
+                    </span>
+                  </div>
+
+                  {/* Nút bấm mở Dropdown Cổ Phục */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsCostumeDropdownOpen(!isCostumeDropdownOpen);
+                      setIsEventDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between p-2.5 rounded-xl bg-white border transition-all text-left shadow-2xs cursor-pointer group ${
+                      isCostumeDropdownOpen
+                        ? 'border-[#C84B69] ring-2 ring-[#C84B69]/15'
+                        : 'border-[#F4C2CE] hover:border-[#C84B69]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <img
+                        src={costume.coverImage || '/assets/costumes/ao-tac-bat-bao.jpeg'}
+                        alt={costume.name}
+                        className="w-8 h-8 rounded-lg object-cover border border-[#F4C2CE] shrink-0 shadow-2xs"
+                        onError={(e) => {
+                          e.currentTarget.src = '/assets/costumes/ao-tac-bat-bao.jpeg';
+                        }}
+                      />
+                      <div className="min-w-0">
+                        <div className="text-xs font-serif font-bold text-[#1C1917] group-hover:text-[#C84B69] transition-colors truncate">
+                          {costume.name}
+                        </div>
+                        <div className="text-[10px] text-[#78716C] truncate">
+                          {costume.shortDescription || `${costume.era} • Y phục di sản`}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 pl-2 text-[#78716C] group-hover:text-[#C84B69] shrink-0">
+                      <span className="text-[11px] font-serif hidden sm:inline text-[#C84B69]/80 font-medium">Đổi</span>
+                      {isCostumeDropdownOpen ? (
+                        <ChevronUp className="w-4 h-4 text-[#C84B69]" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Menu thả xuống chọn Cổ Phục */}
+                  {isCostumeDropdownOpen && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-white border border-[#F4C2CE] rounded-2xl shadow-xl p-2 max-h-72 overflow-y-auto space-y-1">
+                      <div className="px-2 py-1 text-[10px] font-serif font-bold text-[#78716C] uppercase tracking-wider border-b border-[#F4C2CE]/60 mb-1 flex items-center justify-between">
+                        <span>Danh mục cổ phục ({costumes.length} bộ)</span>
+                        <span className="text-[9px] text-[#C84B69] font-normal normal-case">Nhấn để nạp vào Studio</span>
+                      </div>
+                      {costumes.map((c) => {
+                        const isSelected = c.id === costume.id;
+                        return (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onClick={() => {
+                              if (onSelectCostume) onSelectCostume(c);
+                              setIsCostumeDropdownOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between p-2 rounded-xl text-left transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-[#FFF5F7] border border-[#C84B69]/40 text-[#C84B69]'
+                                : 'hover:bg-[#FFF5F7]/60 text-[#1C1917] border border-transparent'
+                            }`}
+                          >
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              <img
+                                src={c.coverImage || '/assets/costumes/ao-tac-bat-bao.jpeg'}
+                                alt={c.name}
+                                className="w-9 h-9 rounded-lg object-cover border border-[#F4C2CE] shrink-0"
+                                onError={(e) => {
+                                  e.currentTarget.src = '/assets/costumes/ao-tac-bat-bao.jpeg';
+                                }}
+                              />
+                              <div className="min-w-0">
+                                <div className="text-xs font-serif font-bold truncate">
+                                  {c.name}
+                                </div>
+                                <div className="text-[10px] text-[#78716C] truncate flex items-center gap-1.5">
+                                  <span>{c.era}</span>
+                                  <span>•</span>
+                                  <span>{c.gender === 'female' ? 'Nữ' : c.gender === 'male' ? 'Nam' : 'Nam & Nữ'}</span>
+                                </div>
+                              </div>
+                            </div>
+                            {isSelected && (
+                              <CheckCircle2 className="w-4 h-4 text-[#C84B69] shrink-0 ml-2" />
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* 2. HỘP DROP DOWN CHỌN DỊP LỄ & SỰ KIỆN */}
+              {events && events.length > 0 && (
+                <div className="space-y-1.5 relative" ref={eventDropdownRef}>
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-serif font-bold text-[#1C1917] flex items-center gap-1.5">
+                      <Calendar className="w-3.5 h-3.5 text-[#C84B69]" />
+                      Dịp lễ & Sự kiện mặc:
+                    </label>
+                    {suitabilityForEvent && (
+                      <span className="text-[10px] font-medium text-[#C84B69] bg-[#C84B69]/10 px-2 py-0.5 rounded-full font-serif">
+                        {suitabilityForEvent.score}/100 • {suitabilityForEvent.label}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Nút bấm mở Dropdown Sự Kiện */}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsEventDropdownOpen(!isEventDropdownOpen);
+                      setIsCostumeDropdownOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between p-2.5 rounded-xl bg-white border transition-all text-left shadow-2xs cursor-pointer group ${
+                      isEventDropdownOpen
+                        ? 'border-[#C84B69] ring-2 ring-[#C84B69]/15'
+                        : 'border-[#F4C2CE] hover:border-[#C84B69]'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="w-8 h-8 rounded-lg bg-[#FFF5F7] border border-[#F4C2CE] flex items-center justify-center shrink-0 text-[#C84B69]">
+                        <Calendar className="w-4 h-4" />
+                      </div>
+                      <div className="min-w-0">
+                        <div className="text-xs font-serif font-bold text-[#1C1917] group-hover:text-[#C84B69] transition-colors truncate">
+                          {selectedEventItem?.name || 'Chọn dịp lễ & sự kiện'}
+                        </div>
+                        <div className="text-[10px] text-[#78716C] truncate">
+                          {selectedEventItem?.formalityLevel || selectedEventItem?.category || 'Ngữ cảnh văn hóa'}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-1.5 pl-2 text-[#78716C] group-hover:text-[#C84B69] shrink-0">
+                      <span className="text-[11px] font-serif hidden sm:inline text-[#C84B69]/80 font-medium">Chọn</span>
+                      {isEventDropdownOpen ? (
+                        <ChevronUp className="w-4 h-4 text-[#C84B69]" />
+                      ) : (
+                        <ChevronDown className="w-4 h-4" />
+                      )}
+                    </div>
+                  </button>
+
+                  {/* Menu thả xuống chọn Sự Kiện */}
+                  {isEventDropdownOpen && (
+                    <div className="absolute left-0 right-0 top-full mt-1.5 z-40 bg-white border border-[#F4C2CE] rounded-2xl shadow-xl p-2 max-h-72 overflow-y-auto space-y-1">
+                      <div className="px-2 py-1 text-[10px] font-serif font-bold text-[#78716C] uppercase tracking-wider border-b border-[#F4C2CE]/60 mb-1 flex items-center justify-between">
+                        <span>Danh mục lễ hội & sự kiện ({events.length})</span>
+                        <span className="text-[9px] text-[#C84B69] font-normal normal-case">Điểm độ phù hợp</span>
+                      </div>
+                      {events.map((evt) => {
+                        const isSelected = selectedEventItem?.id === evt.id;
+                        const suit = costume.suitability?.find((s) => s.eventId === evt.id);
+                        return (
+                          <button
+                            key={evt.id}
+                            type="button"
+                            onClick={() => {
+                              handleSelectEvent(evt);
+                              setIsEventDropdownOpen(false);
+                            }}
+                            className={`w-full flex items-center justify-between p-2 rounded-xl text-left transition-all cursor-pointer ${
+                              isSelected
+                                ? 'bg-[#FFF5F7] border border-[#C84B69]/40 text-[#C84B69]'
+                                : 'hover:bg-[#FFF5F7]/60 text-[#1C1917] border border-transparent'
+                            }`}
+                          >
+                            <div className="min-w-0 pr-2">
+                              <div className="text-xs font-serif font-bold truncate">
+                                {evt.name}
+                              </div>
+                              <div className="text-[10px] text-[#78716C] truncate">
+                                {evt.formalityLevel || evt.category}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 shrink-0">
+                              {suit && (
+                                <span className={`text-[10px] font-medium px-2 py-0.5 rounded-full font-serif ${
+                                  suit.score >= 90
+                                    ? 'bg-[#C84B69]/10 text-[#C84B69]'
+                                    : 'bg-[#C29B38]/15 text-[#9E6B15]'
+                                }`}>
+                                  {suit.score}/100
+                                </span>
+                              )}
+                              {isSelected && (
+                                <CheckCircle2 className="w-4 h-4 text-[#C84B69]" />
+                              )}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Lý giải văn hóa về sự tương thích */}
+                  {suitabilityForEvent && (
+                    <div className="p-2.5 rounded-xl bg-white border border-[#F4C2CE]/80 text-[11px] text-[#57534E] space-y-1">
+                      <div className="flex items-center gap-1.5 font-serif font-semibold text-[#C84B69]">
+                        <span>✦ Đánh giá ngữ cảnh:</span>
+                        <span>{suitabilityForEvent.label}</span>
+                      </div>
+                      <p className="font-light italic leading-tight text-[#78716C]">
+                        {suitabilityForEvent.reason}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* 1. ĐỊNH HƯỚNG PHONG CÁCH (ĐẶT LÊN ĐẦU TIÊN!) */}
-            <div className="p-4 rounded-2xl bg-[#FAF7F2] border border-[#C29B38]/40 space-y-2.5">
+            <div className="p-4 rounded-2xl bg-[#FFF5F7] border border-[#C29B38]/40 space-y-2.5">
               <div className="flex items-center justify-between">
                 <label className="text-xs font-serif font-bold text-[#1C1917] flex items-center gap-1.5">
-                  <Sparkle className="w-3.5 h-3.5 text-[#9B2C2C]" />
+                  <Sparkle className="w-3.5 h-3.5 text-[#C84B69]" />
                   1. Định hướng phong cách:
                 </label>
-                <span className="text-[10px] uppercase font-serif font-bold text-[#9B2C2C] bg-[#9B2C2C]/10 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] uppercase font-serif font-bold text-[#C84B69] bg-[#C84B69]/10 px-2 py-0.5 rounded-full">
                   Ưu tiên số 1
                 </span>
               </div>
@@ -674,8 +1012,8 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                   onClick={() => handleSelectRemixStyle('traditional')}
                   className={`py-2 px-1 rounded-xl border text-[11px] font-serif font-medium transition-all text-center cursor-pointer ${
                     remixStyle === 'traditional'
-                      ? 'bg-[#9B2C2C] text-white border-[#9B2C2C] font-bold shadow-xs'
-                      : 'bg-white border-[#E8E2D8] text-[#57534E] hover:text-[#1C1917]'
+                      ? 'bg-[#C84B69] text-white border-[#C84B69] font-bold shadow-xs'
+                      : 'bg-white border-[#F4C2CE] text-[#57534E] hover:text-[#1C1917]'
                   }`}
                 >
                   Truyền thống
@@ -685,8 +1023,8 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                   onClick={() => handleSelectRemixStyle('subtle_modern')}
                   className={`py-2 px-1 rounded-xl border text-[11px] font-serif font-medium transition-all text-center cursor-pointer ${
                     remixStyle === 'subtle_modern'
-                      ? 'bg-[#9B2C2C] text-white border-[#9B2C2C] font-bold shadow-xs'
-                      : 'bg-white border-[#E8E2D8] text-[#57534E] hover:text-[#1C1917]'
+                      ? 'bg-[#C84B69] text-white border-[#C84B69] font-bold shadow-xs'
+                      : 'bg-white border-[#F4C2CE] text-[#57534E] hover:text-[#1C1917]'
                   }`}
                 >
                   Cách tân nhẹ
@@ -696,8 +1034,8 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                   onClick={() => handleSelectRemixStyle('remix_fusion')}
                   className={`py-2 px-1 rounded-xl border text-[11px] font-serif font-medium transition-all text-center cursor-pointer ${
                     remixStyle === 'remix_fusion'
-                      ? 'bg-[#9B2C2C] text-white border-[#9B2C2C] font-bold shadow-xs'
-                      : 'bg-white border-[#E8E2D8] text-[#57534E] hover:text-[#1C1917]'
+                      ? 'bg-[#C84B69] text-white border-[#C84B69] font-bold shadow-xs'
+                      : 'bg-white border-[#F4C2CE] text-[#57534E] hover:text-[#1C1917]'
                   }`}
                 >
                   Remix hiện đại
@@ -714,7 +1052,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
             {/* 2. NGƯỜI MẪU (CHỈ CHỌN GIỚI TÍNH - DÁNG ĐỨNG CHUẨN THỜI TRANG) */}
             <div className="space-y-2">
               <label className="block text-xs font-serif font-bold text-[#1C1917] flex items-center gap-1.5">
-                <User className="w-3.5 h-3.5 text-[#9B2C2C]" />
+                <User className="w-3.5 h-3.5 text-[#C84B69]" />
                 2. Người mẫu:
               </label>
 
@@ -724,11 +1062,11 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                   onClick={() => setModelGender('female')}
                   className={`py-2 px-3 rounded-xl border text-xs font-medium transition-all cursor-pointer ${
                     modelGender === 'female'
-                      ? 'bg-[#9B2C2C]/10 border-[#9B2C2C] text-[#9B2C2C] font-semibold shadow-2xs'
-                      : 'bg-[#FAF7F2] border-[#E8E2D8] text-[#57534E] hover:text-[#1C1917]'
+                      ? 'bg-[#C84B69]/10 border-[#C84B69] text-[#C84B69] font-semibold shadow-2xs'
+                      : 'bg-[#FFF5F7] border-[#F4C2CE] text-[#57534E] hover:text-[#1C1917]'
                   }`}
                 >
-                  Người mẫu Nữ (Thanh tú)
+                  Nữ
                 </button>
                 <button
                   type="button"
@@ -738,12 +1076,12 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                     isFemaleOnly
                       ? 'bg-stone-100 border-stone-200 text-stone-400 cursor-not-allowed opacity-50'
                       : modelGender === 'male'
-                      ? 'bg-[#9B2C2C]/10 border-[#9B2C2C] text-[#9B2C2C] font-semibold shadow-2xs cursor-pointer'
-                      : 'bg-[#FAF7F2] border-[#E8E2D8] text-[#57534E] hover:text-[#1C1917] cursor-pointer'
+                      ? 'bg-[#C84B69]/10 border-[#C84B69] text-[#C84B69] font-semibold shadow-2xs cursor-pointer'
+                      : 'bg-[#FFF5F7] border-[#F4C2CE] text-[#57534E] hover:text-[#1C1917] cursor-pointer'
                   }`}
                   title={isFemaleOnly ? 'Y phục này theo điển chế thuần nữ, không áp dụng cho nam' : 'Chọn người mẫu Nam'}
                 >
-                  Người mẫu Nam {isFemaleOnly && '(Không áp dụng)'}
+                  Nam {isFemaleOnly && '(Chỉ áp dụng nữ)'}
                 </button>
               </div>
             </div>
@@ -751,11 +1089,11 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
             {/* 3. BIẾN THỂ MÀU SẮC */}
             <div>
               <label className="block text-xs font-serif font-bold text-[#1C1917] mb-2 flex items-center gap-1.5">
-                <Palette className="w-3.5 h-3.5 text-[#9B2C2C]" />
-                3. Biến thể màu sắc ({costume.colorVariants.length} sắc độ):
+                <Palette className="w-3.5 h-3.5 text-[#C84B69]" />
+                3. Biến thể màu sắc {remixStyle === 'traditional' ? '(4 màu truyền thống)' : '(2 màu cách tân)'}:
               </label>
               <div className="grid grid-cols-2 gap-2">
-                {costume.colorVariants.map((col) => {
+                {availableColors.map((col: ColorVariant) => {
                   const isSelected = selectedColor.id === col.id;
                   return (
                     <button
@@ -764,8 +1102,8 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                       onClick={() => setSelectedColor(col)}
                       className={`flex items-center gap-2.5 p-2 rounded-xl border text-xs transition-all text-left cursor-pointer ${
                         isSelected
-                          ? 'bg-[#FAF7F2] border-[#9B2C2C] shadow-2xs'
-                          : 'bg-[#FFFFFF] border-[#E8E2D8] hover:border-[#C29B38]'
+                          ? 'bg-[#FFF5F7] border-[#C84B69] shadow-2xs'
+                          : 'bg-[#FFFFFF] border-[#F4C2CE] hover:border-[#C29B38]'
                       }`}
                     >
                       <span
@@ -786,14 +1124,14 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between pb-1">
                 <label className="text-xs font-serif font-bold text-[#1C1917] flex items-center gap-1.5">
-                  <Layers className="w-3.5 h-3.5 text-[#9B2C2C]" />
+                  <Layers className="w-3.5 h-3.5 text-[#C84B69]" />
                   4. Phụ kiện phối ({remixStyle === 'traditional' ? 'Cổ truyền' : remixStyle === 'subtle_modern' ? 'Cách tân nhẹ' : 'Remix hiện đại'}):
                 </label>
                 {selectedAccessories.length > 0 && (
                   <button
                     type="button"
                     onClick={() => setSelectedAccessories([])}
-                    className="text-[11px] text-[#9B2C2C] hover:underline cursor-pointer font-serif font-medium"
+                    className="text-[11px] text-[#C84B69] hover:underline cursor-pointer font-serif font-medium"
                   >
                     Bỏ chọn ({selectedAccessories.length})
                   </button>
@@ -814,8 +1152,8 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                       key={category.id}
                       className={`border rounded-xl transition-all overflow-hidden ${
                         hasSelection
-                          ? 'border-[#9B2C2C]/30 bg-[#FAF7F2]/60'
-                          : 'border-[#E8E2D8] bg-[#FFFFFF]'
+                          ? 'border-[#C84B69]/30 bg-[#FFF5F7]/60'
+                          : 'border-[#F4C2CE] bg-[#FFFFFF]'
                       }`}
                     >
                       {/* Thanh tiêu đề Drop Down */}
@@ -830,7 +1168,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
 
                         <div className="flex items-center gap-2 shrink-0">
                           {hasSelection && (
-                            <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#9B2C2C]/10 text-[#9B2C2C] truncate max-w-[150px]">
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#C84B69]/10 text-[#C84B69] truncate max-w-[150px]">
                               {selectedInCat.length === 1 ? selectedInCat[0] : `${selectedInCat.length} món`}
                             </span>
                           )}
@@ -846,7 +1184,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
 
                       {/* Danh sách chọn bên trong khi Drop Down mở */}
                       {isOpen && (
-                        <div className="p-2.5 pt-1 border-t border-[#E8E2D8]/60 bg-white/70">
+                        <div className="p-2.5 pt-1 border-t border-[#F4C2CE]/60 bg-white/70">
                           <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
                             {category.items.map((accName, idx) => {
                               const isChecked = selectedAccessories.includes(accName);
@@ -857,16 +1195,16 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                                   onClick={() => handleToggleAccessory(accName)}
                                   className={`flex items-center justify-between gap-2 p-2 rounded-lg border text-xs text-left transition-all cursor-pointer ${
                                     isChecked
-                                      ? 'bg-[#9B2C2C]/10 border-[#9B2C2C] text-[#9B2C2C] font-semibold'
-                                      : 'bg-[#FFFFFF] border-[#E8E2D8] text-[#57534E] hover:border-[#C29B38] hover:bg-[#FAF7F2]'
+                                      ? 'bg-[#C84B69]/10 border-[#C84B69] text-[#C84B69] font-semibold'
+                                      : 'bg-[#FFFFFF] border-[#F4C2CE] text-[#57534E] hover:border-[#C29B38] hover:bg-[#FFF5F7]'
                                   }`}
                                 >
                                   <span className="truncate pr-1 text-[11px]">{accName}</span>
                                   <div
                                     className={`w-3.5 h-3.5 rounded flex items-center justify-center shrink-0 border transition-colors ${
                                       isChecked
-                                        ? 'bg-[#9B2C2C] border-[#9B2C2C] text-white'
-                                        : 'border-[#D8D1C7] bg-[#FAF7F2]'
+                                        ? 'bg-[#C84B69] border-[#C84B69] text-white'
+                                        : 'border-[#D8D1C7] bg-[#FFF5F7]'
                                     }`}
                                   >
                                     {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
@@ -889,8 +1227,8 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
       {/* ========================================================================= */}
       {/* PHẦN 2: XƯỞNG CHẾ TÁC CHẤT LIỆU VẢI, BỐI CẢNH & TẠO ẢNH AI */}
       {/* ========================================================================= */}
-      <section className="space-y-6 pt-4 border-t border-[#E8E2D8]">
-        <div className="flex items-center justify-between border-b border-[#E8E2D8] pb-3">
+      <section className="space-y-6 pt-4 border-t border-[#F4C2CE]">
+        <div className="flex items-center justify-between border-b border-[#F4C2CE] pb-3">
           <div className="flex items-center gap-2">
             <span className="w-6 h-6 rounded-full bg-[#C29B38] text-white text-xs font-bold flex items-center justify-center font-serif">
               2
@@ -905,83 +1243,123 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Cột 1: Chất liệu dệt di sản (6 cols) */}
-          <div className="lg:col-span-6 bg-[#FFFFFF] border border-[#E8E2D8] rounded-3xl p-6 sm:p-7 space-y-4 shadow-xs">
-            <div className="flex items-center justify-between border-b border-[#F0EBE3] pb-3">
-              <h3 className="font-serif font-bold text-sm text-[#1C1917] flex items-center gap-2">
-                <Wand2 className="w-4 h-4 text-[#9B2C2C]" />
-                Chất liệu dệt & Độ bắt sáng của vải
-              </h3>
-              <span className="text-[11px] text-[#78716C] font-serif">Làng nghề truyền thống</span>
+          {/* CỘT 1: Chất liệu dệt di sản + Không gian bối cảnh + Tư thế tạo hình (6 cols) */}
+          <div className="lg:col-span-6 bg-[#FFFFFF] border border-[#F4C2CE] rounded-3xl p-6 sm:p-7 space-y-6 shadow-xs">
+            {/* 1. Chất liệu dệt di sản */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between border-b border-[#F0EBE3] pb-3">
+                <h3 className="font-serif font-bold text-sm text-[#1C1917] flex items-center gap-2">
+                  <Wand2 className="w-4 h-4 text-[#C84B69]" />
+                  Chất liệu dệt & Độ bắt sáng của vải
+                </h3>
+                <span className="text-[11px] text-[#78716C] font-serif">Làng nghề truyền thống</span>
+              </div>
+
+              <div className="space-y-2.5">
+                {costume.materials.map((mat) => {
+                  const isSelected = selectedMaterial.id === mat.id;
+                  return (
+                    <button
+                      key={mat.id}
+                      type="button"
+                      onClick={() => setSelectedMaterial(mat)}
+                      className={`w-full p-3.5 rounded-2xl border text-xs text-left transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#FFF5F7] border-[#C84B69] shadow-xs ring-1 ring-[#C84B69]/20'
+                          : 'bg-[#FFFFFF] border-[#F4C2CE] text-[#57534E] hover:border-[#C29B38]'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between font-serif font-bold text-[#1C1917] mb-1">
+                        <span className="flex items-center gap-2">
+                          {isSelected && <span className="w-2 h-2 rounded-full bg-[#C84B69]" />}
+                          {mat.name}
+                        </span>
+                        <span className="text-[10px] px-2 py-0.5 rounded bg-[#FFF5F7] text-[#C84B69] font-mono border border-[#F4C2CE]">
+                          {mat.origin}
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#78716C] font-light leading-relaxed">
+                        {mat.description}
+                      </p>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
-            <div className="space-y-2.5">
-              {costume.materials.map((mat) => {
-                const isSelected = selectedMaterial.id === mat.id;
-                return (
-                  <button
-                    key={mat.id}
-                    type="button"
-                    onClick={() => setSelectedMaterial(mat)}
-                    className={`w-full p-3.5 rounded-2xl border text-xs text-left transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#FAF7F2] border-[#9B2C2C] shadow-xs ring-1 ring-[#9B2C2C]/20'
-                        : 'bg-[#FFFFFF] border-[#E8E2D8] text-[#57534E] hover:border-[#C29B38]'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between font-serif font-bold text-[#1C1917] mb-1">
-                      <span className="flex items-center gap-2">
-                        {isSelected && <span className="w-2 h-2 rounded-full bg-[#9B2C2C]" />}
-                        {mat.name}
-                      </span>
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-[#FAF7F2] text-[#9B2C2C] font-mono border border-[#E8E2D8]">
-                        {mat.origin}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-[#78716C] font-light leading-relaxed">
-                      {mat.description}
-                    </p>
-                  </button>
-                );
-              })}
+            {/* 2. Không gian bối cảnh di sản */}
+            <div className="space-y-3 pt-2">
+              <div className="flex items-center justify-between border-b border-[#F0EBE3] pb-3">
+                <h3 className="font-serif font-bold text-sm text-[#1C1917] flex items-center gap-2">
+                  <Compass className="w-4 h-4 text-[#C84B69]" />
+                  Không gian bối cảnh di sản
+                </h3>
+                <span className="text-[11px] text-[#78716C] font-serif">{backgrounds.length} bối cảnh</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                {backgrounds.map((bg) => {
+                  const isSelected = selectedBackground.id === bg.id;
+                  return (
+                    <button
+                      key={bg.id}
+                      type="button"
+                      onClick={() => setSelectedBackground(bg)}
+                      className={`p-3 rounded-2xl border text-xs text-left transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-[#FFF5F7] border-[#C84B69] text-[#1C1917] font-semibold shadow-xs ring-1 ring-[#C84B69]/20'
+                          : 'bg-white border-[#F4C2CE] text-[#57534E] hover:border-[#C29B38]'
+                      }`}
+                    >
+                      <div className="font-serif font-bold text-[#1C1917] flex items-center justify-between">
+                        <span className="truncate pr-1">{bg.name}</span>
+                        {isSelected && <Check className="w-3.5 h-3.5 text-[#C84B69] shrink-0" />}
+                      </div>
+                      <div className="text-[10px] text-[#C84B69] font-serif mt-0.5">{bg.aesthetic}</div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* 3. Tư thế tạo hình khi AI sinh ảnh */}
+            <div className="space-y-2 pt-2">
+              <div className="flex items-center justify-between border-b border-[#F0EBE3] pb-2">
+                <label className="text-xs font-serif font-bold text-[#1C1917] flex items-center gap-1.5">
+                  <Armchair className="w-3.5 h-3.5 text-[#C84B69]" />
+                  Tư thế tạo hình khi AI sinh ảnh:
+                </label>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setAiPose('standing_formal')}
+                  className={`py-2 px-2.5 rounded-xl border text-xs font-medium transition-all text-center cursor-pointer ${
+                    aiPose === 'standing_formal'
+                      ? 'bg-[#C84B69] text-white border-[#C84B69] font-semibold shadow-2xs'
+                      : 'bg-white border-[#F4C2CE] text-[#57534E] hover:text-[#1C1917]'
+                  }`}
+                >
+                  Dáng đứng thủ lễ
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAiPose('seated_regal')}
+                  className={`py-2 px-2.5 rounded-xl border text-xs font-medium transition-all text-center cursor-pointer ${
+                    aiPose === 'seated_regal'
+                      ? 'bg-[#C84B69] text-white border-[#C84B69] font-semibold shadow-2xs'
+                      : 'bg-white border-[#F4C2CE] text-[#57534E] hover:text-[#1C1917]'
+                  }`}
+                >
+                  Dáng ngồi trường kỷ quyền quý
+                </button>
+              </div>
             </div>
           </div>
 
-          {/* Cột 2: Không gian bối cảnh & Cổng tạo ảnh AI (6 cols) */}
-          <div className="lg:col-span-6 bg-[#FFFFFF] border border-[#E8E2D8] rounded-3xl p-6 sm:p-7 space-y-5 shadow-xs">
-            <div className="flex items-center justify-between border-b border-[#F0EBE3] pb-3">
-              <h3 className="font-serif font-bold text-sm text-[#1C1917] flex items-center gap-2">
-                <Compass className="w-4 h-4 text-[#9B2C2C]" />
-                Không gian bối cảnh di sản
-              </h3>
-              <span className="text-[11px] text-[#78716C] font-serif">{backgrounds.length} bối cảnh</span>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-              {backgrounds.map((bg) => {
-                const isSelected = selectedBackground.id === bg.id;
-                return (
-                  <button
-                    key={bg.id}
-                    type="button"
-                    onClick={() => setSelectedBackground(bg)}
-                    className={`p-3 rounded-2xl border text-xs text-left transition-all cursor-pointer ${
-                      isSelected
-                        ? 'bg-[#FAF7F2] border-[#9B2C2C] text-[#1C1917] font-semibold shadow-xs ring-1 ring-[#9B2C2C]/20'
-                        : 'bg-white border-[#E8E2D8] text-[#57534E] hover:border-[#C29B38]'
-                    }`}
-                  >
-                    <div className="font-serif font-bold text-[#1C1917] flex items-center justify-between">
-                      <span className="truncate pr-1">{bg.name}</span>
-                      {isSelected && <Check className="w-3.5 h-3.5 text-[#9B2C2C] shrink-0" />}
-                    </div>
-                    <div className="text-[10px] text-[#9B2C2C] font-serif mt-0.5">{bg.aesthetic}</div>
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Custom AI Prompt Input */}
+          {/* CỘT 2: Chỉ dẫn thêm + Tư liệu tham chiếu + Tổng hợp thiết lập AI (6 cols) */}
+          <div className="lg:col-span-6 bg-[#FFFFFF] border border-[#F4C2CE] rounded-3xl p-6 sm:p-7 space-y-5 shadow-xs">
+            {/* 1. Chỉ dẫn sáng tạo thêm cho AI */}
             <div>
               <label className="block text-xs font-serif font-bold text-[#1C1917] mb-1.5">
                 Chỉ dẫn sáng tạo thêm cho AI (Tùy chọn):
@@ -991,24 +1369,24 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                 onChange={(e) => setCustomPrompt(e.target.value)}
                 placeholder="Ví dụ: Ánh nắng chiều hoàng hôn Cố đô Huế rọi qua tán ngọc lan, màu sắc gấm óng ánh..."
                 rows={2}
-                className="w-full bg-[#FAF7F2] border border-[#E8E2D8] rounded-xl p-3 text-xs text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#9B2C2C]"
+                className="w-full bg-[#FFF5F7] border border-[#F4C2CE] rounded-xl p-3 text-xs text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#C84B69]"
               />
             </div>
 
-            {/* 🖼️ MỎ NEO ẢNH TƯ LIỆU THAM CHIẾU CHO AI (REFERENCE ARTIFACT IMAGE) */}
-            <div className="p-3.5 rounded-2xl bg-[#FAF7F2] border border-[#C29B38]/40 space-y-3">
+            {/* 2. Ảnh tư liệu tham chiếu (Mỏ neo thị giác cho AI) */}
+            <div className="p-3.5 rounded-2xl bg-[#FFF5F7] border border-[#C29B38]/40 space-y-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-1.5 font-serif font-bold text-xs text-[#1C1917]">
-                  <ImageIcon className="w-3.5 h-3.5 text-[#9B2C2C]" />
+                  <ImageIcon className="w-3.5 h-3.5 text-[#C84B69]" />
                   <span>Ảnh tư liệu tham chiếu (Mỏ neo thị giác cho AI):</span>
                 </div>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#9B2C2C]/10 text-[#9B2C2C] font-semibold">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#C84B69]/10 text-[#C84B69] font-semibold">
                   Tăng độ chuẩn xác
                 </span>
               </div>
 
               {/* Chế độ chọn ảnh tham chiếu */}
-              <div className="grid grid-cols-3 gap-1.5 bg-white p-1 rounded-xl border border-[#E8E2D8] text-[11px] font-serif">
+              <div className="grid grid-cols-3 gap-1.5 bg-white p-1 rounded-xl border border-[#F4C2CE] text-[11px] font-serif">
                 <button
                   type="button"
                   onClick={() => {
@@ -1017,7 +1395,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                   }}
                   className={`py-1.5 px-2 rounded-lg text-center transition-all cursor-pointer ${
                     referenceMode === 'preset'
-                      ? 'bg-[#9B2C2C] text-white font-bold shadow-2xs'
+                      ? 'bg-[#C84B69] text-white font-bold shadow-2xs'
                       : 'text-[#57534E] hover:text-[#1C1917]'
                   }`}
                 >
@@ -1031,7 +1409,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                   }}
                   className={`py-1.5 px-2 rounded-lg text-center transition-all flex items-center justify-center gap-1 cursor-pointer ${
                     referenceMode === 'upload'
-                      ? 'bg-[#9B2C2C] text-white font-bold shadow-2xs'
+                      ? 'bg-[#C84B69] text-white font-bold shadow-2xs'
                       : 'text-[#57534E] hover:text-[#1C1917]'
                   }`}
                 >
@@ -1043,7 +1421,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                   onClick={() => setReferenceMode('url')}
                   className={`py-1.5 px-2 rounded-lg text-center transition-all flex items-center justify-center gap-1 cursor-pointer ${
                     referenceMode === 'url'
-                      ? 'bg-[#9B2C2C] text-white font-bold shadow-2xs'
+                      ? 'bg-[#C84B69] text-white font-bold shadow-2xs'
                       : 'text-[#57534E] hover:text-[#1C1917]'
                   }`}
                 >
@@ -1069,12 +1447,12 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                     value={urlInput}
                     onChange={(e) => setUrlInput(e.target.value)}
                     placeholder="Dán link ảnh web (https://...jpg/png)"
-                    className="flex-1 bg-white border border-[#E8E2D8] rounded-lg px-2.5 py-1.5 text-xs text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#9B2C2C]"
+                    className="flex-1 bg-white border border-[#F4C2CE] rounded-lg px-2.5 py-1.5 text-xs text-[#1C1917] placeholder:text-[#A8A29E] focus:outline-none focus:border-[#C84B69]"
                   />
                   <button
                     type="button"
                     onClick={handleApplyUrl}
-                    className="px-3 py-1.5 bg-[#9B2C2C] hover:bg-[#7A2121] text-white text-xs font-serif font-bold rounded-lg transition-colors cursor-pointer"
+                    className="px-3 py-1.5 bg-[#C84B69] hover:bg-[#B33B58] text-white text-xs font-serif font-bold rounded-lg transition-colors cursor-pointer"
                   >
                     Gắn link
                   </button>
@@ -1083,11 +1461,11 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
 
               {/* Thumbnail Preview */}
               {referenceImageUrl && (
-                <div className="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-[#E8E2D8]">
+                <div className="flex items-center gap-3 bg-white p-2.5 rounded-xl border border-[#F4C2CE]">
                   <img
                     src={referenceImageUrl}
                     alt="Ảnh tư liệu tham chiếu"
-                    className="w-14 h-16 object-cover rounded-lg border border-[#E8E2D8] shadow-2xs shrink-0"
+                    className="w-14 h-16 object-cover rounded-lg border border-[#F4C2CE] shadow-2xs shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <div className="text-[11px] font-serif font-bold text-[#1C1917] truncate">
@@ -1109,7 +1487,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                         setReferenceMode('preset');
                         setReferenceImageUrl(costume.coverImage || '');
                       }}
-                      className="p-1.5 text-[#78716C] hover:text-[#9B2C2C] transition-colors"
+                      className="p-1.5 text-[#78716C] hover:text-[#C84B69] transition-colors"
                       title="Hủy ảnh tùy biến, dùng ảnh gốc"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -1119,52 +1497,22 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
               )}
             </div>
 
-            {/* Cổng hoàn thiện AI (AI Generation Action Card) */}
-            <div className="p-4 rounded-2xl bg-gradient-to-br from-[#FAF7F2] to-[#F5ECE0] border border-[#C29B38]/50 space-y-3">
+            {/* 3. Tổng hợp thiết lập phục dựng AI (đầy đủ Sự kiện & Định hướng phong cách) */}
+            <div className="p-4 rounded-2xl bg-gradient-to-br from-[#FFF5F7] to-[#F5ECE0] border border-[#C29B38]/50 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-serif font-bold text-[#1C1917] flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5 text-[#9B2C2C]" />
+                  <Sparkles className="w-3.5 h-3.5 text-[#C84B69]" />
                   Tổng hợp thiết lập phục dựng AI
                 </span>
-                <span className="text-[10px] font-mono text-[#9B2C2C] font-semibold">
+                <span className="text-[10px] font-mono text-[#C84B69] font-semibold">
                   8K Cinematic
                 </span>
               </div>
 
-              {/* 🌟 LỰA CHỌN TƯ THẾ CHO AI SINH ẢNH (CHUYỂN XUỐNG ĐÂY THEO YÊU CẦU CỦA BẠN) */}
-              <div className="bg-white/80 p-3 rounded-xl border border-[#E8E2D8] space-y-1.5">
-                <label className="block text-[11px] font-serif font-bold text-[#1C1917] flex items-center gap-1.5">
-                  <Armchair className="w-3.5 h-3.5 text-[#9B2C2C]" />
-                  Tư thế tạo hình khi AI sinh ảnh:
-                </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setAiPose('standing_formal')}
-                    className={`py-2 px-2.5 rounded-lg border text-xs font-medium transition-all text-center cursor-pointer ${
-                      aiPose === 'standing_formal'
-                        ? 'bg-[#9B2C2C] text-white border-[#9B2C2C] font-semibold shadow-2xs'
-                        : 'bg-white border-[#E8E2D8] text-[#57534E] hover:text-[#1C1917]'
-                    }`}
-                  >
-                    Dáng đứng thủ lễ
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setAiPose('seated_regal')}
-                    className={`py-2 px-2.5 rounded-lg border text-xs font-medium transition-all text-center cursor-pointer ${
-                      aiPose === 'seated_regal'
-                        ? 'bg-[#9B2C2C] text-white border-[#9B2C2C] font-semibold shadow-2xs'
-                        : 'bg-white border-[#E8E2D8] text-[#57534E] hover:text-[#1C1917]'
-                    }`}
-                  >
-                    Dáng ngồi trường kỷ quyền quý
-                  </button>
-                </div>
-              </div>
-
-              <div className="text-[11px] text-[#57534E] font-light space-y-1">
+              <div className="text-[11px] text-[#57534E] font-light space-y-1.5">
                 <p>• <strong>Trang phục:</strong> {costume.name} ({selectedColor.name}, {selectedMaterial.name})</p>
+                <p>• <strong>Dịp lễ & Sự kiện:</strong> {selectedEventItem ? `${selectedEventItem.name} (${selectedEventItem.formalityLevel || selectedEventItem.category})` : 'Tự do'}</p>
+                <p>• <strong>Định hướng phong cách:</strong> {remixStyle === 'traditional' ? 'Cổ truyền chuẩn xác (Traditional)' : remixStyle === 'subtle_modern' ? 'Cách tân nhẹ (Subtle Modern)' : 'Remix Fusion đương đại'}</p>
                 <p>• <strong>Người mẫu & Tư thế AI:</strong> {modelGender === 'male' ? 'Nam' : 'Nữ'} • {aiPose === 'seated_regal' ? 'Dáng ngồi trường kỷ quyền quý' : 'Dáng đứng thủ lễ'}</p>
                 <p>• <strong>Bối cảnh:</strong> {selectedBackground.name} ({selectedBackground.aesthetic})</p>
                 <p>• <strong>Phụ kiện:</strong> {selectedAccessories.join(', ') || 'Cơ bản'}</p>
@@ -1174,7 +1522,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                 type="button"
                 onClick={handleGenerateAI}
                 disabled={aiLoading}
-                className="w-full py-3 rounded-xl bg-[#9B2C2C] hover:bg-[#832424] text-white text-xs font-semibold tracking-wide flex items-center justify-center gap-2 shadow-md transition-all hover:shadow-lg disabled:opacity-50 cursor-pointer"
+                className="w-full py-3 rounded-xl bg-[#C84B69] hover:bg-[#B33B58] text-white text-xs font-semibold tracking-wide flex items-center justify-center gap-2 shadow-md transition-all hover:shadow-lg disabled:opacity-50 cursor-pointer"
               >
                 {aiLoading ? (
                   <>

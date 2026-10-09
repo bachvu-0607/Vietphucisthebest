@@ -1,7 +1,7 @@
 import { GoogleGenAI } from '@google/genai';
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
-import { db } from './db.js';
+import { db } from './db.ts';
 import sharp from 'sharp';
 import fs from 'fs';
 import path from 'path';
@@ -258,6 +258,27 @@ function getCostumeStructuralProfile(costumeName: string): {
  * Generate an optimized, museum-grade cultural prompt describing the Vietnamese costume,
  * accessories, background and remix styling with strict Vietnamese heritage fidelity.
  */
+function getEventContextDirective(eventName?: string): string {
+  if (!eventName) return 'a prestigious Vietnamese cultural celebration with dignified, festive elegance.';
+  const name = eventName.toLowerCase();
+  if (name.includes('cưới') || name.includes('wedding') || name.includes('hôn lễ')) {
+    return 'an authentic traditional Vietnamese imperial wedding ceremony (Hôn lễ cổ truyền / Hỷ sự gia tiên). The atmosphere conveys blissful romance, auspicious joy, familial honor, and sacred matrimonial reverence, radiant and deeply dignified.';
+  }
+  if (name.includes('tết') || name.includes('xuân') || name.includes('tet')) {
+    return 'the joyous Vietnamese Lunar New Year & Spring celebration (Tết Nguyên Đán & Du Xuân). The atmosphere conveys vibrant festive renewal, auspicious spring warmth, prosperity, and jubilant heritage spirit.';
+  }
+  if (name.includes('lễ hội') || name.includes('di tích') || name.includes('festival')) {
+    return 'a grand Vietnamese heritage festival at historic temple or palace grounds (Lễ hội văn hóa di tích). The atmosphere is solemn, sacred, honoring ancestral heritage with respectful courtly grandeur.';
+  }
+  if (name.includes('ngoại giao') || name.includes('tiệc tối') || name.includes('diplomacy')) {
+    return 'a high-level diplomatic state gala & imperial banquet (Ngoại giao & Dạ tiệc hoàng gia). The atmosphere exudes utmost regal authority, poise, sophisticated protocol, and refined cultural prestige.';
+  }
+  if (name.includes('kỷ yếu') || name.includes('tốt nghiệp') || name.includes('graduation')) {
+    return 'a commemorative Vietnamese graduation portrait (Kỷ yếu & Thanh xuân). The mood captures youthful grace, intellectual pride, and nostalgic Vietnamese poetic beauty.';
+  }
+  return `a prestigious Vietnamese cultural celebration of ${eventName}, with an elegant, dignified, festive appearance.`;
+}
+
 export function buildCostumePrompt(job: {
   costumeName: string;
   eventName: string;
@@ -284,10 +305,16 @@ export function buildCostumePrompt(job: {
       ? 'refined contemporary Vietnamese aesthetic, retaining authentic Vietnamese collar structure, tailored fit, and minimalist modern luxury.'
       : 'high-fashion modern Vietnamese fusion remix, avant-garde haute couture meets traditional imperial attire, vibrant artistic composition while respecting Vietnamese heritage roots.';
 
-  const accListFormatted =
-    job.accessories && job.accessories.length > 0
-      ? job.accessories.map((acc) => `* ${acc}`).join('\n')
-      : `* Authentic traditional headwear and coordinating accessories matching ${job.costumeName}`;
+  const formattedAccessoriesList = (job.accessories && job.accessories.length > 0)
+    ? job.accessories.map((acc) => {
+        if (acc.toLowerCase().includes('trâm')) {
+          return `* ${acc} (CRITICAL HAIRPIN PLACEMENT: The ornate silver/gold and jade lotus hairpin must be placed HORIZONTALLY behind the hair bun/chignon. The shaft of the pin is neatly tucked horizontally through the back of the hair bun, with ONLY the decorative jade flower head and delicate cascading beaded tassels gracefully exposed at the side of the bun. DO NOT stick the pin vertically or diagonally into the top of the head).`;
+        }
+        return `* ${acc}`;
+      })
+    : [`* Authentic traditional headwear and coordinating accessories matching ${job.costumeName}`];
+
+  const accListFormatted = formattedAccessoriesList.join('\n');
 
   const constructionFormatted = structuralProfile.constructionDetails
     .map((item) => `* ${item}`)
@@ -325,7 +352,8 @@ export function buildCostumePrompt(job: {
 
   return [
     `Create a photorealistic, full-length editorial portrait of a ${personSubject} wearing authentic ${job.costumeName}, presented as ${styleDirective}`,
-    `${pronoun} is dressed for ${job.eventName || 'a prestigious cultural celebration'}, with an elegant, dignified, festive appearance.`,
+    `EVENT CONTEXT & CELEBRATORY OCCASION:`,
+    `${pronoun} is dressed for ${getEventContextDirective(job.eventName)}`,
 
     `GARMENT IDENTITY & MANDATORY STRUCTURAL CONSTRUCTION:`,
     `The garment MUST visually read as an authentic ${job.costumeName} before any decorative or photographic styling is applied.`,

@@ -81,8 +81,18 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
     });
     // Trâm cài tóc: Cài trên đầu / búi tóc
     const hasHairpin = selectedAccessories.some((a) => a.toLowerCase().includes('trâm'));
-    // Kim bội hoàng gia
-    const hasKimBoi = selectedAccessories.some((a) => a.toLowerCase().includes('kim bội'));
+    // Cúc áo / khuy cài cổ phong
+    const hasCuc = selectedAccessories.some((a) => {
+      const n = a.toLowerCase();
+      return n.includes('cúc') || n.includes('khuy');
+    });
+    // Dải thao / Kim bội / Ấn tua rua đỏ hoàng cung
+    const hasThao = selectedAccessories.some((a) => {
+      const n = a.toLowerCase();
+      return n.includes('kim bội') || n.includes('thao') || n.includes('tua rua') || n.includes('ấn');
+    });
+    const hasKimBoi = hasThao;
+    const hasAnyCucOrThao = hasCuc || hasThao;
     // Kiềng cổ
     const hasKieng = selectedAccessories.some((a) => a.toLowerCase().includes('kiềng'));
     // Quạt cầm tay (Quạt tròn đoàn phiến vs Quạt xếp nan ngà)
@@ -710,20 +720,6 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
         ctx.arc(300, 121, 14, -Math.PI * 0.8, -Math.PI * 0.2);
         ctx.stroke();
 
-        // Trâm cài tóc vàng ngọc thanh nhã khi có phụ kiện trâm
-        if (hasHairpin) {
-          ctx.strokeStyle = '#F59E0B';
-          ctx.lineWidth = 2.2;
-          ctx.beginPath();
-          ctx.moveTo(282, 120);
-          ctx.lineTo(318, 124);
-          ctx.stroke();
-          ctx.fillStyle = '#EF4444';
-          ctx.beginPath();
-          ctx.arc(320, 124, 3, 0, Math.PI * 2);
-          ctx.fill();
-        }
-
         // Đôi tai nhỏ xinh hai bên
         ctx.fillStyle = skinGrad;
         ctx.beginPath();
@@ -997,6 +993,11 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
     // 5. LAYER: MAIN ROBE BODY (HAI VẠT ĐỐI KHÂM CHỮ NHẬT & TAY ÁO NGŨ SẮC TOÀN PHẦN)
     // =========================================================================
     let robeBaseColor = selectedColor?.hex || '#9B2C2C';
+    const colId = selectedColor?.id || '';
+    const colName = (selectedColor?.name || '').toLowerCase();
+    const colHex = (selectedColor?.hex || '').toLowerCase();
+    const isPink = colId.includes('pink') || colName.includes('hồng') || colHex === '#fbcfe8';
+    const isIvory = colId.includes('ivory') || colName.includes('trắng') || colName.includes('bạch') || colHex === '#faf7f0';
 
     if (mainActive) {
       ctx.save();
@@ -1100,9 +1101,16 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
           ctx.restore();
         });
 
-        // 🌟 4. CỬA TAY ÁO NGŨ SẮC: MỎNG (7.5PX/DẢI), NGHIÊNG THEO ĐỘ DỐC TAY ÁO, KHÔNG CÓ VIỀN VÀNG THỪA
-        // Thứ tự dải màu từ ngoài vào trong: Đỏ -> Trắng -> Lam -> Vàng -> Lục (may liền mạch tại cửa tay)
-        const cuffColors = ['#DC2626', '#FFFFFF', '#1D4ED8', '#FACC15', '#15803D']; // Đỏ ngoài cùng đến Lục trong cùng
+        // 🌟 4. CỬA TAY ÁO:
+        // - Khi là Áo Hồng Phấn: Cửa tay dùng các dải màu PASTEL dịu mắt (Tím lavender, Xanh lơ nhạt, Vàng bơ, Hồng phấn, Trắng kem) - Chuẩn 100% Ảnh 2!
+        // - Khi là Áo Trắng Ngà: Cửa tay dùng dải màu Trắng ngà - Vàng kim champagne thanh nhã đồng điệu - Chuẩn 100% Ảnh 1!
+        // - Khi là Áo Truyền Thống: Cửa tay dùng 5 màu ngũ sắc cung đình (Đỏ, Trắng, Lam, Vàng, Lục)
+        let cuffColors = ['#DC2626', '#FFFFFF', '#1D4ED8', '#FACC15', '#15803D'];
+        if (isPink) {
+          cuffColors = ['#C4B5FD', '#BAE6FD', '#FEF08A', '#FBCFE8', '#FFF7ED'];
+        } else if (isIvory) {
+          cuffColors = ['#D4AF37', '#FFFDF5', '#FEF08A', '#FAF7F0', '#E2E8F0'];
+        }
         const stripeW = 7.5; // Mỏng gọn theo yêu cầu
 
         // Véc-tơ hướng dốc mép trên và mép dưới tay áo trái
@@ -1304,54 +1312,100 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
         ctx.stroke();
         ctx.restore();
 
-        // 🌟 2. HAI VẠT NẸP CỔ ÁO NHẬT BÌNH: NHÔ CAO CHE PHẦN ÁO ĐỎ, VẠT CHỮ NHẬT MỎNG THANH THOÁT 24PX
-        // VẠT NẸP TRÁI (VÁT XUÔI NGHIÊNG THEO VAI TRÁI, MỞ RÃNH TIM CỔ)
+        // 🌟 2. HAI VẠT NẸP CỔ ÁO NHẬT BÌNH:
+        // - Khi là Áo Hồng Phấn (Chuẩn Ảnh 1): Cổ áo mang dải viền ngoài màu hồng đào pastel (#F472B6) phối chân nẹp tím pastel (#818CF8), dải trong trắng kem
+        // - Khi là Áo Trắng Ngà (Chuẩn Ảnh cô gái mặc áo trắng): Cổ áo mang tone trắng ngà (#FAF7F0) viền vàng kim champagne (#D4AF37)
+        // - Khi là Áo Truyền Thống: Cổ áo mang dải ngoài màu xanh dương hoàng gia (#1E3A8A), dải trong trắng bạch ngà (#FFFDF5)
+        let collarOuterColor = '#1E3A8A';
+        let collarInnerColor = '#FFFDF5';
+        let collarOuterBorderColor = '#0F172A';
+        let collarDetailColor1 = '#F59E0B';
+        let collarDetailColor2 = '#DC2626';
+
+        if (isPink) {
+          collarOuterColor = '#F472B6'; // Hồng đào pastel đồng điệu với thân áo (chuẩn ảnh 1)
+          collarInnerColor = '#FFFDF7'; // Trắng kem
+          collarOuterBorderColor = '#DB2777'; // Viền hồng sẫm
+          collarDetailColor1 = '#818CF8'; // Chân nẹp tím lavender pastel (chuẩn ảnh 1)
+          collarDetailColor2 = '#FB7185'; // Hoa văn hồng phấn
+        } else if (isIvory) {
+          collarOuterColor = '#FAF7F0'; // Trắng ngà đồng điệu tone-sur-tone (chuẩn ảnh áo trắng)
+          collarInnerColor = '#FFFFFF'; // Trắng ngọc
+          collarOuterBorderColor = '#D4AF37'; // Viền vàng kim champagne
+          collarDetailColor1 = '#D4AF37';
+          collarDetailColor2 = '#FDE047';
+        }
+
+        // VẠT NẸP TRÁI (VÁT XUÔI THEO VAI TRÁI, MỞ RÃNH TIM CỔ)
         ctx.save();
-        ctx.fillStyle = '#FFFDF5'; // Nền lụa bạch ngà hoàng gia
+        
+        // 2.1 LỚP NỀN DẢI NGOÀI (PHỦ TOÀN BỘ KHUNG FORM CỔ TRÁI)
+        ctx.fillStyle = collarOuterColor;
         ctx.beginPath();
-        // Bắt đầu từ chân cổ bên trái nhô cao (y=236)
         ctx.moveTo(284, 236);
-        // Vạt mở rộng nhô lên phủ trọn bờ vai áo đỏ underneath
         ctx.quadraticCurveTo(266, 238, 256, 256);
-        // Mép ngoài ôm theo dốc vai xuôi xuống nẹp đứng
         ctx.quadraticCurveTo(254, 276, 274, 302);
-        // Cạnh đứng mép ngoài buông thẳng xuống (chiều rộng vạt chữ nhật mỏng 24px)
         ctx.lineTo(274, bottomY);
-        // Gấu nẹp dưới
         ctx.lineTo(298, bottomY);
-        // Mép trong chạy dọc thẳng từ dưới lên tới điểm rẽ chữ V (y = 292)
         ctx.lineTo(298, 292);
-        // Mép trong rẽ chéo mở rộng thành vạt tim (chữ V) khoe vạt áo lót trắng bên trong
         ctx.quadraticCurveTo(290, 264, 284, 236);
         ctx.closePath();
         ctx.fill();
 
-        // Viền ngoài xanh lam hoàng gia (rộng, đậm nét theo chuẩn cổ áo Nhật Bình hình 2)
-        ctx.strokeStyle = '#1E3A8A';
-        ctx.lineWidth = 3.2;
+        // Viền mép ngoài cùng của dải ngoài
+        ctx.strokeStyle = collarOuterBorderColor;
+        ctx.lineWidth = 1.2;
         ctx.stroke();
 
-        // Viền xanh lục bảo bên trong viền xanh lam (chuẩn viền kép hình 2)
-        ctx.strokeStyle = '#15803D';
-        ctx.lineWidth = 1.2;
+        // 2.2 DẢI TRONG MÀU TRẮNG BẠCH NGÀ (CHIẾM NỬA TRONG CỦA BẢN NẸP)
+        ctx.fillStyle = collarInnerColor;
         ctx.beginPath();
-        ctx.moveTo(282, 238);
-        ctx.quadraticCurveTo(266, 240, 258, 256);
-        ctx.quadraticCurveTo(256, 276, 276, 302);
-        ctx.lineTo(276, bottomY - 2);
+        ctx.moveTo(284, 236);
+        // Đường phân chia giữa dải ngoài và dải trong uốn dọc theo nẹp (x ~ 286)
+        ctx.quadraticCurveTo(278, 260, 286, 302);
+        ctx.lineTo(286, bottomY);
+        ctx.lineTo(298, bottomY);
+        ctx.lineTo(298, 292);
+        ctx.quadraticCurveTo(290, 264, 284, 236);
+        ctx.closePath();
+        ctx.fill();
+
+        // Đường chỉ vàng viền phân cách tinh tế giữa dải ngoài và dải trong
+        ctx.strokeStyle = isPink ? '#F472B6' : '#D4AF37';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(284, 236);
+        ctx.quadraticCurveTo(278, 260, 286, 302);
+        ctx.lineTo(286, bottomY);
         ctx.stroke();
 
         // Viền chỉ vàng mép trong ôm lấy đường vạt tim
-        ctx.strokeStyle = '#D4AF37';
-        ctx.lineWidth = 1.3;
+        ctx.strokeStyle = isPink ? '#F472B6' : '#D4AF37';
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.moveTo(284, 236);
         ctx.quadraticCurveTo(290, 264, 298, 292);
         ctx.lineTo(298, bottomY);
         ctx.stroke();
 
+        // Điểm xuyết hoa văn nhẹ nhàng trên dải ngoài và dải trong bên trái
+        [322, 356, 386].forEach((yPos) => {
+          // Họa tiết dải ngoài
+          ctx.fillStyle = collarDetailColor1;
+          ctx.beginPath();
+          ctx.arc(280, yPos, 2, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Họa tiết dải trong
+          ctx.fillStyle = collarDetailColor2;
+          ctx.beginPath();
+          ctx.arc(292, yPos, 1.6, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
         // VẠT NẸP PHẢI (ĐỐI XỨNG HOÀN TOÀN QUA TRỤC X=300)
-        ctx.fillStyle = '#FFFDF5';
+        // 2.3 LỚP NỀN DẢI NGOÀI (PHỦ TOÀN BỘ KHUNG FORM CỔ PHẢI)
+        ctx.fillStyle = collarOuterColor;
         ctx.beginPath();
         ctx.moveTo(316, 236);
         ctx.quadraticCurveTo(334, 238, 344, 256);
@@ -1363,102 +1417,110 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
         ctx.closePath();
         ctx.fill();
 
-        // Viền ngoài xanh lam hoàng gia
-        ctx.strokeStyle = '#1E3A8A';
-        ctx.lineWidth = 3.2;
-        ctx.stroke();
-
-        // Viền xanh lục bảo bên trong viền xanh lam
-        ctx.strokeStyle = '#15803D';
+        // Viền mép ngoài cùng của dải ngoài bên phải
+        ctx.strokeStyle = collarOuterBorderColor;
         ctx.lineWidth = 1.2;
-        ctx.beginPath();
-        ctx.moveTo(318, 238);
-        ctx.quadraticCurveTo(334, 240, 342, 256);
-        ctx.quadraticCurveTo(344, 276, 324, 302);
-        ctx.lineTo(324, bottomY - 2);
         ctx.stroke();
 
-        // Viền chỉ vàng mép trong ôm lấy đường vạt tim
-        ctx.strokeStyle = '#D4AF37';
-        ctx.lineWidth = 1.3;
+        // 2.4 DẢI TRONG MÀU TRẮNG BÊN PHẢI (CHIẾM NỬA TRONG CỦA BẢN NẸP)
+        ctx.fillStyle = collarInnerColor;
+        ctx.beginPath();
+        ctx.moveTo(316, 236);
+        // Đường phân chia giữa dải ngoài và dải trong bên phải (x ~ 314)
+        ctx.quadraticCurveTo(322, 260, 314, 302);
+        ctx.lineTo(314, bottomY);
+        ctx.lineTo(302, bottomY);
+        ctx.lineTo(302, 292);
+        ctx.quadraticCurveTo(310, 264, 316, 236);
+        ctx.closePath();
+        ctx.fill();
+
+        // Đường chỉ vàng viền phân cách giữa dải ngoài và dải trong bên phải
+        ctx.strokeStyle = isPink ? '#F472B6' : '#D4AF37';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(316, 236);
+        ctx.quadraticCurveTo(322, 260, 314, 302);
+        ctx.lineTo(314, bottomY);
+        ctx.stroke();
+
+        // Viền chỉ vàng mép trong bên phải ôm lấy đường vạt tim
+        ctx.strokeStyle = isPink ? '#F472B6' : '#D4AF37';
+        ctx.lineWidth = 1.2;
         ctx.beginPath();
         ctx.moveTo(316, 236);
         ctx.quadraticCurveTo(310, 264, 302, 292);
         ctx.lineTo(302, bottomY);
         ctx.stroke();
 
-        // 🌟 3. HOA VĂN THÊU KIM TUYẾN HOÀNG GIA CHẠY DỌC TRÊN NỀN NẸP CỔ HAI BÊN (CHUẨN HÌNH 2)
-        [266, 296, 326, 356, 386].forEach((yPos, idx) => {
-          // Bông hoa kim tuyến / phượng ổ thu nhỏ bên trái
-          const leftMidX = yPos < 294 ? 276 : 286;
-          ctx.fillStyle = '#D4AF37';
+        // Điểm xuyết hoa văn nhẹ nhàng trên dải ngoài và dải trong bên phải
+        [322, 356, 386].forEach((yPos) => {
+          // Họa tiết dải ngoài bên phải
+          ctx.fillStyle = collarDetailColor1;
           ctx.beginPath();
-          ctx.arc(leftMidX, yPos, 3.8, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = idx % 2 === 0 ? '#DC2626' : '#2563EB';
-          ctx.beginPath();
-          ctx.arc(leftMidX, yPos, 1.6, 0, Math.PI * 2);
+          ctx.arc(320, yPos, 2, 0, Math.PI * 2);
           ctx.fill();
 
-          // Bên phải đối xứng
-          const rightMidX = 600 - leftMidX;
-          ctx.fillStyle = '#D4AF37';
+          // Họa tiết dải trong bên phải
+          ctx.fillStyle = collarDetailColor2;
           ctx.beginPath();
-          ctx.arc(rightMidX, yPos, 3.8, 0, Math.PI * 2);
-          ctx.fill();
-          ctx.fillStyle = idx % 2 === 0 ? '#DC2626' : '#2563EB';
-          ctx.beginPath();
-          ctx.arc(rightMidX, yPos, 1.6, 0, Math.PI * 2);
+          ctx.arc(308, yPos, 1.6, 0, Math.PI * 2);
           ctx.fill();
         });
 
-        // 🌟 4. CÚC CÀI KIM BỘI & DẢI TUA RUA ĐỎ BUÔNG TỪ ĐIỂM GIAO NHAU CỦA HAI VẠT CỔ (Y = 302)
-        const buttonY = 302; // Cài ngay điểm giao nhau của vạt chữ V
-        // Đế hoa vàng kim bội
-        ctx.fillStyle = '#F59E0B';
-        ctx.beginPath();
-        ctx.arc(300, buttonY, 6.2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#B45309';
-        ctx.lineWidth = 1.3;
-        ctx.stroke();
+        // 🌟 4. CÚC CÀI KIM BỘI / BẠCH NGỌC & DẢI TUA RUA (TÙY CHỌN TRONG PHẦN PHỤ KIỆN)
+        // Chỉ vẽ khi người dùng chọn phụ kiện Cúc áo hoặc Kim Bội / Dải thao
+        if (hasAnyCucOrThao && visibleLayers['cmp-acc'] !== false) {
+          const buttonY = 302; // Cài ngay điểm giao nhau của vạt chữ V
+          // Đế hoa ngọc bội (Áo hồng: bạch ngọc viền đồng cổ hoa mai như ảnh 1; Áo trắng: bạch ngọc viền vàng kim; Truyền thống: kim bội vàng)
+          ctx.fillStyle = isPink ? '#E2E8F0' : isIvory ? '#FFFFFF' : '#F59E0B';
+          ctx.beginPath();
+          ctx.arc(300, buttonY, 6.2, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = isPink ? '#94A3B8' : isIvory ? '#D4AF37' : '#B45309';
+          ctx.lineWidth = 1.3;
+          ctx.stroke();
 
-        // Nhụy ngọc ruby đỏ
-        ctx.fillStyle = '#DC2626';
-        ctx.beginPath();
-        ctx.arc(300, buttonY, 2.8, 0, Math.PI * 2);
-        ctx.fill();
-        // Ánh ngọc bắt sáng
-        ctx.fillStyle = '#FFFFFF';
-        ctx.beginPath();
-        ctx.arc(299, buttonY - 1, 1, 0, Math.PI * 2);
-        ctx.fill();
+          // Nhụy ngọc
+          ctx.fillStyle = isPink ? '#FB7185' : isIvory ? '#F59E0B' : '#DC2626';
+          ctx.beginPath();
+          ctx.arc(300, buttonY, 2.8, 0, Math.PI * 2);
+          ctx.fill();
+          // Ánh ngọc bắt sáng
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(299, buttonY - 1, 1, 0, Math.PI * 2);
+          ctx.fill();
 
-        // Khóa ngọc chặn dải tua rua ở đáy nẹp cổ (y = 398)
-        ctx.fillStyle = '#FDE047';
-        ctx.beginPath();
-        ctx.roundRect(296, bottomY - 2, 8, 10, 2);
-        ctx.fill();
-        ctx.strokeStyle = '#78350F';
-        ctx.lineWidth = 1;
-        ctx.stroke();
+          // Dải thao buông rủ có đính ngọc/ấn (Chỉ vẽ khi người dùng chọn phụ kiện có Dải thao / Kim bội / Ấn)
+          if (hasThao) {
+            // Khóa ngọc chặn dải tua rua ở đáy nẹp cổ (y = 398)
+            ctx.fillStyle = '#FDE047';
+            ctx.beginPath();
+            ctx.roundRect(296, bottomY - 2, 8, 10, 2);
+            ctx.fill();
+            ctx.strokeStyle = '#78350F';
+            ctx.lineWidth = 1;
+            ctx.stroke();
 
-        // Hai dải tua rua đỏ thắm buông dài từ cúc áo kim bội qua đáy nẹp cổ
-        ctx.strokeStyle = '#DC2626';
-        ctx.lineWidth = 2.4;
-        ctx.beginPath();
-        ctx.moveTo(298, buttonY + 7);
-        ctx.lineTo(296, bottomY + 50);
-        ctx.moveTo(302, buttonY + 7);
-        ctx.lineTo(304, bottomY + 50);
-        ctx.stroke();
+            // Hai dải tua rua đỏ thắm buông dài từ cúc áo kim bội qua đáy nẹp cổ
+            ctx.strokeStyle = '#DC2626';
+            ctx.lineWidth = 2.4;
+            ctx.beginPath();
+            ctx.moveTo(298, buttonY + 7);
+            ctx.lineTo(296, bottomY + 50);
+            ctx.moveTo(302, buttonY + 7);
+            ctx.lineTo(304, bottomY + 50);
+            ctx.stroke();
 
-        // Hạt ngọc chặn tua rua
-        ctx.fillStyle = '#FACC15';
-        ctx.beginPath();
-        ctx.arc(296, bottomY + 50, 2.6, 0, Math.PI * 2);
-        ctx.arc(304, bottomY + 50, 2.6, 0, Math.PI * 2);
-        ctx.fill();
+            // Hạt ngọc chặn tua rua
+            ctx.fillStyle = '#FACC15';
+            ctx.beginPath();
+            ctx.arc(296, bottomY + 50, 2.6, 0, Math.PI * 2);
+            ctx.arc(304, bottomY + 50, 2.6, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
         ctx.restore();
 
       } else if (isAoDai) {
@@ -1599,78 +1661,170 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
     if (accActive) {
       ctx.save();
 
-      // 8.1 TRÂM BẠC CÀI HOA SEN CẨN NGỌC (CÀI TRÊN ĐẦU / BÚI TÓC BÊN PHẢI)
+      // 8.1 TRÂM BẠC CÀI HOA SEN CẨN NGỌC (CÀI NGANG SAU BÚI TÓC, GIẤU THÂN TRÂM CHỈ LỘ ĐẦU TRÂM VÀ TUA RUA)
       if (hasHairpin) {
-        const pinStartX = 318;
-        const pinStartY = 154;
-        const pinEndX = 358;
-        const pinEndY = 118;
+        ctx.save();
 
-        // Vầng sáng trâm
-        ctx.strokeStyle = 'rgba(254, 240, 138, 0.4)';
-        ctx.lineWidth = 6;
-        ctx.beginPath();
-        ctx.moveTo(pinStartX, pinStartY);
-        ctx.lineTo(pinEndX, pinEndY);
-        ctx.stroke();
+        // 1. Thân trâm thanh mảnh cài ngang qua búi tóc sau đầu
+        // Búi tóc ở x: 300, y: 122. Thân trâm luồn ngang ẩn sau búi tóc:
+        const pinY = 122;
+        const pinLeftX = 276; // Đuôi trâm kim loại hơi nhú nhẹ bên trái búi tóc
+        const pinRightX = 328; // Đầu trâm vươn ra bên phải búi tóc
 
-        // Thân trâm bạc mạ vàng
-        ctx.strokeStyle = '#F1F5F9';
-        ctx.lineWidth = 3;
-        ctx.beginPath();
-        ctx.moveTo(pinStartX, pinStartY);
-        ctx.lineTo(pinEndX, pinEndY);
-        ctx.stroke();
-
+        // Thân trâm vàng ánh kim luồn ngang phía sau búi tóc
         ctx.strokeStyle = '#D4AF37';
-        ctx.lineWidth = 1.2;
+        ctx.lineWidth = 2.2;
+        ctx.beginPath();
+        ctx.moveTo(pinLeftX, pinY);
+        ctx.lineTo(pinRightX, pinY);
         ctx.stroke();
 
-        // Đầu trâm: đóa hoa sen ngọc bích 5 cánh
-        const flowerX = pinEndX;
-        const flowerY = pinEndY;
+        // Điểm đầu nhỏ đuôi trâm bên trái
+        ctx.fillStyle = '#E2E8F0';
+        ctx.beginPath();
+        ctx.arc(pinLeftX, pinY, 1.8, 0, Math.PI * 2);
+        ctx.fill();
 
-        ctx.fillStyle = '#FDA4AF';
+        // 2. Đầu trâm hoa sen / hoa ngọc cẩn ngọc thanh nhã bên phải búi tóc (x: 328 -> 350, y: 115 -> 126)
+        const flowerX = 336;
+        const flowerY = 120;
+
+        // Vầng sáng ngọc thanh tao
+        ctx.strokeStyle = 'rgba(254, 240, 138, 0.4)';
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(flowerX + 4, flowerY - 1, 9, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // Cành vàng kết nối các đóa ngọc
+        ctx.strokeStyle = '#D4AF37';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(pinRightX, pinY);
+        ctx.quadraticCurveTo(flowerX + 2, flowerY - 3, flowerX + 10, flowerY - 4);
+        ctx.stroke();
+
+        // Nhánh ngọc / lá ngọc bích xanh non trong suốt ôm lấy hoa (như ảnh mẫu)
+        ctx.fillStyle = 'rgba(134, 239, 172, 0.9)'; // Xanh ngọc bích non
+        ctx.strokeStyle = '#15803D';
+        ctx.lineWidth = 0.8;
+        // Chiếc lá ngọc trên
+        ctx.beginPath();
+        ctx.ellipse(flowerX - 2, flowerY - 7, 5, 2.5, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+        // Chiếc lá ngọc dưới
+        ctx.beginPath();
+        ctx.ellipse(flowerX + 2, flowerY + 6, 5, 2.5, 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.stroke();
+
+        // Đóa hoa sen ngọc bích / hoa ngọc trắng ngà 5 cánh thanh khiết
+        ctx.fillStyle = '#FFFFFF';
+        ctx.strokeStyle = '#FDE047';
+        ctx.lineWidth = 0.8;
         for (let i = 0; i < 5; i++) {
-          const angle = (i * (Math.PI * 2)) / 5;
-          const petX = flowerX + Math.cos(angle) * 7;
-          const petY = flowerY + Math.sin(angle) * 7;
+          const a = (i * (Math.PI * 2)) / 5 - 0.2;
+          const px = flowerX + 4 + Math.cos(a) * 5.5;
+          const py = flowerY - 1 + Math.sin(a) * 5.5;
           ctx.beginPath();
-          ctx.arc(petX, petY, 4, 0, Math.PI * 2);
+          ctx.arc(px, py, 3.2, 0, Math.PI * 2);
           ctx.fill();
-          ctx.strokeStyle = '#F43F5E';
-          ctx.lineWidth = 0.8;
           ctx.stroke();
         }
 
-        // Nhụy hoa ngọc trắng bọc ruby
-        ctx.fillStyle = '#FFFFFF';
+        // Nhụy hoa ngọc vàng ánh kim & đính ruby đỏ nhỏ ở giữa
+        ctx.fillStyle = '#F59E0B';
         ctx.beginPath();
-        ctx.arc(flowerX, flowerY, 4.5, 0, Math.PI * 2);
+        ctx.arc(flowerX + 4, flowerY - 1, 3, 0, Math.PI * 2);
         ctx.fill();
         ctx.fillStyle = '#DC2626';
         ctx.beginPath();
-        ctx.arc(flowerX, flowerY, 2.2, 0, Math.PI * 2);
+        ctx.arc(flowerX + 4, flowerY - 1, 1.4, 0, Math.PI * 2);
         ctx.fill();
 
-        // Chuỗi ngọc và tua rua chỉ đỏ rủ đung đưa
-        [
-          { x: flowerX + 2, y: flowerY + 10 },
-          { x: flowerX + 4, y: flowerY + 18 },
-          { x: flowerX + 5, y: flowerY + 26 }
-        ].forEach((p) => {
-          ctx.fillStyle = '#FFFFFF';
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, 2.4, 0, Math.PI * 2);
-          ctx.fill();
-        });
-
-        ctx.strokeStyle = '#E11D48';
-        ctx.lineWidth = 1.6;
+        // Búp hoa phụ nhỏ vươn chếch lên trên
+        ctx.fillStyle = '#FFFFFF';
         ctx.beginPath();
-        ctx.moveTo(flowerX + 5, flowerY + 28);
-        ctx.lineTo(flowerX + 6, flowerY + 44);
+        ctx.ellipse(flowerX + 12, flowerY - 5, 3.5, 2.2, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#FDE047';
+        ctx.lineWidth = 0.7;
         ctx.stroke();
+
+        // 3. Chuỗi tua rua ngọc và chuông ngọc buông rủ thanh thoát đung đưa bên cạnh búi tóc
+        // (3 dải dây chuyền vàng đính hạt ngọc và hoa chuông ngọc rủ xuống như ảnh mẫu)
+        const tasselStartX = flowerX + 6;
+        const tasselStartY = flowerY + 4;
+
+        // Dải tua rua 1 (ngắn ở trong)
+        ctx.strokeStyle = '#D4AF37';
+        ctx.lineWidth = 0.9;
+        ctx.beginPath();
+        ctx.moveTo(tasselStartX - 2, tasselStartY);
+        ctx.lineTo(tasselStartX - 2, tasselStartY + 16);
+        ctx.stroke();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(tasselStartX - 2, tasselStartY + 8, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        // Hoa chuông ngọc ở đuôi
+        ctx.fillStyle = '#FFFDF5';
+        ctx.beginPath();
+        ctx.moveTo(tasselStartX - 4, tasselStartY + 16);
+        ctx.lineTo(tasselStartX, tasselStartY + 16);
+        ctx.lineTo(tasselStartX - 2, tasselStartY + 20);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#FDE047';
+        ctx.stroke();
+
+        // Dải tua rua 2 (dài nhất ở giữa, rủ mềm mại bên tai)
+        ctx.strokeStyle = '#D4AF37';
+        ctx.lineWidth = 0.9;
+        ctx.beginPath();
+        ctx.moveTo(tasselStartX + 2, tasselStartY + 1);
+        ctx.lineTo(tasselStartX + 2, tasselStartY + 30);
+        ctx.stroke();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(tasselStartX + 2, tasselStartY + 10, 1.6, 0, Math.PI * 2);
+        ctx.arc(tasselStartX + 2, tasselStartY + 20, 1.6, 0, Math.PI * 2);
+        ctx.fill();
+        // Hạt ngọc chuông ở đuôi
+        ctx.fillStyle = '#FFFDF5';
+        ctx.beginPath();
+        ctx.moveTo(tasselStartX, tasselStartY + 30);
+        ctx.lineTo(tasselStartX + 4, tasselStartY + 30);
+        ctx.lineTo(tasselStartX + 2, tasselStartY + 35);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#FDE047';
+        ctx.stroke();
+
+        // Dải tua rua 3 (vừa ở ngoài)
+        ctx.strokeStyle = '#D4AF37';
+        ctx.lineWidth = 0.9;
+        ctx.beginPath();
+        ctx.moveTo(tasselStartX + 6, tasselStartY);
+        ctx.lineTo(tasselStartX + 6, tasselStartY + 22);
+        ctx.stroke();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.beginPath();
+        ctx.arc(tasselStartX + 6, tasselStartY + 11, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+        // Hoa chuông ngọc ở đuôi
+        ctx.fillStyle = '#FFFDF5';
+        ctx.beginPath();
+        ctx.moveTo(tasselStartX + 4, tasselStartY + 22);
+        ctx.lineTo(tasselStartX + 8, tasselStartY + 22);
+        ctx.lineTo(tasselStartX + 6, tasselStartY + 27);
+        ctx.closePath();
+        ctx.fill();
+        ctx.strokeStyle = '#FDE047';
+        ctx.stroke();
+
+        ctx.restore();
       }
 
       // 8.2 BÚP SEN TRẮNG TƯƠI CẦM TAY (GẮN CHUẨN XÁC VÀO TAY MẪU)
@@ -1867,24 +2021,333 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
         ctx.fill();
       }
 
-      // 8.11 DÙ LỤA HOA SEN CHE NẮNG
+      // 8.11 DÙ LỤA HOA SEN CHE NẮNG (DÁNG DÙ LỤA TRUYỀN THỐNG CHUẨN XÁC, TÁN NÓN VÒM THANH THOÁT)
       if (hasUmbrella) {
         ctx.save();
-        // Cán dù nghiêng vươn từ bàn tay
-        ctx.strokeStyle = '#78350F';
+
+        const handX = 432;
+        const handY = 445;
+        const apexX = 488;
+        const apexY = 145; // Đỉnh chóp dù vút cao tạo dáng nón vòm thanh thoát
+        const bottomHandleX = 422;
+        const bottomHandleY = 492;
+
+        // 1. CÁN DÙ TRÚC GIÀ (Thân trúc thanh mảnh, đốt trúc tinh xảo)
+        // Cán dù nghiêng góc tự nhiên ~21 độ, vươn từ tay cầm lên thẳng tâm đỉnh dù
+        ctx.strokeStyle = '#5C381E'; // Màu tre trúc già ngả nâu ấm
         ctx.lineWidth = 3.2;
+        ctx.lineCap = 'round';
         ctx.beginPath();
-        ctx.moveTo(432, 450);
-        ctx.lineTo(470, 240);
+        ctx.moveTo(bottomHandleX, bottomHandleY);
+        ctx.lineTo(apexX, apexY);
         ctx.stroke();
 
-        ctx.fillStyle = '#FCE7F3';
+        // Chỉ vàng kim thanh thoát viền sống cán trúc
+        ctx.strokeStyle = '#D4AF37';
+        ctx.lineWidth = 0.9;
         ctx.beginPath();
-        ctx.ellipse(470, 230, 52, 28, -0.3, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.strokeStyle = '#DB2777';
-        ctx.lineWidth = 1.6;
+        ctx.moveTo(bottomHandleX, bottomHandleY);
+        ctx.lineTo(apexX, apexY);
         ctx.stroke();
+
+        // Các ngấn đốt trúc mảnh mai trên cán
+        const bambooNodes = [0.18, 0.32, 0.48, 0.65, 0.82];
+        bambooNodes.forEach((t) => {
+          const nx = bottomHandleX + (apexX - bottomHandleX) * t;
+          const ny = bottomHandleY + (apexY - bottomHandleY) * t;
+          ctx.strokeStyle = '#A16207';
+          ctx.lineWidth = 2.2;
+          ctx.beginPath();
+          ctx.moveTo(nx - 2, ny + 1);
+          ctx.lineTo(nx + 2, ny - 1);
+          ctx.stroke();
+        });
+
+        // Chuôi cán dù phía dưới: Hạt ngọc bội xanh và tua rua chỉ đỏ rủ
+        ctx.fillStyle = '#047857'; // Ngọc bích chuôi cán
+        ctx.beginPath();
+        ctx.arc(bottomHandleX, bottomHandleY, 3.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#BE123C'; // Dải tua rua đỏ thắm
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(bottomHandleX, bottomHandleY + 3);
+        ctx.quadraticCurveTo(bottomHandleX - 1, bottomHandleY + 18, bottomHandleX + 1, bottomHandleY + 30);
+        ctx.stroke();
+
+        // 2. KẾT CẤU TÁN DÙ LỤA (DÁNG NÓN VÒM PAGODA THANH NHÃ, KHÔNG PHẢI HÌNH TRÒN PHẲNG)
+        // Vành dù nghiêng không gian 3 chiều:
+        const rimPoints = [
+          { x: 370, y: 242 }, // Mép ngoài cùng bên trái
+          { x: 395, y: 254 },
+          { x: 422, y: 263 },
+          { x: 452, y: 268 },
+          { x: 485, y: 270 }, // Điểm thấp nhất vành trước
+          { x: 518, y: 266 },
+          { x: 548, y: 256 },
+          { x: 574, y: 240 },
+          { x: 596, y: 220 }  // Mép ngoài cùng bên phải (lùi xa hơn tạo góc nhìn 3D)
+        ];
+
+        // 2.1 LÒNG DÙ PHÍA DƯỚI & HỆ KÈO NAN DÙ TRE (Đặc trưng không thể nhầm lẫn của cây dù thật)
+        // Lòng dù bên trong nhìn thấy nhẹ dưới vành trước:
+        ctx.fillStyle = '#9F1239'; // Màu lòng lụa trong bóng tối
+        ctx.beginPath();
+        ctx.moveTo(rimPoints[0].x, rimPoints[0].y);
+        // Đường vành sau của lòng dù
+        ctx.quadraticCurveTo(482, 218, rimPoints[rimPoints.length - 1].x, rimPoints[rimPoints.length - 1].y);
+        // Men theo vành trước
+        for (let i = rimPoints.length - 1; i >= 0; i--) {
+          ctx.lineTo(rimPoints[i].x, rimPoints[i].y);
+        }
+        ctx.closePath();
+        ctx.fill();
+
+        // Các kèo dù tre (bộ nan đỡ xòe bung ra từ cán đỡ lòng dù)
+        const runnerX = apexX - 14;
+        const runnerY = apexY + 48; // Con trượt dù trên cán
+        ctx.strokeStyle = '#D4AF37'; // Nan kèo tre thếp vàng
+        ctx.lineWidth = 1;
+        [1, 2, 3, 4, 5, 6, 7].forEach((i) => {
+          ctx.beginPath();
+          ctx.moveTo(runnerX, runnerY);
+          ctx.lineTo(rimPoints[i].x, rimPoints[i].y - 4);
+          ctx.stroke();
+        });
+
+        // Vòng đai con trượt (runner ring) bọc quanh cán
+        ctx.fillStyle = '#78350F';
+        ctx.beginPath();
+        ctx.ellipse(runnerX, runnerY, 3.5, 2.5, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2.2 TÁN DÙ CHÍNH BẰNG LỤA TƠ TẰM HỒNG ĐÀO (Dáng nón vòm pagoda duyên dáng)
+        // Gradient phủ dọc theo độ dốc mái nón dù: Sáng từ chóp lướt xuống vành ngoài
+        const silkGrad = ctx.createLinearGradient(apexX, apexY, 480, 270);
+        silkGrad.addColorStop(0, '#FFF1F2');   // Đỉnh chóp lụa trắng ngà phớt ánh kim
+        silkGrad.addColorStop(0.2, '#FFE4E6'); // Hồng phấn thanh khiết
+        silkGrad.addColorStop(0.6, '#FDA4AF'); // Hồng đào tơ tằm
+        silkGrad.addColorStop(0.9, '#F43F5E'); // Hồng sen thắm
+        silkGrad.addColorStop(1, '#BE123C');   // Viền son thắm mép dù
+
+        ctx.fillStyle = silkGrad;
+        ctx.beginPath();
+        // Mép trái tán dù: Cong thoai thoải hình mái vòm pagoda từ chóp xuống mép trái
+        ctx.moveTo(apexX, apexY);
+        ctx.quadraticCurveTo(405, 172, rimPoints[0].x, rimPoints[0].y);
+
+        // Mép dưới vành dù: Uốn cong theo từng múi nan lụa căng (Scalloped silk gore edges)
+        for (let i = 0; i < rimPoints.length - 1; i++) {
+          const p1 = rimPoints[i];
+          const p2 = rimPoints[i + 1];
+          const midX = (p1.x + p2.x) / 2;
+          const midY = (p1.y + p2.y) / 2 + 2.8; // Độ võng nhẹ của mép vải lụa căng giữa 2 nan
+          ctx.quadraticCurveTo(midX, midY, p2.x, p2.y);
+        }
+
+        // Mép phải tán dù: Vút lên đỉnh chóp
+        ctx.quadraticCurveTo(558, 162, apexX, apexY);
+        ctx.closePath();
+        ctx.fill();
+
+        // 2.3 CÁC MÚI NAN TRÚC DÁT VÀNG PHỦ TRÊN TÁN DÙ (TẠO CẤU TRÚC 12 NAN CHUẨN MỰC)
+        rimPoints.forEach((pt, idx) => {
+          // Đường nan tre chính
+          ctx.strokeStyle = 'rgba(212, 175, 55, 0.85)'; // Màu chỉ vàng kim
+          ctx.lineWidth = 1.3;
+          ctx.beginPath();
+          ctx.moveTo(apexX, apexY);
+          // Đường nan dù cong nhẹ theo sườn mái nón
+          const cx = (apexX + pt.x) / 2 - (idx < 4 ? 6 : -3);
+          const cy = (apexY + pt.y) / 2 - 4;
+          ctx.quadraticCurveTo(cx, cy, pt.x, pt.y);
+          ctx.stroke();
+
+          // Bóng nếp gấp vải lụa căng hai bên nan (tạo múi lụa 3 chiều chân thực)
+          ctx.strokeStyle = 'rgba(159, 18, 57, 0.22)';
+          ctx.lineWidth = 0.8;
+          ctx.beginPath();
+          ctx.moveTo(apexX, apexY);
+          ctx.quadraticCurveTo(cx + 1.2, cy + 1, pt.x, pt.y);
+          ctx.stroke();
+        });
+
+        // 3. HỌA TIẾT CÀNH SEN THỦY MẶC VẼ TRÊN MẶT LỤA (KHÔNG PHẢI MỘT HÌNH TRÒN GIỮA DÙ)
+        // Nhành sen uốn lượn mềm mại nghiêng theo sườn tán dù bên trái
+        // Thân cành sen uốn cong duyên dáng
+        ctx.strokeStyle = 'rgba(4, 120, 87, 0.75)'; // Xanh ngọc lục bảo thanh nhã
+        ctx.lineWidth = 1.6;
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        ctx.moveTo(436, 252);
+        ctx.quadraticCurveTo(442, 215, 464, 192);
+        ctx.stroke();
+
+        // Lá sen non xanh ngọc mờ ảo đệm dưới cành
+        ctx.fillStyle = 'rgba(16, 185, 129, 0.38)';
+        ctx.beginPath();
+        ctx.ellipse(438, 236, 14, 7, -0.3, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = 'rgba(5, 150, 105, 0.6)';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        // ĐÓA SEN HỒNG NỞ E ẤP NGHIÊNG BÓNG TRÊN TÁN LỤA
+        const flowerX = 462;
+        const flowerY = 196;
+
+        // Lớp cánh sen ngoài phớt hồng
+        ctx.fillStyle = '#FB7185';
+        ctx.beginPath();
+        ctx.moveTo(flowerX - 10, flowerY + 6);
+        ctx.quadraticCurveTo(flowerX - 18, flowerY - 4, flowerX - 6, flowerY - 12);
+        ctx.quadraticCurveTo(flowerX - 2, flowerY, flowerX - 10, flowerY + 6);
+        ctx.fill();
+
+        ctx.beginPath();
+        ctx.moveTo(flowerX + 8, flowerY + 6);
+        ctx.quadraticCurveTo(flowerX + 16, flowerY - 4, flowerX + 6, flowerY - 12);
+        ctx.quadraticCurveTo(flowerX + 2, flowerY, flowerX + 8, flowerY + 6);
+        ctx.fill();
+
+        // Cánh sen chính ở giữa nở thon cao vút
+        ctx.fillStyle = '#FFF1F2'; // Trắng ngà cánh sen
+        ctx.beginPath();
+        ctx.moveTo(flowerX - 7, flowerY + 5);
+        ctx.quadraticCurveTo(flowerX - 8, flowerY - 16, flowerX, flowerY - 22);
+        ctx.quadraticCurveTo(flowerX + 8, flowerY - 16, flowerX + 7, flowerY + 5);
+        ctx.closePath();
+        ctx.fill();
+
+        // Đầu cánh sen điểm hồng son thắm
+        ctx.fillStyle = '#E11D48';
+        ctx.beginPath();
+        ctx.moveTo(flowerX - 4, flowerY - 14);
+        ctx.quadraticCurveTo(flowerX, flowerY - 22, flowerX + 4, flowerY - 14);
+        ctx.quadraticCurveTo(flowerX, flowerY - 17, flowerX - 4, flowerY - 14);
+        ctx.fill();
+
+        // Nhụy hoa sen vàng kim
+        ctx.fillStyle = '#EAB308';
+        ctx.beginPath();
+        ctx.ellipse(flowerX, flowerY + 1, 3.5, 2.5, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Gân cánh sen vẽ nét bút lông mảnh
+        ctx.strokeStyle = '#BE123C';
+        ctx.lineWidth = 0.7;
+        ctx.beginPath();
+        ctx.moveTo(flowerX, flowerY + 1);
+        ctx.lineTo(flowerX, flowerY - 19);
+        ctx.stroke();
+
+        // BÚP SEN NON THANH MẢNH NGHIÊNG BÊN CẠNH
+        ctx.strokeStyle = 'rgba(4, 120, 87, 0.75)';
+        ctx.lineWidth = 1.2;
+        ctx.beginPath();
+        ctx.moveTo(452, 218);
+        ctx.quadraticCurveTo(472, 216, 484, 206);
+        ctx.stroke();
+
+        ctx.fillStyle = '#F43F5E';
+        ctx.beginPath();
+        ctx.moveTo(482, 207);
+        ctx.quadraticCurveTo(484, 198, 492, 196);
+        ctx.quadraticCurveTo(490, 205, 484, 209);
+        ctx.closePath();
+        ctx.fill();
+
+        // Cánh sen lụa rơi bay nhẹ theo gió
+        ctx.fillStyle = '#FDA4AF';
+        ctx.beginPath();
+        ctx.ellipse(506, 224, 5, 2.5, 0.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 4. VIỀN VÀNG KIM CHẠY DỌC VÀNH DÙ VÀ DẢI TUA RUA LỤA
+        ctx.strokeStyle = '#D4AF37'; // Viền vàng dát
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.moveTo(rimPoints[0].x, rimPoints[0].y);
+        for (let i = 0; i < rimPoints.length - 1; i++) {
+          const p1 = rimPoints[i];
+          const p2 = rimPoints[i + 1];
+          const midX = (p1.x + p2.x) / 2;
+          const midY = (p1.y + p2.y) / 2 + 2.8;
+          ctx.quadraticCurveTo(midX, midY, p2.x, p2.y);
+        }
+        ctx.stroke();
+
+        // Dải tua rua lụa hồng buông rủ thẳng đứng theo trọng lực ở các múi phía trước
+        [2, 3, 4, 5, 6].forEach((idx) => {
+          const pt = rimPoints[idx];
+
+          // Hạt ngọc vàng nhỏ đính ở đầu nan dù
+          ctx.fillStyle = '#FACC15';
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y + 1, 1.8, 0, Math.PI * 2);
+          ctx.fill();
+
+          // Dải tua rua lụa rủ thẳng buông mềm
+          ctx.strokeStyle = '#FB7185';
+          ctx.lineWidth = 1.4;
+          ctx.beginPath();
+          ctx.moveTo(pt.x, pt.y + 2);
+          ctx.lineTo(pt.x, pt.y + 16);
+          ctx.stroke();
+
+          // Hạt ngọc trắng châu nhỏ ở đuôi tua rua
+          ctx.fillStyle = '#FFFFFF';
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y + 16, 1.2, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        // 5. CHÓP BÚP SEN THẾP VÀNG TẠI ĐỈNH DÙ (FINIAL / FERRULE)
+        // Chóp búp sen vút nhọn đặc trưng của dù cung đình Việt Nam
+        ctx.fillStyle = '#EAB308';
+        ctx.beginPath();
+        ctx.moveTo(apexX - 4, apexY + 1);
+        ctx.lineTo(apexX + 4, apexY + 1);
+        ctx.lineTo(apexX + 1.5, apexY - 14);
+        ctx.quadraticCurveTo(apexX, apexY - 20, apexX - 1.5, apexY - 14);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = '#A16207';
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Ánh sáng lấp lánh đỉnh chóp
+        ctx.fillStyle = '#FEF08A';
+        ctx.beginPath();
+        ctx.arc(apexX, apexY - 12, 1.5, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 6. BÀN TAY BÚP MĂNG CẦM CÁN DÙ (Vẽ phủ lên cán dù tạo cảm giác cầm nắm thật)
+        ctx.fillStyle = '#FED7AA';
+        ctx.beginPath();
+        ctx.moveTo(handX + 4, handY - 9);
+        ctx.quadraticCurveTo(handX + 8, handY + 1, handX, handY + 9);
+        ctx.quadraticCurveTo(handX - 8, handY + 11, handX - 10, handY + 3);
+        ctx.quadraticCurveTo(handX - 8, handY - 7, handX, handY - 11);
+        ctx.closePath();
+        ctx.fill();
+
+        ctx.strokeStyle = 'rgba(190, 120, 90, 0.4)';
+        ctx.lineWidth = 0.8;
+        ctx.stroke();
+
+        // Ngón tay thon búp măng ôm quanh cán
+        ctx.strokeStyle = 'rgba(190, 120, 90, 0.45)';
+        ctx.lineWidth = 0.7;
+        ctx.beginPath();
+        ctx.moveTo(handX + 2, handY - 4);
+        ctx.lineTo(handX + 4, handY + 4);
+        ctx.moveTo(handX - 2, handY - 2);
+        ctx.lineTo(handX, handY + 6);
+        ctx.stroke();
+
         ctx.restore();
       }
 

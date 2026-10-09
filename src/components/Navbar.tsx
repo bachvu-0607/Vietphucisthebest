@@ -1,5 +1,5 @@
 import React from 'react';
-import { ChimLacIcon, TrienSonSeal } from './VietnameseMotifs';
+import { ChimLacIcon, TrienSonSeal, PubSeal } from './VietnameseMotifs';
 import { Bookmark, Compass, BookOpen, Layers, Home, Sparkles } from 'lucide-react';
 
 interface NavbarProps {
@@ -18,29 +18,15 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-md bg-[#FFF5F7]/95 border-b border-[#F7D6DE] transition-colors">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-        {/* Brand with [PUB] Logo & Typography as drawn in sketch */}
+        {/* Brand Name - Con dấu PUB đặt góc trái trên cùng bên trái chữ Việt Phục */}
         <div
           onClick={() => onNavigate('home')}
-          className="flex items-center gap-3 cursor-pointer group"
+          className="flex items-center gap-2.5 cursor-pointer group"
         >
-          {/* [PUB] Stamp Badge as drawn in sketch */}
-          <div className="px-2.5 py-1 border-2 border-[#C84B69] rounded-md font-serif font-black text-xs text-[#C84B69] bg-white shadow-xs tracking-wider group-hover:scale-105 transition-transform">
-            PUB
-          </div>
-
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-              <span className="text-[#1C1917] font-serif font-bold text-xl tracking-tight group-hover:text-[#C84B69] transition-colors">
-                Việt Phục Remix
-              </span>
-              <span className="hidden sm:inline-flex text-[10px] uppercase font-semibold px-2 py-0.5 rounded-xs bg-[#C84B69]/10 text-[#C84B69] border border-[#C84B69]/25 tracking-wider">
-                Di Sản
-              </span>
-            </div>
-            <span className="text-[11px] text-[#78716C] font-normal tracking-wide">
-              Khám phá • Phối đồ • Định hình phong cách
-            </span>
-          </div>
+          <PubSeal size="md" className="group-hover:scale-105 transition-transform" />
+          <span className="text-[#1C1917] font-serif font-bold text-2xl tracking-tight group-hover:text-[#C84B69] transition-colors">
+            Việt Phục
+          </span>
         </div>
 
         {/* Desktop Navigation Items */}

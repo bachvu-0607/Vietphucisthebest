@@ -30,9 +30,9 @@ const EVENT_GRAPHIC_DETAILS: Record<
   { icon: React.ReactNode; motifTag: string; accentColor: string }
 > = {
   'evt-tet': {
-    icon: <Sparkles className="w-5 h-5 text-[#9B2C2C]" />,
+    icon: <Sparkles className="w-5 h-5 text-[#C84B69]" />,
     motifTag: 'Hoa Đào • Phố Xuân',
-    accentColor: '#9B2C2C'
+    accentColor: '#C84B69'
   },
   'evt-festival': {
     icon: <Calendar className="w-5 h-5 text-[#C29B38]" />,
@@ -40,9 +40,9 @@ const EVENT_GRAPHIC_DETAILS: Record<
     accentColor: '#C29B38'
   },
   'evt-wedding': {
-    icon: <HeartHandshake className="w-5 h-5 text-[#9B2C2C]" />,
+    icon: <HeartHandshake className="w-5 h-5 text-[#C84B69]" />,
     motifTag: 'Hỷ Sự • Trầu Cau',
-    accentColor: '#9B2C2C'
+    accentColor: '#C84B69'
   },
   'evt-yearbook': {
     icon: <GraduationCap className="w-5 h-5 text-[#1E3A4A]" />,
@@ -82,14 +82,14 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Editorial Hero Intro */}
         <div className="text-center max-w-3xl mx-auto mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#9B2C2C]/8 border border-[#9B2C2C]/20 text-[#9B2C2C] text-xs font-serif font-semibold tracking-wider uppercase mb-5">
-            <ChimLacIcon className="w-3.5 h-3 text-[#9B2C2C]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C84B69]/8 border border-[#C84B69]/20 text-[#C84B69] text-xs font-serif font-semibold tracking-wider uppercase mb-5">
+            <ChimLacIcon className="w-3.5 h-3 text-[#C84B69]" />
             Khởi đầu từ hoàn cảnh sử dụng
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-serif font-bold text-[#1C1917] tracking-tight leading-tight mb-5">
             Mặc đúng lễ nghi, <br className="hidden sm:inline" />
-            <span className="italic font-normal text-[#9B2C2C]">hòa hợp cùng thời khắc</span>
+            <span className="italic font-normal text-[#C84B69]">hòa hợp cùng thời khắc</span>
           </h1>
 
           <p className="text-base sm:text-lg text-[#57534E] font-light leading-relaxed max-w-2xl mx-auto">
@@ -102,7 +102,7 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
         {onOpenAoDaiRecommender && (
           <div
             onClick={onOpenAoDaiRecommender}
-            className="max-w-4xl mx-auto mb-12 bg-gradient-to-r from-[#9B2C2C] via-[#851E1E] to-[#6E1616] text-white rounded-xl p-4.5 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 cursor-pointer shadow-md hover:shadow-lg transition-all group border border-[#D4AF37]/30"
+            className="max-w-4xl mx-auto mb-12 bg-gradient-to-r from-[#C84B69] via-[#851E1E] to-[#6E1616] text-white rounded-xl p-4.5 sm:p-5 flex flex-col sm:flex-row items-center justify-between gap-4 cursor-pointer shadow-md hover:shadow-lg transition-all group border border-[#D4AF37]/30"
           >
             <div className="flex items-center gap-3.5">
               <div className="w-11 h-11 rounded-full bg-white/15 border border-white/20 flex items-center justify-center shrink-0">
@@ -122,7 +122,7 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
                 </p>
               </div>
             </div>
-            <button className="px-4.5 py-2 rounded-md bg-white text-[#9B2C2C] font-semibold text-xs shrink-0 group-hover:bg-amber-100 transition-colors flex items-center gap-1.5 shadow-sm">
+            <button className="px-4.5 py-2 rounded-md bg-white text-[#C84B69] font-semibold text-xs shrink-0 group-hover:bg-amber-100 transition-colors flex items-center gap-1.5 shadow-sm">
               <span>Trải nghiệm ngay</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
@@ -134,9 +134,9 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
           {events.map((evt) => {
             const isSelected = selectedEventId === evt.id;
             const graphic = EVENT_GRAPHIC_DETAILS[evt.id] || {
-              icon: <Sparkles className="w-5 h-5 text-[#9B2C2C]" />,
+              icon: <Sparkles className="w-5 h-5 text-[#C84B69]" />,
               motifTag: 'Văn hóa cổ truyền',
-              accentColor: '#9B2C2C'
+              accentColor: '#C84B69'
             };
 
             return (
@@ -145,15 +145,15 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
                 onClick={() => onSelectEvent(evt)}
                 className={`group relative rounded-xl p-6 sm:p-7 cursor-pointer transition-all duration-300 flex flex-col justify-between border ${
                   isSelected
-                    ? 'bg-[#FFFFFF] border-[#9B2C2C] shadow-lg shadow-[#9B2C2C]/8 ring-1 ring-[#9B2C2C]'
-                    : 'bg-[#FFFFFF] border-[#E8E2D8] hover:border-[#C29B38]/80 hover:shadow-md hover:-translate-y-0.5'
+                    ? 'bg-[#FFFFFF] border-[#C84B69] shadow-lg shadow-[#C84B69]/8 ring-1 ring-[#C84B69]'
+                    : 'bg-[#FFFFFF] border-[#F4C2CE] hover:border-[#C29B38]/80 hover:shadow-md hover:-translate-y-0.5'
                 }`}
               >
                 <div>
                   {/* Top Bar with Icon & Tag */}
                   <div className="flex items-center justify-between mb-5">
                     <div className="flex items-center gap-2.5">
-                      <div className="w-10 h-10 rounded-lg bg-[#FAF7F2] border border-[#E8E2D8] flex items-center justify-center group-hover:border-[#9B2C2C]/40 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-[#FFF5F7] border border-[#F4C2CE] flex items-center justify-center group-hover:border-[#C84B69]/40 transition-colors">
                         {graphic.icon}
                       </div>
                       <span className="text-[11px] font-medium tracking-wider text-[#78716C] uppercase font-serif">
@@ -162,17 +162,17 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
                     </div>
 
                     <div className="flex items-center gap-1.5">
-                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-xs bg-[#FAF7F2] text-[#57534E] border border-[#E8E2D8]">
+                      <span className="text-[11px] font-semibold px-2 py-0.5 rounded-xs bg-[#FFF5F7] text-[#57534E] border border-[#F4C2CE]">
                         {evt.badge}
                       </span>
                       {isSelected && (
-                        <CheckCircle2 className="w-4 h-4 text-[#9B2C2C]" />
+                        <CheckCircle2 className="w-4 h-4 text-[#C84B69]" />
                       )}
                     </div>
                   </div>
 
                   {/* Title & Description */}
-                  <h3 className="text-xl font-serif font-bold text-[#1C1917] group-hover:text-[#9B2C2C] transition-colors mb-2.5">
+                  <h3 className="text-xl font-serif font-bold text-[#1C1917] group-hover:text-[#C84B69] transition-colors mb-2.5">
                     {evt.name}
                   </h3>
                   <p className="text-xs sm:text-sm text-[#57534E] leading-relaxed mb-6 font-light">
@@ -187,7 +187,7 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
                     {evt.recommendedDressCode}
                   </div>
 
-                  <div className="flex items-center justify-between text-xs font-semibold text-[#9B2C2C] pt-2">
+                  <div className="flex items-center justify-between text-xs font-semibold text-[#C84B69] pt-2">
                     <span className="group-hover:underline">Khám phá các bộ phù hợp</span>
                     <ArrowRight className="w-3.5 h-3.5 transform group-hover:translate-x-1 transition-transform" />
                   </div>
@@ -198,11 +198,11 @@ export const EventSelector: React.FC<EventSelectorProps> = ({
         </div>
 
         {/* How It Works Editorial Banner */}
-        <div className="mt-20 p-8 rounded-2xl bg-[#FFFFFF] border border-[#E8E2D8] shadow-xs">
+        <div className="mt-20 p-8 rounded-2xl bg-[#FFFFFF] border border-[#F4C2CE] shadow-xs">
           <HoaSenDivider label="Quy trình trải nghiệm" className="mb-8" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center sm:text-left">
             <div className="flex flex-col gap-2">
-              <span className="font-serif italic text-2xl text-[#9B2C2C] font-bold">01.</span>
+              <span className="font-serif italic text-2xl text-[#C84B69] font-bold">01.</span>
               <h4 className="font-serif font-bold text-base text-[#1C1917]">
                 Chọn sự kiện phù hợp
               </h4>

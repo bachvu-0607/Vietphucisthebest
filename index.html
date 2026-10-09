@@ -9,6 +9,30 @@
     <meta property="og:description" content="Ứng dụng tìm hiểu, lựa chọn, phối thử và hoàn thiện trang phục truyền thống Việt Nam (Việt phục) phù hợp sự kiện bằng công nghệ AI." />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
+    <script>
+      // Ignore WebSocket and HMR errors per AI Studio environment constraints
+      window.addEventListener('unhandledrejection', function (e) {
+        if (
+          e.reason &&
+          (String(e.reason).includes('WebSocket') ||
+            String(e.reason.message || '').includes('WebSocket') ||
+            String(e.reason.message || '').includes('closed without opened'))
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+      window.addEventListener('error', function (e) {
+        if (
+          e.message &&
+          (e.message.includes('WebSocket') ||
+            e.message.includes('closed without opened'))
+        ) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+      });
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">

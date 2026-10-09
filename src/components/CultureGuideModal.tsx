@@ -12,9 +12,9 @@ export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, on
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-[#1C1917]/70 backdrop-blur-xs overflow-y-auto">
-      <div className="relative w-full max-w-3xl rounded-2xl bg-[#FAF7F2] border border-[#E8E2D8] shadow-2xl p-6 sm:p-8 my-8 text-[#1C1917] flex flex-col">
+      <div className="relative w-full max-w-3xl rounded-2xl bg-[#FFF5F7] border border-[#F4C2CE] shadow-2xl p-6 sm:p-8 my-8 text-[#1C1917] flex flex-col">
         {/* Header */}
-        <div className="flex items-center justify-between pb-4 border-b border-[#E8E2D8]">
+        <div className="flex items-center justify-between pb-4 border-b border-[#F4C2CE]">
           <div className="flex items-center gap-3">
             <TrienSonSeal text="Điển Lệ" size="sm" />
             <div>
@@ -29,7 +29,7 @@ export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, on
 
           <button
             onClick={onClose}
-            className="p-2 rounded-md text-[#78716C] hover:text-[#1C1917] hover:bg-[#E8E2D8]/50 transition-colors"
+            className="p-2 rounded-md text-[#78716C] hover:text-[#1C1917] hover:bg-[#F4C2CE]/50 transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -38,8 +38,8 @@ export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, on
         {/* Content */}
         <div className="my-6 space-y-6 text-xs text-[#57534E] leading-relaxed overflow-y-auto max-h-[70vh] pr-2">
           {/* Section 1 */}
-          <div className="p-5 rounded-xl bg-[#FFFFFF] border border-[#E8E2D8] shadow-xs">
-            <h3 className="font-serif font-bold text-[#9B2C2C] text-sm mb-2 flex items-center gap-2">
+          <div className="p-5 rounded-xl bg-[#FFFFFF] border border-[#F4C2CE] shadow-xs">
+            <h3 className="font-serif font-bold text-[#C84B69] text-sm mb-2 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#C29B38]" />
               1. Triết lý Áo Ngũ Thân & Đạo Đức Ngũ Thường
             </h3>
@@ -53,8 +53,8 @@ export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, on
           </div>
 
           {/* Section 2 */}
-          <div className="p-5 rounded-xl bg-[#FFFFFF] border border-[#E8E2D8] shadow-xs">
-            <h3 className="font-serif font-bold text-[#9B2C2C] text-sm mb-2 flex items-center gap-2">
+          <div className="p-5 rounded-xl bg-[#FFFFFF] border border-[#F4C2CE] shadow-xs">
+            <h3 className="font-serif font-bold text-[#C84B69] text-sm mb-2 flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-[#246A5E]" />
               2. Áo Nhật Bình Cung Đình Triều Nguyễn
             </h3>
@@ -67,8 +67,8 @@ export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, on
           </div>
 
           {/* Section 3 */}
-          <div className="p-5 rounded-xl bg-[#FFFFFF] border border-[#E8E2D8] shadow-xs">
-            <h3 className="font-serif font-bold text-[#9B2C2C] text-sm mb-2 flex items-center gap-2">
+          <div className="p-5 rounded-xl bg-[#FFFFFF] border border-[#F4C2CE] shadow-xs">
+            <h3 className="font-serif font-bold text-[#C84B69] text-sm mb-2 flex items-center gap-2">
               <Quote className="w-4 h-4 text-[#C29B38]" />
               3. Phân biệt Áo Giao Lĩnh & Áo Đối Khâm Thời Lý - Trần - Lê
             </h3>
@@ -82,8 +82,8 @@ export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, on
           </div>
 
           {/* Heritage Commitment */}
-          <div className="p-5 rounded-xl bg-[#FAF7F2] border border-[#C29B38]/40">
-            <h3 className="font-serif font-bold text-[#9B2C2C] text-sm mb-1.5">
+          <div className="p-5 rounded-xl bg-[#FFF5F7] border border-[#C29B38]/40">
+            <h3 className="font-serif font-bold text-[#C84B69] text-sm mb-1.5">
               Cam kết tính chính xác của tư liệu
             </h3>
             <p className="text-[11px] leading-relaxed text-[#57534E] font-light text-justify">
@@ -93,10 +93,10 @@ export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, on
         </div>
 
         {/* Footer */}
-        <div className="pt-4 border-t border-[#E8E2D8] flex justify-end">
+        <div className="pt-4 border-t border-[#F4C2CE] flex justify-end">
           <button
             onClick={onClose}
-            className="px-5 py-2 rounded-sm bg-[#9B2C2C] hover:bg-[#832424] text-[#FAF7F2] text-xs font-semibold transition-colors"
+            className="px-5 py-2 rounded-sm bg-[#C84B69] hover:bg-[#832424] text-[#FFF5F7] text-xs font-semibold transition-colors"
           >
             Đã hiểu
           </button>

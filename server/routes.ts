@@ -1,8 +1,9 @@
-import { Router, Request, Response } from 'express';
-import { db } from './db.js';
-import { processJobInBackground } from './ai.js';
+import express from 'express';
+import type { Request, Response } from 'express';
+import { db } from './db.ts';
+import { processJobInBackground } from './ai.ts';
 
-export const apiRouter = Router();
+export const apiRouter = express.Router();
 
 // Events API
 apiRouter.get('/events', (_req: Request, res: Response) => {

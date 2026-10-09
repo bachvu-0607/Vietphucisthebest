@@ -11,7 +11,7 @@ import { ComparisonModal } from './components/ComparisonModal';
 import { CultureGuideModal } from './components/CultureGuideModal';
 import { AoDaiRecommender } from './components/AoDaiRecommender';
 import { HomePage } from './components/HomePage';
-import { TrienSonSeal, ChimLacIcon, HoaSenDivider } from './components/VietnameseMotifs';
+import { TrienSonSeal, ChimLacIcon, HoaSenDivider, PubSeal } from './components/VietnameseMotifs';
 import { Loader2, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function App() {
@@ -168,7 +168,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-[#1C1917] flex flex-col font-sans selection:bg-[#9B2C2C]/20 selection:text-[#9B2C2C]">
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF5F7] via-[#FDF0F3] to-[#FFF5F7] text-[#1C1917] flex flex-col font-sans selection:bg-[#C84B69]/20 selection:text-[#C84B69]">
       {/* Top Editorial Navigation */}
       <Navbar
         currentView={currentView}
@@ -191,27 +191,27 @@ export default function App() {
       <main className="flex-1">
         {loading ? (
           <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-            <div className="w-12 h-12 rounded-full bg-[#9B2C2C]/10 flex items-center justify-center">
-              <Loader2 className="w-6 h-6 text-[#9B2C2C] animate-spin" />
+            <div className="w-14 h-14 rounded-full bg-[#FFF0F4] border border-[#F4C2CE] flex items-center justify-center shadow-xs">
+              <Loader2 className="w-7 h-7 text-[#C84B69] animate-spin" />
             </div>
-            <p className="text-sm font-serif italic text-[#78716C]">
+            <p className="text-sm font-serif italic text-[#6E2E3E]">
               Đang mở tàng thư điển lệ cổ phục Việt...
             </p>
           </div>
         ) : error ? (
-          <div className="max-w-md mx-auto my-20 p-8 rounded-2xl bg-[#FFFFFF] border border-[#E8E2D8] text-center shadow-xs">
-            <AlertCircle className="w-10 h-10 text-[#991B1B] mx-auto mb-3" />
+          <div className="max-w-md mx-auto my-20 p-8 rounded-2xl bg-white border border-[#F4C2CE] text-center shadow-sm">
+            <AlertCircle className="w-10 h-10 text-[#C84B69] mx-auto mb-3" />
             <h3 className="font-serif font-bold text-lg text-[#1C1917] mb-2">{error}</h3>
             <button
               onClick={() => window.location.reload()}
-              className="px-5 py-2.5 bg-[#9B2C2C] hover:bg-[#832424] text-white rounded-sm text-xs font-semibold"
+              className="px-5 py-2.5 bg-[#C84B69] hover:bg-[#B33B58] text-white rounded-xl text-xs font-semibold shadow-xs transition-colors cursor-pointer"
             >
               Tải lại trang
             </button>
           </div>
         ) : (
           <>
-            {/* 1. HOME VIEW: COMPLETE HOMEPAGE (Giới thiệu, Sự kiện, Kho cổ phục) */}
+            {/* 1. HOME VIEW: COMPLETE HOMEPAGE (Giới thiệu, Sự kiện, Kho cổ phục dàn trải) */}
             {currentView === 'home' && (
               <HomePage
                 events={events}
@@ -229,12 +229,13 @@ export default function App() {
               />
             )}
 
-            {/* 2. COSTUMES LIST VIEW: RECOMMENDED BASED ON EVENT */}
+            {/* 2. COSTUMES LIST VIEW: SƠ ĐỒ TRỐNG ĐỒNG + LỌC NAM NỮ + THẺ CỔ PHỤC */}
             {currentView === 'costumes' && (
               <CostumeList
                 costumes={costumes}
                 selectedEvent={selectedEvent}
                 onSelectCostume={handleSelectCostume}
+                onTryRemix={handleStartRemix}
                 onChangeEvent={() => setCurrentView('home')}
               />
             )}
@@ -254,7 +255,13 @@ export default function App() {
               (selectedCostume ? (
                 <StudioRemix
                   costume={selectedCostume}
+                  costumes={costumes}
+                  onSelectCostume={(newCostume) => {
+                    setSelectedCostume(newCostume);
+                  }}
                   event={selectedEvent}
+                  events={events}
+                  onSelectEvent={setSelectedEvent}
                   backgrounds={backgrounds}
                   existingDraft={activeDraft}
                   onDraftSaved={handleDraftSaved}
@@ -267,7 +274,7 @@ export default function App() {
                   </p>
                   <button
                     onClick={() => setCurrentView('costumes')}
-                    className="px-6 py-2.5 rounded-sm bg-[#9B2C2C] text-white font-medium text-xs"
+                    className="px-6 py-2.5 rounded-xl bg-[#C84B69] hover:bg-[#B33B58] text-white font-medium text-xs shadow-xs cursor-pointer"
                   >
                     Xem kho trang phục
                   </button>
@@ -298,32 +305,32 @@ export default function App() {
         )}
       </main>
 
-      {/* Editorial Heritage Footer */}
-      <footer className="border-t border-[#E8E2D8] bg-[#FFFFFF] py-10 text-xs text-[#78716C]">
+      {/* Editorial Heritage Footer - Unified Pink Palette */}
+      <footer className="border-t border-[#F7D6DE] bg-gradient-to-r from-[#FFF5F7] via-[#FFFFFF] to-[#FFF5F7] py-10 text-xs text-[#78716C]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex items-center gap-3">
-            <TrienSonSeal text="Remix" size="sm" />
+            <PubSeal size="sm" />
             <div className="flex flex-col">
-              <span className="font-serif font-bold text-[#1C1917] text-sm">
-                Việt Phục Remix
-              </span>
-              <span className="text-[11px] text-[#A8A29E] font-light">
-                Nền tảng sáng tạo & Phục dựng y phục cổ truyền Việt Nam
+              <div className="flex items-center gap-2">
+                <span className="font-serif font-bold text-[#1C1917] text-sm">
+                  PUB
+                </span>
+                <span className="text-[11px] font-mono text-[#991B1B] font-semibold bg-[#991B1B]/10 px-2 py-0.5 rounded-sm border border-[#991B1B]/25">
+                  PTIT • UET • BKA
+                </span>
+              </div>
+              <span className="text-[11px] text-[#78716C] font-light mt-0.5">
+                Liên minh sinh viên PTIT - UET - BKA sáng tạo & phục dựng y phục cổ truyền Việt Nam
               </span>
             </div>
           </div>
 
-          <div className="flex flex-wrap items-center justify-center gap-6 text-[#57534E]">
-            <button
-              onClick={() => setShowCultureModal(true)}
-              className="hover:text-[#9B2C2C] transition-colors font-serif"
-            >
-              Quy chế Ngũ Thường & Y phục
-            </button>
-            <span>•</span>
-            <span className="font-serif">Đối chiếu Đại Nam Hội Điển</span>
-            <span>•</span>
-            <span className="font-serif">Bảo tàng Cố đô Huế</span>
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs font-serif text-[#57534E]">
+            <span className="hover:text-[#C84B69] transition-colors">Khám phá</span>
+            <span className="text-[#F4C2CE]">•</span>
+            <span className="hover:text-[#C84B69] transition-colors">Phối đồ</span>
+            <span className="text-[#F4C2CE]">•</span>
+            <span className="hover:text-[#C84B69] transition-colors">Định hình phong cách</span>
           </div>
         </div>
       </footer>
