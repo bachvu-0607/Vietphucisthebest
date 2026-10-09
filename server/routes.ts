@@ -20,8 +20,13 @@ export const apiRouter = express.Router({ caseSensitive: true, strict: true });
 
 apiRouter.use((req, res, next) => {
   if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method) && req.headers.cookie && !req.headers.authorization?.startsWith('Bearer ')) {
-    const allowed = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
-    if (!req.get('origin') || req.get('origin') !== allowed.replace(/\/$/, '')) {
+    // Vercel proxies requests while preserving the browser's Origin.
+    // Trust only this project's exact frontend domain, never arbitrary *.vercel.app.
+    const allowed = [
+      process.env.APP_URL || `${req.protocol}://${req.get('host')}`,
+      process.env.FRONTEND_ORIGIN || 'https://vietphucisthebest.vercel.app',
+    ].map(origin => origin.replace(/\/$/, ''));
+    if (!req.get('origin') || !allowed.includes(req.get('origin')!)) {
       return res.status(403).json({ success: false, error: 'Yêu cầu không cùng nguồn với website.' });
     }
   }

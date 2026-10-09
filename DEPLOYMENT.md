@@ -55,3 +55,13 @@ npm run restore -- /duong/dan/tuyet/doi/ban-backup.sqlite
 Lệnh kiểm tra file trước khi thay database, tạo snapshot trước restore, từ chối nếu server đang chạy và thu hồi phiên cũ sau restore. Khôi phục ảnh từ bộ sao lưu tương ứng nếu cần, rồi khởi động lại website. HTTP API không cho phép restore. Nên thử restore trên bản sao cô lập trước khi dùng dữ liệu thật.
 
 `npm test` dùng dữ liệu giả trong thư mục tạm, khóa AI trống; kiểm tra hai tài khoản, ảnh riêng tư, reset, quota, ghi thất bại, backup/restore và entrypoint production. Không kiểm chứng cấu hình deployment thực tế hay chất lượng ảnh từ model có phí.
+
+## Vercel giao diện + Railway backend
+
+`vercel.json` chuyển `/api/*`, `/assets/results/*`, `/assets/costumes/*`, `/assets/events/*` và `/healthz` đến `https://vietphucisthebest-production.up.railway.app`. Giao diện vẫn gọi `/api` trên domain Vercel. Cookie HttpOnly ở cùng domain giao diện, nên tải lại trang và ảnh riêng tư không phụ thuộc cookie bên thứ ba. API và ảnh riêng tư không được cache. Không đưa API key vào biến có tiền tố VITE_.
+
+- Vercel: Root Directory là gốc repo; Vite, build `npm run build`, output `dist` được khai báo trong file cấu hình. Biến `VITE_API_URL` không được sử dụng và có thể xóa.
+- Railway: giữ Volume `/app/data`, đặt `NODE_ENV=production` và khóa bí mật như phần trên. Domain công khai phải hoạt động; `/healthz` trả JSON `{ "ok": true }`.
+- Backend mặc định cho phép cookie request từ đúng `https://vietphucisthebest.vercel.app`. Khi đổi domain frontend, đặt `FRONTEND_ORIGIN` trên Railway thành origin HTTPS mới (không có đường dẫn). `APP_URL` vẫn là origin khi mở ứng dụng trực tiếp. Không tự cho phép mọi domain preview.
+- Khi đổi domain Railway, sửa các destination trong `vercel.json` và deploy lại Vercel.
+- Sau khi cả hai deploy xong, kiểm tra `/healthz`, `/api/events` trên domain Vercel; đăng nhập, tải lại trang, lưu/xóa bản phối và xem ảnh đã có. Không cần tạo ảnh AI có phí để kiểm tra kết nối.

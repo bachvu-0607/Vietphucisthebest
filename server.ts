@@ -15,6 +15,7 @@ export async function createApp() {
   app.disable('x-powered-by');
   app.use((_req, res, next) => { res.setHeader('Referrer-Policy', 'no-referrer'); next(); });
   app.use(express.json({ limit: '12mb' }));
+  app.use('/api', (_req, res, next) => { res.setHeader('Cache-Control', 'private, no-store'); next(); });
   app.use('/api', apiRouter);
   app.use('/api', (_req, res) => { res.status(404).json({ success: false, error: 'Không tìm thấy API.' }); });
   app.get('/healthz', (_req, res) => { res.json({ ok: true }); });

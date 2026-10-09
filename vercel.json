@@ -1,0 +1,48 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://vietphucisthebest-production.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/assets/results/:path*",
+      "destination": "https://vietphucisthebest-production.up.railway.app/assets/results/:path*"
+    },
+    {
+      "source": "/assets/costumes/:path*",
+      "destination": "https://vietphucisthebest-production.up.railway.app/assets/costumes/:path*"
+    },
+    {
+      "source": "/assets/events/:path*",
+      "destination": "https://vietphucisthebest-production.up.railway.app/assets/events/:path*"
+    },
+    {
+      "source": "/healthz",
+      "destination": "https://vietphucisthebest-production.up.railway.app/healthz"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/api/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    },
+    {
+      "source": "/assets/results/:path*",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "private, no-store"
+        }
+      ]
+    }
+  ]
+}

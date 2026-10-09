@@ -43,6 +43,18 @@ test('security, ownership, quota and recoverability',async t=>{
   assert.equal((await req('/api/auth/me?token='+a.token)).status,401);
   assert.equal((await req('/api/auth/logout','POST',undefined,undefined,{Cookie:a.cookie,Origin:'https://evil.invalid'})).status,403);
  });
+ await t.test('Vercel proxy cookie session accepts exact frontend origin only',async()=>{
+  const headers={Cookie:a.cookie,Origin:'https://vietphucisthebest.vercel.app'};
+  const saved=await req('/api/drafts','POST',{costumeId:'cos-nhat-binh'},undefined,headers);
+  assert.equal(saved.status,200);
+  assert.equal((await req('/api/drafts/'+saved.json.data.id,'DELETE',undefined,undefined,headers)).status,200);
+  for(const origin of ['https://attacker.vercel.app','https://vietphucisthebest.vercel.app.evil.invalid','null']) {
+    assert.equal((await req('/api/drafts','POST',{costumeId:'cos-nhat-binh'},undefined,{Cookie:a.cookie,Origin:origin})).status,403);
+  }
+  const me=await fetch(base+'/api/auth/me',{headers:{Cookie:a.cookie}});
+  assert.equal(me.status,200);
+  assert.equal(me.headers.get('cache-control'),'private, no-store');
+ });
  await t.test('isolated wardrobe and full draft fields',async()=>{
   assert.equal((await req('/api/drafts')).status,401);
   const r=await req('/api/drafts','POST',{costumeId:'cos-nhat-binh',selectedHairstyle:'hair',selectedFootwear:'shoes',selectedDetails:{test:'yes'}},a.token);
