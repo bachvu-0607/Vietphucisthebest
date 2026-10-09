@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { apiRouter } from './server/routes.ts';
 import { sqliteDb } from './server/sqlite.ts';
 import { requireAuth, type AuthenticatedRequest } from './server/auth.ts';
-import { RESULTS_DIR, DATA_DIR } from './server/storage.ts';
+import { RESULTS_DIR } from './server/storage.ts';
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 export async function createApp() {
@@ -66,14 +66,6 @@ export async function createApp() {
   return app;
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-    const pidFile = path.join(DATA_DIR, 'server.pid');
-    if (fs.existsSync(pidFile)) {
-      const pid = Number(fs.readFileSync(pidFile, 'utf8'));
-      try { process.kill(pid, 0); throw new Error('Only one server may use this SQLite database.'); }
-      catch (err: any) { if (err.code !== 'ESRCH') throw err; fs.unlinkSync(pidFile); }
-    }
-    fs.writeFileSync(pidFile, String(process.pid), { flag: 'wx' });
-  process.once('exit', () => { if (fs.existsSync(pidFile)) fs.unlinkSync(pidFile); });
   createApp().then(app => {
     const server = app.listen(Number(process.env.PORT || 3000), process.env.HOST || '0.0.0.0', () => console.log('Việt Phục Remix server started.'));
     const backupTimer = setInterval(() => {

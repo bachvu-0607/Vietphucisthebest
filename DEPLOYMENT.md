@@ -69,3 +69,7 @@ Lệnh kiểm tra file trước khi thay database, tạo snapshot trước resto
 ## Ảnh hiển thị
 
 Ảnh công khai trong costumes/events được phục vụ bằng WebP chất lượng 85, cạnh dài tối đa 1600px; `?size=thumb` dùng 640px. `?original=1` lấy nguyên bản. Ảnh AI chỉ nén khi gọi `?preview=1` (640px cho tủ đồ, 1600px cho xem chi tiết); tải về vẫn lấy file gốc. Ảnh nhỏ không được phóng lớn và chỉ dùng bản nén khi nhẹ hơn. Không sửa file gốc, kể cả ảnh đầu vào AI. Cache nén nằm trong RAM tối đa 32MB; tối đa 2 tác vụ nén đồng thời, còn lại trả bản gốc. Quyền sở hữu ảnh được kiểm tra trước khi truy cập cache, ảnh riêng tư vẫn có Cache-Control private, no-store.
+
+## Khóa tiến trình khi deploy
+
+Máy chủ lấy khóa `.server.lock` trong DATA_DIR trước khi mở SQLite. Khóa được cập nhật mỗi 5 giây, hết hạn sau 30 giây nếu container chết; khởi động mới chờ tối đa khoảng 40 giây. Không dùng file `server.pid` cũ vì PID có thể trùng trong container mới. Restore dùng cùng khóa và từ chối khi máy chủ còn chạy. Vẫn chỉ triển khai một replica; không xóa khóa thủ công khi máy chủ đang hoạt động.

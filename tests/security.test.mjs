@@ -172,6 +172,11 @@ test('security, ownership, quota and recoverability',async t=>{
  const pendingDb=new DatabaseSync(path.join(dir,'vietphucremix.sqlite'));
  pendingDb.prepare("UPDATE ai_jobs SET status='processing' WHERE id=(SELECT id FROM ai_jobs LIMIT 1)").run();pendingDb.close();
  const {spawn}=await import('node:child_process');
+ // Railway restart regression: old PID matches a living, unrelated process.
+ fs.writeFileSync(path.join(dir,'server.pid'),String(process.pid));
+ // Simulate a lease left by a killed container, expired before restart.
+ const staleLock=path.join(dir,'.server.lock');fs.mkdirSync(staleLock);
+ const old=new Date(Date.now()-60000);fs.utimesSync(staleLock,old,old);
  const child=spawn(process.execPath,['server.ts'],{env:{...process.env,HOST:'127.0.0.1',PORT:new URL(base).port},stdio:'pipe'});
  let log='';child.stderr.on('data',b=>log+=b);child.stdout.on('data',b=>log+=b);
  try {

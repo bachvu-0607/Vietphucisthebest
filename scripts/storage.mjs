@@ -1,3 +1,4 @@
+import { lockStorageForRestore } from '../server/instance-lock.mjs';
 import 'dotenv/config';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -17,12 +18,8 @@ if (command === 'backup') {
   console.log(filename);
 } else if (command === 'restore') {
   if (!input) throw new Error('Usage: npm run restore -- /absolute/path/to/backup.sqlite');
-  const pidPath = path.join(dir, 'server.pid');
-  if (fs.existsSync(pidPath)) {
-    const pid = Number(fs.readFileSync(pidPath, 'utf8'));
-    try { process.kill(pid, 0); throw new Error('Stop the server before restoring.'); }
-    catch (err) { if (err.code !== 'ESRCH') throw err; }
-  }
+  const release = lockStorageForRestore();
+  try {
   // Validate BEFORE touching the current database.
   const snapshot = new DatabaseSync(path.resolve(input), { readOnly: true });
   try {
@@ -40,4 +37,5 @@ if (command === 'backup') {
   const restored = new DatabaseSync(dbPath);
   try { restored.exec('UPDATE sessions SET is_revoked = 1; DELETE FROM password_resets;'); } finally { restored.close(); }
   console.log('Restored database; all previous sessions revoked. Restore matching result images separately.');
+  } finally { release(); }
 } else throw new Error('Use backup or restore.');
