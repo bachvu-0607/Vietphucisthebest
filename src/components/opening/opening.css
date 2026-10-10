@@ -1,0 +1,20 @@
+#vietphuc-opening { position: fixed; inset: 0; z-index: 1000; font-family: var(--font-serif); outline: none; }
+#vietphuc-opening .ts-stage { position: absolute; inset: 0; overflow: hidden; isolation: isolate; }
+#vietphuc-opening .ts-film,
+#vietphuc-opening .ts-canvas,
+#vietphuc-opening .ts-fallback,
+#vietphuc-opening .ts-curtain { position: absolute; inset: 0; pointer-events: none; }
+#vietphuc-opening .ts-film { background: #243f8e; }
+#vietphuc-opening canvas,
+#vietphuc-opening .ts-curtain > svg,
+#vietphuc-opening .ts-fallback > svg { width: 100%; height: 100%; display: block; }
+#vietphuc-opening .ts-invitation { position: absolute; inset: 0; padding: 64px 20px 0; display: flex; align-items: center; justify-content: center; flex-direction: column; color: #f7eccd; gap: 18px; text-shadow: 0 2px 22px #1b285955; }
+#vietphuc-opening .ts-invitation > span { font: 400 11px var(--font-sans); letter-spacing: .32em; text-align: center; }
+#vietphuc-opening h1 { font-size: clamp(50px, 8vw, 96px); font-weight: 400; line-height: 1.2; letter-spacing: -.04em; margin: 0 0 12px; }
+#vietphuc-opening button { cursor: pointer; }
+#vietphuc-opening .ts-open { border: 1px solid #dfbd6f; background: #f7eccd; color: #243f8e; font: 500 14px var(--font-sans); border-radius: 30px; padding: 14px 24px; min-height: 46px; box-shadow: 0 4px 24px #101d4033; }
+#vietphuc-opening .ts-open:disabled { cursor: wait; }
+#vietphuc-opening .ts-open span { margin-left: 22px; }
+#vietphuc-opening .ts-skip { position: absolute; right: max(20px, env(safe-area-inset-right)); bottom: max(18px, env(safe-area-inset-bottom)); border: 1px solid #dfbd6f77; background: #243f8eb0; color: #f7eccd; padding: 11px 17px; border-radius: 24px; font: 400 13px var(--font-sans); min-height: 44px; }
+#vietphuc-opening button:focus-visible { outline: 2px solid #f7eccd; outline-offset: 5px; }
+#vietphuc-opening [hidden] { display: none !important; }
