@@ -12,7 +12,7 @@ type Message = { role: 'user' | 'model'; text: string };
 
 // Gemini answers in light Markdown: render bullets and **bold** without injecting HTML.
 function renderInline(text: string) {
-  return text.split(/(\*\*[^*]+\*\*)/).map((part, i) =>
+  return text.replace(/`/g, '').split(/(\*\*[^*]+\*\*)/).map((part, i) =>
     part.startsWith('**') && part.endsWith('**') ? <strong key={i}>{part.slice(2, -2)}</strong> : <React.Fragment key={i}>{part}</React.Fragment>
   );
 }
