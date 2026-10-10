@@ -430,6 +430,7 @@ export default function App() {
 
       {/* Culture Guide Handbook Modal */}
       <CultureGuideModal
+        costumes={costumes}
         isOpen={showCultureModal}
         onClose={() => setShowCultureModal(false)}
       />

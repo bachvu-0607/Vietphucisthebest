@@ -1,3 +1,5 @@
+import { getStyleAccessoryCategories, getDefaultAccessoriesForStyle, getAccessoryDisplayLabel } from '../../content/styling/accessories.ts';
+import { STYLING_CONTEXT } from '../../content/sources.ts';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import {
   Costume,
@@ -179,164 +181,14 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
     }
   }, [costume.id, costume.materials, selectedMaterial.id]);
 
-  // Định nghĩa cấu trúc nhóm phụ kiện theo từng bộ phận cơ thể (từ đầu đến chân)
-  interface AccessoryCategoryGroup {
-    id: string;
-    name: string;
-    items: string[];
-  }
-
-  // Danh mục phụ kiện phân theo 5 bộ phận cơ thể chuẩn y phục (Cúc áo / Kim bội đưa vào tùy chọn có thể mặc hoặc không)
-  const getStyleAccessoryCategories = (
-    style: 'traditional' | 'subtle_modern' | 'remix_fusion'
-  ): AccessoryCategoryGroup[] => {
-    if (style === 'subtle_modern') {
-      return [
-        {
-          id: 'head',
-          name: 'Đầu và tóc',
-          items: ['Khăn vành sa lụa trắng ngà', 'Trâm bạc cài hoa sen cẩn ngọc', 'Băng đô lụa tơ tằm thêu tay']
-        },
-        {
-          id: 'face_ears',
-          name: 'Mắt và tai',
-          items: ['Khuyên tai ngọc trai rơi', 'Kính gọng vàng thanh lịch']
-        },
-        {
-          id: 'neck_chest',
-          name: 'Cổ và ngực (Trang sức & Cúc áo)',
-          items: [
-            'Cúc cài kim bội dải thao đỏ',
-            'Khuy xà cừ / Cúc ngọc trang nhã',
-            'Chuỗi ngọc trai hoàng gia nhiều vòng',
-            'Kiềng bạc trơn tối giản',
-            'Khăn lụa tơ tằm quàng cổ'
-          ]
-        },
-        {
-          id: 'hands_waist',
-          name: 'Tay và thắt lưng',
-          items: [
-            'Quạt đoàn phiến lụa tơ thêu mẫu đơn đính ngọc',
-            'Dù lụa hoa sen che nắng',
-            'Túi mây đan tre thủ công',
-            'Đồng hồ dây da phong cách cổ điển'
-          ]
-        },
-        {
-          id: 'feet_shoes',
-          name: 'Chân và hài',
-          items: ['Giày cao gót quai lụa cách tân', 'Guốc mộc quai nhung đỏ']
-        }
-      ];
-    }
-
-    if (style === 'remix_fusion') {
-      return [
-        {
-          id: 'head',
-          name: 'Đầu và tóc',
-          items: ['Tóc tết bím lệch cài hoa ngọc đào', 'Mũ beret dạ cổ điển']
-        },
-        {
-          id: 'face_ears',
-          name: 'Mắt và tai',
-          items: ['Khuyên tai ngọc trai rơi', 'Kính râm mắt mèo retro', 'Tai nghe headphone retro']
-        },
-        {
-          id: 'neck_chest',
-          name: 'Cổ và ngực (Trang sức & Cúc áo)',
-          items: [
-            'Cúc cài kim bội dải thao đỏ',
-            'Khuy kim loại đúc phá cách',
-            'Vòng choker kim loại bản to',
-            'Chuỗi ngọc trai tự nhiên'
-          ]
-        },
-        {
-          id: 'hands_waist',
-          name: 'Tay và thắt lưng',
-          items: [
-            'Túi tote vải canvas streetwear',
-            'Túi đeo chéo mini da bóng',
-            'Vòng tay kim loại dạng xích',
-            'Thắt lưng da bản rộng khóa kim loại'
-          ]
-        },
-        {
-          id: 'feet_shoes',
-          name: 'Chân và giày',
-          items: ['Boot da cổ lửng', 'Giày thể thao trắng']
-        }
-      ];
-    }
-
-    // traditional: Cổ truyền cung đình chuẩn xác (Cúc kim bội dải thao là phụ kiện tùy chọn linh hoạt)
-    return [
-      {
-        id: 'head',
-        name: 'Đầu và tóc',
-        items: [
-          'Khăn vành dây xanh lam thẫm',
-          'Trâm bạc cài hoa sen cẩn ngọc'
-        ]
-      },
-      {
-        id: 'face_ears',
-        name: 'Mắt và tai',
-        items: ['Khuyên tai ngọc trai rơi']
-      },
-      {
-        id: 'neck_chest',
-        name: 'Cổ và ngực (Trang sức & Cúc áo)',
-        items: [
-          'Cúc cài kim bội dải thao đỏ (Ấn bội cổ truyền)',
-          'Hàng cúc ngọc / khuy xà cừ cổ phong',
-          'Kiềng bạc chạm hoa mai',
-          'Chuỗi ngọc trai tự nhiên'
-        ]
-      },
-      {
-        id: 'hands_waist',
-        name: 'Tay và thắt lưng',
-        items: [
-          'Quạt đoàn phiến lụa tơ thêu mẫu đơn đính ngọc',
-          'Quạt xếp nan ngà chạm lộng thếp vàng',
-          'Búp sen bách diệp hồng tươi'
-        ]
-      },
-      {
-        id: 'feet_shoes',
-        name: 'Chân và hài',
-        items: [
-          'Hài thêu hoa sen mũi nhọn',
-          'Guốc mộc quai nhung đỏ'
-        ]
-      }
-    ];
-  };
-
-  const getStyleAccessories = (style: 'traditional' | 'subtle_modern' | 'remix_fusion') => {
-    const cats = getStyleAccessoryCategories(style);
-    return cats.flatMap((cat) => cat.items);
-  };
-
-  const getDefaultAccessoriesForStyle = (style: 'traditional' | 'subtle_modern' | 'remix_fusion') => {
-    if (style === 'subtle_modern') {
-      return ['Khăn vành sa lụa trắng ngà', 'Chuỗi ngọc trai hoàng gia nhiều vòng'];
-    }
-    if (style === 'remix_fusion') {
-      return ['Tóc tết bím lệch cài hoa ngọc đào', 'Khuyên tai ngọc trai rơi'];
-    }
-    // traditional: Mặc định đội Khăn vành dây; Cúc áo / Kim bội dải thao là tùy chọn người dùng có thể mặc hoặc không
-    return ['Khăn vành dây xanh lam thẫm'];
-  };
+  const accessoryCategories = (style: 'traditional' | 'subtle_modern' | 'remix_fusion') => getStyleAccessoryCategories(style, costume);
+  const defaultAccessories = (style: 'traditional' | 'subtle_modern' | 'remix_fusion') => getDefaultAccessoriesForStyle(style, costume);
 
   const [selectedAccessories, setSelectedAccessories] = useState<string[]>(() => {
-    if (existingDraft?.selectedAccessories && existingDraft.selectedAccessories.length > 0) {
+    if (Array.isArray(existingDraft?.selectedAccessories)) {
       return existingDraft.selectedAccessories;
     }
-    return getDefaultAccessoriesForStyle(existingDraft?.remixStyle || 'traditional');
+    return defaultAccessories(existingDraft?.remixStyle || 'traditional');
   });
 
   // Trạng thái mở / đóng của từng Hộp Drop Down
@@ -357,7 +209,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
 
   const handleSelectRemixStyle = (newStyle: 'traditional' | 'subtle_modern' | 'remix_fusion') => {
     setRemixStyle(newStyle);
-    const newDefaults = getDefaultAccessoriesForStyle(newStyle);
+    const newDefaults = defaultAccessories(newStyle);
     setSelectedAccessories(newDefaults);
 
     // 🌟 Đổi phong cách -> Tự động chuyển đổi màu sắc tương ứng
@@ -694,7 +546,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                 </span>
               </div>
               <p className="text-xs text-[#78716C] font-light">
-                Tinh chỉnh chất liệu vải, ánh sáng điện ngọc và phụ kiện cung đình chuẩn điển chế.
+                Tạo hình theo chất liệu, màu sắc và phụ kiện bạn đã chọn.
               </p>
             </div>
           </div>
@@ -739,7 +591,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
             </h2>
           </div>
           <span className="text-xs text-[#78716C] font-serif italic">
-            Người mẫu, Phom dáng đứng & Phụ kiện cổ truyền
+            Người mẫu, Phom dáng đứng & Phụ kiện phối
           </span>
         </div>
 
@@ -766,13 +618,13 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
             <div className="p-4 rounded-2xl bg-[#FFFFFF] border border-[#F4C2CE] text-xs text-[#57534E] space-y-2 shadow-2xs">
               <div className="font-serif font-bold text-[#1C1917] flex items-center gap-2">
                 <Compass className="w-4 h-4 text-[#C84B69]" />
-                Chuẩn mực phục dựng y phục hoàng triều
+                Mẫu phối & cách sử dụng Studio
               </div>
               <p className="font-light leading-relaxed">
                 • Bấm vào các nút tròn bên lề trái để bật/tắt hiển thị Áo hoặc Quần. Toàn bộ phụ kiện (đầu và tóc, mắt và tai, cổ, tay, chân) được chọn và hiển thị trực tiếp thông qua các hộp chọn bên phải.
               </p>
               <p className="font-light leading-relaxed">
-                • {isFemaleOnly ? '⚠️ Lưu ý: Áo Nhật Bình và Áo Tứ Thân là y phục cung đình / dân gian thuần nữ theo điển chế, không áp dụng cho nam.' : 'Trang phục này có phom chuẩn cho cả nam (khăn đóng) và nữ (khăn vành sa).'}
+                • {isFemaleOnly ? 'Mẫu hiện tại minh họa trang phục nữ; xem trang chi tiết để biết bối cảnh lịch sử.' : 'Chọn người mẫu và phụ kiện phù hợp bộ trang phục, dịp sử dụng và phong cách của bạn.'}
               </p>
             </div>
           </div>
@@ -1071,7 +923,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
               </div>
 
               <p className="text-[11px] text-[#78716C] font-light leading-relaxed">
-                {remixStyle === 'traditional' && '✨ Bảo lưu 100% quy chuẩn hoàng triều: khăn vành sa/khăn đóng, hoa văn thêu vàng và hài nhung cổ truyền.'}
+                {remixStyle === 'traditional' && '✨ Gợi ý phối truyền thống: giữ đặc điểm nhận diện của áo và chọn phụ kiện theo nhu cầu.'}
                 {remixStyle === 'subtle_modern' && '✨ Tinh giản đương đại: đường may thanh thoát, tóc búi nhẹ nhàng, giảm bớt hoa văn rườm rà.'}
                 {remixStyle === 'remix_fusion' && '✨ Đương đại phá cách: phối màu tương phản cao, phong thái street-fusion và phụ kiện ấn tượng.'}
               </p>
@@ -1107,7 +959,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                       ? 'bg-[#C84B69]/10 border-[#C84B69] text-[#C84B69] font-semibold shadow-2xs cursor-pointer'
                       : 'bg-[#FFF5F7] border-[#F4C2CE] text-[#57534E] hover:text-[#1C1917] cursor-pointer'
                   }`}
-                  title={isFemaleOnly ? 'Y phục này theo điển chế thuần nữ, không áp dụng cho nam' : 'Chọn người mẫu Nam'}
+                  title={isFemaleOnly ? 'Mẫu minh họa này dành cho người mẫu nữ' : 'Chọn người mẫu Nam'}
                 >
                   Nam {isFemaleOnly && '(Chỉ áp dụng nữ)'}
                 </button>
@@ -1166,9 +1018,10 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                 )}
               </div>
 
+              <p className="text-[11px] leading-relaxed text-[#78716C]">{STYLING_CONTEXT}</p>
               {/* Danh sách các Hộp Drop Down theo thứ tự bộ phận (Tối giản & Sang trọng) */}
               <div className="space-y-2 max-h-96 overflow-y-auto pr-1">
-                {getStyleAccessoryCategories(remixStyle).map((category) => {
+                {accessoryCategories(remixStyle).map((category) => {
                   const isOpen = !!openCategories[category.id];
                   const selectedInCat = category.items.filter((item) =>
                     selectedAccessories.includes(item)
@@ -1197,7 +1050,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                         <div className="flex items-center gap-2 shrink-0">
                           {hasSelection && (
                             <span className="px-2 py-0.5 rounded-md text-[10px] font-medium bg-[#C84B69]/10 text-[#C84B69] truncate max-w-[150px]">
-                              {selectedInCat.length === 1 ? selectedInCat[0] : `${selectedInCat.length} món`}
+                              {selectedInCat.length === 1 ? getAccessoryDisplayLabel(selectedInCat[0]) : `${selectedInCat.length} món`}
                             </span>
                           )}
                           <div className="text-[#78716C]">
@@ -1227,7 +1080,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                                       : 'bg-[#FFFFFF] border-[#F4C2CE] text-[#57534E] hover:border-[#C29B38] hover:bg-[#FFF5F7]'
                                   }`}
                                 >
-                                  <span className="truncate pr-1 text-[11px]">{accName}</span>
+                                  <span className="truncate pr-1 text-[11px]">{getAccessoryDisplayLabel(accName)}</span>
                                   <div
                                     className={`w-3.5 h-3.5 rounded flex items-center justify-center shrink-0 border transition-colors ${
                                       isChecked
@@ -1427,7 +1280,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                       : 'text-[#57534E] hover:text-[#1C1917]'
                   }`}
                 >
-                  Ảnh bảo tàng
+                  Ảnh minh họa
                 </button>
                 <button
                   type="button"
@@ -1498,7 +1351,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
                   <div className="flex-1 min-w-0">
                     <div className="text-[11px] font-serif font-bold text-[#1C1917] truncate">
                       {referenceMode === 'preset'
-                        ? `Ảnh hiện vật: ${costume.name}`
+                        ? `Ảnh minh họa: ${costume.name}`
                         : referenceMode === 'upload'
                         ? 'Ảnh tải lên từ thiết bị'
                         : 'Ảnh từ liên kết trực tuyến'}
@@ -1540,10 +1393,10 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
               <div className="text-[11px] text-[#57534E] font-light space-y-1.5">
                 <p>• <strong>Trang phục:</strong> {costume.name} ({selectedColor.name}, {selectedMaterial.name})</p>
                 <p>• <strong>Dịp lễ & Sự kiện:</strong> {selectedEventItem ? `${selectedEventItem.name} (${selectedEventItem.formalityLevel || selectedEventItem.category})` : 'Tự do'}</p>
-                <p>• <strong>Định hướng phong cách:</strong> {remixStyle === 'traditional' ? 'Cổ truyền chuẩn xác (Traditional)' : remixStyle === 'subtle_modern' ? 'Cách tân nhẹ (Subtle Modern)' : 'Remix Fusion đương đại'}</p>
+                <p>• <strong>Định hướng phong cách:</strong> {remixStyle === 'traditional' ? 'Phong cách truyền thống (Traditional)' : remixStyle === 'subtle_modern' ? 'Cách tân nhẹ (Subtle Modern)' : 'Remix Fusion đương đại'}</p>
                 <p>• <strong>Người mẫu & Tư thế AI:</strong> {modelGender === 'male' ? 'Nam' : 'Nữ'} • {aiPose === 'seated_regal' ? 'Dáng ngồi trường kỷ quyền quý' : 'Dáng đứng thủ lễ'}</p>
                 <p>• <strong>Bối cảnh:</strong> {selectedBackground.name} ({selectedBackground.aesthetic})</p>
-                <p>• <strong>Phụ kiện:</strong> {selectedAccessories.join(', ') || 'Cơ bản'}</p>
+                <p>• <strong>Phụ kiện:</strong> {selectedAccessories.map(getAccessoryDisplayLabel).join(', ') || 'Không chọn thêm'}</p>
               </div>
 
               <button

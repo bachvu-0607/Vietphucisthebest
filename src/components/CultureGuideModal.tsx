@@ -1,13 +1,17 @@
 import React from 'react';
-import { TrienSonSeal, HoaSenDivider, ChimLacIcon } from './VietnameseMotifs';
-import { X, BookOpen, Sparkles, ShieldCheck, Quote } from 'lucide-react';
+import type { Costume } from '../types';
+import { TrienSonSeal } from './VietnameseMotifs';
+import { X, BookOpen } from 'lucide-react';
+import { CULTURE_GUIDE } from '../../content/guides/culture-guide.ts';
+import { ContentSources } from './ContentSources';
 
 interface CultureGuideModalProps {
   isOpen: boolean;
+  costumes: Costume[];
   onClose: () => void;
 }
 
-export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, onClose }) => {
+export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, onClose, costumes }) => {
   if (!isOpen) return null;
 
   return (
@@ -19,16 +23,17 @@ export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, on
             <TrienSonSeal text="Điển Lệ" size="sm" />
             <div>
               <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#1C1917]">
-                Sổ Tay Điển Cứu Cổ Phục Việt
+                Sổ tay trang phục Việt
               </h2>
               <p className="text-xs text-[#78716C] font-light">
-                Tìm hiểu cấu trúc, triết lý Ngũ Thường và quy cách y phục truyền thống
+                Phân biệt thông tin lịch sử và gợi ý phối đồ hiện nay
               </p>
             </div>
           </div>
 
           <button
             onClick={onClose}
+            aria-label="Đóng sổ tay trang phục"
             className="p-2 rounded-md text-[#78716C] hover:text-[#1C1917] hover:bg-[#F4C2CE]/50 transition-colors"
           >
             <X className="w-5 h-5" />
@@ -37,59 +42,28 @@ export const CultureGuideModal: React.FC<CultureGuideModalProps> = ({ isOpen, on
 
         {/* Content */}
         <div className="my-6 space-y-6 text-xs text-[#57534E] leading-relaxed overflow-y-auto max-h-[70vh] pr-2">
-          {/* Section 1 */}
-          <div className="p-5 rounded-xl bg-[#FFFFFF] border border-[#F4C2CE] shadow-xs">
-            <h3 className="font-serif font-bold text-[#C84B69] text-sm mb-2 flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#C29B38]" />
-              1. Triết lý Áo Ngũ Thân & Đạo Đức Ngũ Thường
-            </h3>
-            <p className="mb-2 font-light text-justify">
-              Áo Ngũ Thân (bao gồm cả Áo Tấc lễ phục tay thụng và Áo Tay Chẽn thường phục) được định chế từ thời chúa Nguyễn Phúc Khoát (1744) và chính thức chuẩn hóa trên toàn cõi Đại Nam dưới triều vua Minh Mạng (1827).
-            </p>
-            <p className="font-light text-justify">
-              • <strong>Năm thân áo:</strong> Bốn thân ngoài tượng trưng cho "Tứ thân phụ mẫu" (cha mẹ ruột và cha mẹ chồng/vợ), thân con nhỏ bên trong tượng trưng cho chính người mặc được che chở nâng niu.<br />
-              • <strong>Năm cúc áo:</strong> Biểu trưng cho Ngũ Thường của đạo Nho: Nhân, Lễ, Nghĩa, Trí, Tín - chuẩn mực đạo đức cốt lõi của người quân tử.
-            </p>
-          </div>
-
-          {/* Section 2 */}
-          <div className="p-5 rounded-xl bg-[#FFFFFF] border border-[#F4C2CE] shadow-xs">
-            <h3 className="font-serif font-bold text-[#C84B69] text-sm mb-2 flex items-center gap-2">
-              <ShieldCheck className="w-4 h-4 text-[#246A5E]" />
-              2. Áo Nhật Bình Cung Đình Triều Nguyễn
-            </h3>
-            <p className="mb-2 font-light text-justify">
-              Áo Nhật Bình là thường phục tôn quý của bậc Hậu phi, Công chúa và Cung tần triều Nguyễn. Đặc trưng cốt lõi là cổ áo hình chữ nhật viền thêu kim tuyến trước ngực và dải ngũ sắc ngũ hành ở cổ tay áo.
-            </p>
-            <p className="font-light text-justify">
-              Khi mặc Nhật Bình trong hôn lễ hoặc ngày trọng đại, người mặc cần giữ tư thế đoan trang, bước chân nhẹ nhàng, không xắn tay áo làm lộ đường may lót bên trong.
-            </p>
-          </div>
-
-          {/* Section 3 */}
-          <div className="p-5 rounded-xl bg-[#FFFFFF] border border-[#F4C2CE] shadow-xs">
-            <h3 className="font-serif font-bold text-[#C84B69] text-sm mb-2 flex items-center gap-2">
-              <Quote className="w-4 h-4 text-[#C29B38]" />
-              3. Phân biệt Áo Giao Lĩnh & Áo Đối Khâm Thời Lý - Trần - Lê
-            </h3>
-            <p className="mb-2 font-light text-justify">
-              Trước khi định chế Ngũ Thân cổ đứng trở thành quy chuẩn dưới thời Nguyễn, y phục Đại Việt thời Lý, Trần, Lê phổ biến với cổ bẻ chéo (Giao Lĩnh) hoặc hai vạt song song buông thẳng (Đối Khâm).
-            </p>
-            <p className="font-light text-justify">
-              • <strong>Quy tắc Giao Lĩnh:</strong> Bắt buộc vạt bên Trái đè lên vạt bên Phải (tượng trưng cho Dương chế ngự Âm, ánh sáng và sự sống).<br />
-              • <strong>Áo Đối Khâm:</strong> Là lớp áo khoác ngoài phô diễn hoa văn yếm lót bên trong, tạo dáng thoát tục, thanh tao.
-            </p>
-          </div>
-
-          {/* Heritage Commitment */}
-          <div className="p-5 rounded-xl bg-[#FFF5F7] border border-[#C29B38]/40">
-            <h3 className="font-serif font-bold text-[#C84B69] text-sm mb-1.5">
-              Cam kết tính chính xác của tư liệu
-            </h3>
-            <p className="text-[11px] leading-relaxed text-[#57534E] font-light text-justify">
-              Mọi dữ liệu trang phục trong ứng dụng Việt Phục Remix đều có trường thông tin ghi rõ tình trạng kiểm chứng (đối chiếu qua Khâm Định Đại Nam Hội Điển Sự Lệ, hiện vật bảo tàng, tranh tượng cổ Đại Việt) hoặc đánh dấu là dữ liệu mẫu biên tập, tuyệt đối không tạo dựng lịch sử giả mạo.
-            </p>
-          </div>
+          {CULTURE_GUIDE.map((section) => (
+            <section key={section.id} className="p-5 rounded-xl bg-white border border-[#F4C2CE] shadow-xs space-y-3">
+              <h3 className="font-serif font-bold text-[#C84B69] text-sm flex items-center gap-2">
+                <BookOpen className="w-4 h-4" />{section.title}
+              </h3>
+              {section.costumeIds.map(id => costumes.find(c => c.id === id)).filter((c): c is Costume => !!c).map((costume) => (
+                <div key={costume.id} className="space-y-2">
+                  <h4 className="font-medium text-[#1C1917]">{costume.name}</h4>
+                  <p>{costume.historicalContext}</p>
+                  <p>{costume.research?.modernUse}</p>
+                  <details>
+                    <summary className="cursor-pointer text-[#9E2A47]">Nguồn và phạm vi tham khảo</summary>
+                    <div className="pt-2"><ContentSources references={costume.research?.sources || []} /></div>
+                  </details>
+                </div>
+              ))}
+              <p className="pt-2 border-t border-[#F4C2CE]">{section.note}</p>
+            </section>
+          ))}
+          <p className="p-4 rounded-xl bg-white border border-[#C29B38]/40">
+            Lịch sử có nguồn tham khảo theo từng phạm vi. Gợi ý phối màu, phụ kiện và hình ảnh của ứng dụng phục vụ khám phá, không chứng nhận độ chính xác của một bộ phục dựng.
+          </p>
         </div>
 
         {/* Footer */}

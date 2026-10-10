@@ -1,4 +1,6 @@
 import React from 'react';
+import { CostumeResearchNotes } from './ContentSources';
+import { STYLING_CONTEXT } from '../../content/sources.ts';
 import { Costume, EventItem } from '../types';
 import { TrienXacThuc, HoaSenDivider, ChimLacIcon, TrongDongWatermark, TrienSonSeal } from './VietnameseMotifs';
 import {
@@ -73,9 +75,9 @@ export const CostumeDetail: React.FC<CostumeDetailProps> = ({
                 alt={costume.name}
                 className="max-h-full max-w-full object-contain object-center drop-shadow-lg group-hover:scale-104 transition-transform duration-500"
               />
-              <div className="absolute top-3 left-3">
-                <TrienXacThuc className="bg-white/95" />
-              </div>
+              {costume.isVerifiedHistoricalData && (
+                <div className="absolute top-3 left-3"><TrienXacThuc className="bg-white/95" /></div>
+              )}
               {matchSuitability && (
                 <div className="absolute bottom-3 right-3 flex items-center gap-1 text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#C84B69] text-white shadow-xs">
                   <Star className="w-3 h-3 fill-current" />
@@ -137,39 +139,7 @@ export const CostumeDetail: React.FC<CostumeDetailProps> = ({
         </div>
       </div>
 
-      {/* 3. Thẩm Định Lịch Sử & Tính Xác Thực */}
-      <div
-        className={`p-4 sm:p-5 rounded-2xl border flex items-start gap-3.5 text-xs ${
-          costume.isVerifiedHistoricalData
-            ? 'bg-[#FFF9FA] border-[#F4C2CE] text-[#57534E]'
-            : 'bg-[#FFFBEB] border-[#FDE68A] text-[#92400E]'
-        }`}
-      >
-        <div className="w-8 h-8 rounded-full bg-[#FFF0F4] border border-[#F4C2CE] flex items-center justify-center shrink-0 mt-0.5 text-[#C84B69]">
-          {costume.isVerifiedHistoricalData ? (
-            <Quote className="w-4 h-4 text-[#C84B69]" />
-          ) : (
-            <AlertTriangle className="w-4 h-4 text-[#D97706]" />
-          )}
-        </div>
-        <div className="space-y-1">
-          <div className="font-serif font-bold text-sm text-[#1C1917] flex items-center gap-2">
-            <span>
-              {costume.isVerifiedHistoricalData
-                ? 'Tư liệu lịch sử đối chiếu chính sử & Khảo cổ học'
-                : 'Nội dung mẫu đang trong quá trình thẩm định'}
-            </span>
-            {costume.isVerifiedHistoricalData && (
-              <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#C84B69]/10 text-[#C84B69] font-medium">
-                Đã chuẩn hóa
-              </span>
-            )}
-          </div>
-          <p className="leading-relaxed font-light text-[#57534E]">
-            {costume.verificationNote}
-          </p>
-        </div>
-      </div>
+      <CostumeResearchNotes costume={costume} />
 
       {/* 4. Bố Cục 2 Cột Hài Hòa, Đơn Giản & Tinh Tế */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
@@ -184,7 +154,7 @@ export const CostumeDetail: React.FC<CostumeDetailProps> = ({
 
             <div className="relative pl-5 border-l-2 border-[#C84B69]/40 space-y-2">
               <div className="text-xs font-serif font-bold text-[#C84B69] uppercase tracking-wider">
-                Quy chế định hình qua các triều đại
+                Bối cảnh lịch sử
               </div>
               <p className="text-xs sm:text-sm text-[#57534E] leading-relaxed font-light text-justify">
                 {costume.historicalContext}
@@ -209,13 +179,13 @@ export const CostumeDetail: React.FC<CostumeDetailProps> = ({
             <div className="flex items-center justify-between">
               <h2 className="text-lg sm:text-xl font-serif font-bold text-[#1C1917] flex items-center gap-2.5">
                 <Layers className="w-5 h-5 text-[#C84B69]" />
-                <span>Cấu tạo bộ trang phục ({costume.components.length} lớp)</span>
+                <span>Các lớp trong mẫu phối ({costume.components.length})</span>
               </h2>
               <span className="text-xs text-[#78716C] font-serif">Theo thứ tự layer</span>
             </div>
 
             <p className="text-xs text-[#57534E] font-light">
-              Y phục được thiết kế nguyên bộ, tuân thủ thứ tự mặc từ trong ra ngoài theo điển chế:
+              Các lớp dưới đây mô tả mẫu phối trong Studio. Thứ tự giúp sắp xếp hình ảnh; bộ phục dựng lịch sử cần tư liệu riêng:
             </p>
 
             <div className="space-y-2.5 pt-1">
@@ -233,7 +203,7 @@ export const CostumeDetail: React.FC<CostumeDetailProps> = ({
                         <span>{comp.name}</span>
                         {comp.isRequired ? (
                           <span className="text-[9px] px-2 py-0.5 rounded-full bg-[#FFF0F4] text-[#C84B69] border border-[#F4C2CE] font-bold">
-                            Bắt buộc
+                            Lớp chính
                           </span>
                         ) : (
                           <span className="text-[9px] px-2 py-0.5 rounded-full bg-white text-[#78716C] border border-stone-200">
@@ -279,10 +249,11 @@ export const CostumeDetail: React.FC<CostumeDetailProps> = ({
           <section className="bg-white border border-[#F4C2CE] rounded-3xl p-6 sm:p-7 shadow-xs space-y-5">
             <div className="flex items-center gap-2.5 text-lg sm:text-xl font-serif font-bold text-[#1C1917] pb-3 border-b border-[#F7D6DE]">
               <Shirt className="w-5 h-5 text-[#C84B69]" />
-              <span>Cẩm nang phối đồ chuẩn mực</span>
+              <span>Gợi ý phối đồ hiện nay</span>
             </div>
 
             <div className="space-y-4 text-xs">
+              <p className="text-xs leading-relaxed text-[#78716C]">{STYLING_CONTEXT}</p>
               {/* Phụ kiện */}
               <div>
                 <span className="font-serif font-bold text-[#1C1917] block mb-1.5">

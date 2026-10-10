@@ -77,7 +77,7 @@ export const CostumeQuickViewModal: React.FC<CostumeQuickViewModalProps> = ({
           <div className="w-full pt-2 border-t border-[#E8DFC8] flex items-center justify-between text-[11px] text-[#78716C]">
             <span className="font-serif italic">Toàn bộ chi tiết & phụ kiện</span>
             <span className="text-[10px] text-[#C84B69] font-medium bg-white px-2 py-0.5 rounded-full border border-[#F4C2CE]">
-              Ảnh nguyên bản
+              Ảnh minh họa
             </span>
           </div>
         </div>
@@ -107,7 +107,7 @@ export const CostumeQuickViewModal: React.FC<CostumeQuickViewModalProps> = ({
                 </span>
               </div>
               <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-200/70 text-sky-800 font-bold shrink-0">
-                Chuẩn di sản
+                Tìm hiểu trang phục
               </span>
             </div>
 

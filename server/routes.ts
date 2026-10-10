@@ -506,6 +506,7 @@ apiRouter.post('/ai/jobs', requireAuth, (req: AuthenticatedRequest, res: Respons
 
     // Launch background AI worker
     processJobInBackground(job.id, {
+      costumeId,
       costumeName,
       eventName: eventName || 'Sự kiện văn hóa',
       remixStyle: remixStyle || 'traditional',
@@ -547,6 +548,7 @@ apiRouter.post('/ai/jobs/:id/retry', requireAuth, (req: AuthenticatedRequest, re
 
     // Launch worker with ALL original parameters preserved!
     processJobInBackground(updatedJob.id, {
+      costumeId: updatedJob.costumeId,
       costumeName: updatedJob.costumeName,
       eventName: updatedJob.eventName,
       remixStyle: updatedJob.remixStyle,

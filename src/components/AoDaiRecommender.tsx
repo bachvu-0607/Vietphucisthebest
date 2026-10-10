@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { Costume, EventItem, FittingDraft } from '../types';
 import {
   Sparkles,
@@ -19,34 +19,13 @@ import {
   Heart
 } from 'lucide-react';
 import { TrienSonSeal } from './VietnameseMotifs';
+import { styleMatrix, heritagePresets, weatherGuidance, occasionGuidanceByKey } from '../../content/lookbooks/ao-dai.ts';
+import type { OccasionKey, WeatherKey, VibeKey } from '../../content/lookbooks/ao-dai.ts';
+export type { OccasionKey, WeatherKey, VibeKey } from '../../content/lookbooks/ao-dai.ts';
 
 interface AoDaiRecommenderProps {
   onStartRemix: (costume: Costume, preset?: Partial<FittingDraft>) => void;
   aoDaiCostume?: Costume;
-}
-
-export type OccasionKey = 'tet' | 'wedding' | 'yearbook' | 'street' | 'temple';
-export type WeatherKey = 'hot' | 'mild' | 'cold' | 'rainy';
-export type VibeKey = 'traditional' | 'elegant' | 'minimal' | 'vintage' | 'genz' | 'contemporary' | 'streetwear';
-
-interface StyleLookbookItem {
-  id: VibeKey;
-  name: string;
-  subtitle: string;
-  imageUrl: string;
-  imageAlt: string;
-  photoCredit: string;
-  licenseText: string;
-  topDesc: string;
-  bottomDesc: string;
-  accDesc: string;
-  culturalNote: string;
-  factBite: string;
-  safetyLevel: 'PRESERVE' | 'CAUTION' | 'SAFE';
-  safetyLabel: string;
-  safetyTip: string;
-  recommendedHex: string;
-  recommendedTrouserHex: string;
 }
 
 export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
@@ -61,261 +40,8 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
   const [customColor, setCustomColor] = useState<string | null>(null);
   const [customTrouserColor, setCustomTrouserColor] = useState<string | null>(null);
 
-  // 7 Verified Style Lookbook Presets
-  const styleMatrix: Record<VibeKey, StyleLookbookItem> = {
-    traditional: {
-      id: 'traditional',
-      name: 'Truyền Thống Chuẩn Mực',
-      subtitle: 'Thướt tha, trang trọng, đậm cốt cách Việt',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/%C3%81o_d%C3%A0i_%286405924827%29.jpg',
-      imageAlt: 'Thiếu nữ bên hoa sen trong tà Áo dài truyền thống',
-      photoCredit: 'Trần Hải Nam (Flickr: trunghainam)',
-      licenseText: 'CC BY 2.0 (Wikimedia Commons)',
-      topDesc: 'Áo dài lụa tơ tằm Vạn Phúc cổ đứng 3cm, tay dài ôm raglan, tà dài chấm mắt cá',
-      bottomDesc: 'Quần lụa trắng hoặc đen ống suông rộng chạm đất',
-      accDesc: 'Nón lá bài thơ quai lụa + Kiềng bạc chạm hoa cúc + Guốc mộc quai nhung',
-      culturalNote: 'Chuẩn mực di sản ngàn đời của phụ nữ Việt, trang nhã tuyệt đối trước gia tiên và nghi lễ.',
-      factBite: 'Chiếc áo dài hai tà xẻ sườn là sự giao thoa mỹ học giữa triều Nguyễn và trường Mỹ thuật Đông Dương thập niên 1930.',
-      safetyLevel: 'PRESERVE',
-      safetyLabel: '✓ Chuẩn mực di sản tuyệt đối',
-      safetyTip: 'Bắt buộc mặc cùng quần dài suông; tà áo phủ qua gối chạm mu bàn chân.',
-      recommendedHex: '#C92A2A', // Đỏ son
-      recommendedTrouserHex: '#D97706' // Vàng đồng
-    },
-    elegant: {
-      id: 'elegant',
-      name: 'Quý Phái & Trưởng Thành',
-      subtitle: 'Nét kiêu sa, đài các của quý cô dự tiệc',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/9/91/%C3%81o_d%C3%A0i_Saigon_1960.jpg',
-      imageAlt: 'Áo dài Sài Gòn 1960 thanh lịch quý phái',
-      photoCredit: 'Vietcuongdao (Wikimedia Commons)',
-      licenseText: 'CC BY-SA 4.0',
-      topDesc: 'Áo dài nhung the hoặc gấm lụa thêu hoa, cổ thuyền tôn xương quai xanh',
-      bottomDesc: 'Quần lụa Tây Thi ống rộng đen tuyền hoặc be ngà',
-      accDesc: 'Chuỗi ngọc trai tự nhiên + Túi cầm tay (clutch) thêu hoa + Giày gót nhọn',
-      culturalNote: 'Kế thừa phong cách Áo dài Cổ Thuyền do bà Trần Lệ Xuân khởi xướng năm 1958.',
-      factBite: 'Biến thể cổ thuyền năm 1958 từng gây sốt vì giải phóng sự gò bó của vùng cổ, mở ra kỷ nguyên thời trang hiện đại.',
-      safetyLevel: 'SAFE',
-      safetyLabel: '✓ Thanh lịch & Hợp chuẩn dạ tiệc',
-      safetyTip: 'Cổ khoét thuyền nhẹ nhàng, không xẻ ngực sâu để giữ nét quý phái.',
-      recommendedHex: '#0F766E', // Xanh cổ vịt
-      recommendedTrouserHex: '#FAF5FF' // Be ngọc trai
-    },
-    minimal: {
-      id: 'minimal',
-      name: 'Tối Giản Đương Đại',
-      subtitle: 'Trơn mờ, thuần khiết, thanh thoát nhẹ nhàng',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/c/c9/Highschool_students_in_ao_dai.jpg',
-      imageAlt: 'Áo dài trắng thanh thuần',
-      photoCredit: 'User Tieumocquan (Wikimedia Commons)',
-      licenseText: 'CC0 Public Domain',
-      topDesc: 'Áo dài đũi tơ hoặc lanh lụa trơn một màu, cổ đứng thanh mảnh, phom suông nhẹ',
-      bottomDesc: 'Quần đũi tơ tệp màu áo hoặc quần lụa đen tối giản',
-      accDesc: 'Khuyên tai bạc điêu khắc hình học + Túi da trơn phom hộp + Sandal quai mảnh',
-      culturalNote: 'Phù hợp người yêu thích lối sống tối giản (Minimalism) nhưng vẫn giữ hồn cốt áo dài.',
-      factBite: 'Lược bỏ toàn bộ hạt cườm hay hoa văn sặc sỡ, vẻ đẹp của áo dài tối giản đến từ độ rủ tự nhiên của tơ lụa.',
-      safetyLevel: 'SAFE',
-      safetyLabel: '✓ Thuần khiết & Duyên dáng',
-      safetyTip: 'Vải trơn cần chọn chất liệu có độ rủ tốt để tránh bị phồng cứng mất dáng.',
-      recommendedHex: '#F5F5F4', // Trắng giấy
-      recommendedTrouserHex: '#1C1917' // Đen tuyền
-    },
-    vintage: {
-      id: 'vintage',
-      name: 'Sài Gòn Retro 1968',
-      subtitle: 'Hơi thở thanh xuân rực rỡ thập niên 60-70',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ea/Female_students_wearing_%C3%A1o_d%C3%A0i_%28cropped%29.jpg',
-      imageAlt: 'Áo dài hoa Sài Gòn vintage',
-      photoCredit: 'Hoàng Duy Khang (Flickr/Wikimedia)',
-      licenseText: 'CC BY 2.0',
-      topDesc: 'Áo dài hoa nhí hoặc chấm bi phom Raglan Đakao, eo chít con kiến tôn ngực',
-      bottomDesc: 'Quần lụa đen ống rộng patte hơi vẩy nhẹ',
-      accDesc: 'Băng đô tóc retro vải hoa cùng tone + Kính mắt mèo + Guốc gỗ gót cong',
-      culturalNote: 'Dấu ấn rực rỡ của thời trang Sài Gòn trước 1975, tươi vui và đầy sức sống thanh xuân.',
-      factBite: 'Kỹ thuật tay Raglan do nhà may Dũng ở Đakao sáng chế năm 1958 đã giải quyết triệt để vết nhăn nhúm ở nách áo.',
-      safetyLevel: 'SAFE',
-      safetyLabel: '✦ Dấu ấn hoài niệm 1960s',
-      safetyTip: 'Phom chít eo khá ôm, nên chọn vải có độ co giãn nhẹ để dễ thở.',
-      recommendedHex: '#D97706', // Vàng mù tạt
-      recommendedTrouserHex: '#18181B' // Quần đen
-    },
-    genz: {
-      id: 'genz',
-      name: 'Gen Z Phá Cách',
-      subtitle: 'Tà lửng, tay bồng, năng động dạo phố',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/b/b8/Female_students_wearing_%C3%A1o_d%C3%A0i.jpg',
-      imageAlt: 'Áo dài cách tân hoa tươi trẻ',
-      photoCredit: 'Hoàng Duy Khang (Wikimedia Commons)',
-      licenseText: 'CC BY 2.0',
-      topDesc: 'Áo dài gấm xốp tà lửng ngang bắp chân, tay bồng nhẹ tiểu thư, cổ tròn thoáng',
-      bottomDesc: 'Quần lụa ống lửng hoặc chân váy xòe xếp ly nhẹ nhàng',
-      accDesc: 'Giày Mary Jane đế bệt hoặc Sneaker trắng + Kẹp tóc ruy băng lụa + Túi cói mini',
-      culturalNote: 'Dành cho thế hệ trẻ dạo phố cà phê cuối tuần, dễ bước đi và ngồi xe máy.',
-      factBite: 'Áo dài tà lửng xuất hiện từ trào lưu mini-ao-dai cuối thập niên 60 và bùng nổ mạnh mẽ trong thập niên 2010.',
-      safetyLevel: 'CAUTION',
-      safetyLabel: '✦ Biến thể cách tân trẻ trung',
-      safetyTip: 'Thích hợp dạo phố, chụp ảnh cà phê. Không mặc vào các nghi lễ trang nghiêm như viếng đền miếu.',
-      recommendedHex: '#10B981', // Xanh bơ pastel
-      recommendedTrouserHex: '#FFFFFF' // Quần trắng
-    },
-    contemporary: {
-      id: 'contemporary',
-      name: 'Đương Đại Nghệ Thuật',
-      subtitle: 'Dập ly, loang màu, giao thoa hội họa',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/ec/Ao_Dai.jpg',
-      imageAlt: 'Áo dài nghệ thuật đương đại',
-      photoCredit: 'Stephen Shephard (Flickr/Wikimedia)',
-      licenseText: 'CC BY 2.0',
-      topDesc: 'Áo dài tơ dập ly hoặc loang màu ombré, vạt áo nhiều tầng xếp lớp bay bổng',
-      bottomDesc: 'Quần lụa ống suông rộng đen mờ xếp nếp',
-      accDesc: 'Trang sức bạc thủ công đương đại + Ankle boots da mềm',
-      culturalNote: 'Ngôn ngữ thời trang cao cấp (haute couture) giao lưu quốc tế.',
-      factBite: 'Kỹ thuật dập ly trên tơ tằm đem lại độ phồng tự nhiên mà không cần khung độn cứng nhắc.',
-      safetyLevel: 'SAFE',
-      safetyLabel: '✦ Nghệ thuật biểu đạt đương đại',
-      safetyTip: 'Tạo cảm giác bay bổng khi di chuyển trong không gian triển lãm nghệ thuật.',
-      recommendedHex: '#7C3AED', // Tím thạch anh
-      recommendedTrouserHex: '#1F2937' // Xám than
-    },
-    streetwear: {
-      id: 'streetwear',
-      name: 'Streetwear Fusion (Nam & Nữ)',
-      subtitle: 'Áo dài vạt ngắn kết hợp phong cách đường phố',
-      imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/e/e0/%C3%81o_d%C3%A0i_%26_kh%C4%83n_%C4%91%C3%B3ng2.jpg',
-      imageAlt: 'Áo dài nam truyền thống phối hợp phong cách',
-      photoCredit: 'Phan Ba (Wikimedia Commons)',
-      licenseText: 'CC BY-SA 3.0',
-      topDesc: 'Áo dài nam vạt lửng vải linen thô hoặc cotton tơ, cổ đứng khuy ngực chắc chắn',
-      bottomDesc: 'Quần âu xếp ly ống rộng (wide-leg trousers) màu xám khói',
-      accDesc: 'Giày chunky sneaker + Túi đeo chéo canvas + Kính râm gọng tròn',
-      culturalNote: 'Đưa áo dài trở lại đời sống thường nhật của nam giới thế kỷ 21.',
-      factBite: 'Trước năm 1945, áo dài ngũ thân là trang phục mặc định mỗi ngày của nam giới từ tri thức đến công sở.',
-      safetyLevel: 'CAUTION',
-      safetyLabel: '✦ Giao thoa văn hóa đường phố',
-      safetyTip: 'Vẫn giữ khuy cài ngay ngắn và quần dài, tránh mặc cùng quần đùi lộ gối.',
-      recommendedHex: '#1E293B', // Xanh than navy
-      recommendedTrouserHex: '#475569' // Xám đá
-    }
-  };
-
-  // 5 Heritage Color Presets
-  const heritagePresets = [
-    {
-      id: 'nu-sinh',
-      name: 'Nữ Sinh Hà Thành',
-      badge: 'Thuần Khiết',
-      topHex: '#FFFFFF',
-      trouserHex: '#18181B',
-      desc: 'Áo trắng ngọc lụa nõn + Quần lụa đen tuyền'
-    },
-    {
-      id: 'khai-xuan',
-      name: 'Khai Xuân Đắc Lộc',
-      badge: 'Tết May Mắn',
-      topHex: '#C92A2A',
-      trouserHex: '#D97706',
-      desc: 'Áo đỏ son thêu hoa + Quần lụa vàng đồng'
-    },
-    {
-      id: 'retro-saigon',
-      name: 'Sài Gòn 1968',
-      badge: 'Vintage',
-      topHex: '#D97706',
-      trouserHex: '#18181B',
-      desc: 'Áo vàng mù tạt hoa nhí + Quần đen ống suông'
-    },
-    {
-      id: 'cung-dinh',
-      name: 'Cung Đình Trầm Mặc',
-      badge: 'Quý Phái',
-      topHex: '#0F766E',
-      trouserHex: '#FEF3C7',
-      desc: 'Áo xanh cổ vịt gấm hoa + Quần vàng mỡ gà'
-    },
-    {
-      id: 'modern-chic',
-      name: 'Modern Chic',
-      badge: 'Tối Giản',
-      topHex: '#18181B',
-      trouserHex: '#64748B',
-      desc: 'Áo đen tuyền nhung mờ + Quần xám khói'
-    }
-  ];
-
-  // Dynamic Weather Impact Rules
-  const weatherRecommendation = useMemo(() => {
-    switch (selectedWeather) {
-      case 'hot':
-        return {
-          title: 'Thời tiết Nắng Nóng (> 30°C)',
-          tag: '☀️ Ưu tiên thoáng mát',
-          fabricTip: 'Khuyên dùng: Lụa tơ tằm dệt thưa, Đũi tơ, Voan cát mềm. Tránh nhung dày, gấm xốp ép.',
-          cutTip: 'Cổ đứng thấp 2cm hoặc cổ tròn, tay lỡ 3/4 nhẹ nhàng.'
-        };
-      case 'cold':
-        return {
-          title: 'Thời tiết Se Lạnh (< 18°C)',
-          tag: '❄️ Giữ ấm thanh lịch',
-          fabricTip: 'Khuyên dùng: Nhung tuyết cao cấp, Gấm dệt chỉ vàng, Lụa trần bông nhẹ.',
-          cutTip: 'Khoác thêm áo măng tô dạ dáng dài hoặc choàng khăn len cashmere màu tương phản.'
-        };
-      case 'rainy':
-        return {
-          title: 'Thời tiết Mưa & Ẩm',
-          tag: '🌧️ Chống vấy bẩn',
-          fabricTip: 'Khuyên dùng: Lụa nhân tạo mau khô, phối Quần lụa đen tối màu để tránh bùn bẩn.',
-          cutTip: 'Nên chọn tà áo lửng cách tân hoặc nâng gấu áo cách đất khi di chuyển.'
-        };
-      default:
-        return {
-          title: 'Thời tiết Mát Mẻ (20°C - 28°C)',
-          tag: '🍃 Thời tiết lý tưởng nhất',
-          fabricTip: 'Phù hợp với 100% các loại chất liệu: Lụa Vạn Phúc, Gấm hoa, Tơ sống, Lãnh Mỹ A.',
-          cutTip: 'Phô diễn trọn vẹn tà áo dài truyền thống thướt tha chạm mắt cá chân.'
-        };
-    }
-  }, [selectedWeather]);
-
-  // Dynamic Occasion Guidance
-  const occasionGuidance = useMemo(() => {
-    switch (selectedOccasion) {
-      case 'temple':
-        return {
-          name: 'Đi Lễ Chùa & Nghi Lễ',
-          badge: 'Trang nghiêm',
-          note: 'Bắt buộc chọn cổ đứng cao kín đáo, tay dài, tuyệt đối không mặc áo không tay hoặc tà quá ngắn.',
-          isStrict: true
-        };
-      case 'wedding':
-        return {
-          name: 'Lễ Cưới & Gia Tiên',
-          badge: 'Hỷ sự long trọng',
-          note: 'Sắc đỏ son hoặc trắng kem thanh tao, phối kiềng bạc hoặc khăn vấn để tôn vẻ đẹp ngày trọng đại.',
-          isStrict: false
-        };
-      case 'yearbook':
-        return {
-          name: 'Kỷ Yếu & Tốt Nghiệp',
-          badge: 'Tuổi thanh xuân',
-          note: 'Màu trắng ngọc kinh điển phối quần đen hoặc quần trắng, kết hợp nón lá hoặc bó hoa cúc họa mi.',
-          isStrict: false
-        };
-      case 'street':
-        return {
-          name: 'Dạo Phố & Cà Phê',
-          badge: 'Trẻ trung tự do',
-          note: 'Thoải mái thử nghiệm các biến thể tà lửng, tay phồng, phối cùng giày búp bê, sneaker hoặc túi cói.',
-          isStrict: false
-        };
-      default:
-        return {
-          name: 'Tết & Du Xuân',
-          badge: 'Đón tân niên may mắn',
-          note: 'Sắc màu rực rỡ (Đỏ, Vàng, Xanh lá non), mang lại hỷ khí và tài lộc khi chúc Tết họ hàng.',
-          isStrict: false
-        };
-    }
-  }, [selectedOccasion]);
+  const weatherRecommendation = weatherGuidance[selectedWeather];
+  const occasionGuidance = occasionGuidanceByKey[selectedOccasion];
 
   const activeVibe = styleMatrix[selectedVibe];
   const activeColorHex = customColor || activeVibe.recommendedHex;
@@ -485,7 +211,7 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
 
       {/* Main Result: The Outfit Recommendation Card */}
       <div className="bg-[#FFFFFF] border-2 border-[#F4C2CE] rounded-2xl p-6 sm:p-8 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        {/* Left: Visual Verified Lookbook Photo */}
+        {/* Left: Illustrative lookbook photo */}
         <div className="lg:col-span-5 relative group">
           <div className="relative aspect-[3/4] rounded-xl overflow-hidden bg-[#FFF5F7] border border-[#F4C2CE] shadow-md">
             <img
@@ -501,7 +227,7 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
 
             {/* License attribution tiny tag */}
             <div className="absolute bottom-2 left-2 right-2 bg-black/60 backdrop-blur-xs px-2 py-1 rounded text-[10px] text-white/80 font-mono text-center truncate">
-              {activeVibe.photoCredit} • {activeVibe.licenseText}
+              {activeVibe.photoCredit} • {activeVibe.licenseText} • Hồ sơ chưa đối chiếu đầy đủ
             </div>
           </div>
         </div>

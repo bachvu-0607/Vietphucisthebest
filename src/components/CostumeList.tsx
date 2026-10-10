@@ -124,7 +124,7 @@ export const CostumeList: React.FC<CostumeListProps> = ({
           </h1>
           <p className="text-xs sm:text-sm text-[#57534E] font-light leading-relaxed">
             {selectedEvent
-              ? `Hệ thống gợi ý các bộ cổ phục chuẩn mực đối chiếu theo dịp "${selectedEvent.name}". Bấm vào thẻ để tìm hiểu chi tiết hoặc vào Studio phối thử.`
+              ? `Hệ thống gợi ý các mẫu trang phục theo dịp "${selectedEvent.name}". Bấm vào thẻ để tìm hiểu chi tiết hoặc vào Studio phối thử.`
               : 'Khám phá phả hệ cổ phục ngàn năm văn hiến được phục dựng chuẩn xác theo tư liệu khảo cổ và điển chế triều đình.'}
           </p>
         </div>

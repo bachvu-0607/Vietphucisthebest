@@ -1,0 +1,790 @@
+[
+  {
+    "id": "cos-nhat-binh",
+    "slug": "ao-nhat-binh",
+    "coverImage": "/assets/costumes/ao-nhat-binh-cong-chua.jpg",
+    "components": [
+      "cmp-nb-model",
+      "cmp-nb-inner",
+      "cmp-nb-pants",
+      "cmp-nb-main",
+      "cmp-nb-collar",
+      "cmp-nb-sleeves",
+      "cmp-nb-head",
+      "cmp-nb-kimboi",
+      "cmp-nb-fan",
+      "cmp-nb-shoes"
+    ],
+    "colorVariants": [
+      "col-nb-red",
+      "col-nb-ivory",
+      "col-nb-pink",
+      "col-nb-yellow",
+      "col-nb-teal",
+      "col-nb-purple"
+    ],
+    "materials": [
+      "mat-gam-hue",
+      "mat-lua-to-tam",
+      "mat-sa-nam-nha"
+    ],
+    "accessories": [
+      "acc-nb-khanvanh",
+      "acc-nb-tram",
+      "acc-nb-kimboi",
+      "acc-nb-quat-doan-phien",
+      "acc-nb-quat-nan-nga",
+      "acc-nb-sen",
+      "acc-nb-hai"
+    ],
+    "details": [
+      "dtl-nb-cuc",
+      "dtl-nb-vien",
+      "dtl-nb-hoa-van"
+    ],
+    "layers": [
+      {
+        "id": "cmp-nb-model",
+        "layerOrder": 1,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#f5ebe0"
+      },
+      {
+        "id": "cmp-nb-inner",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#ffffff"
+      },
+      {
+        "id": "cmp-nb-pants",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#faf8f5"
+      },
+      {
+        "id": "cmp-nb-main",
+        "layerOrder": 3,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#9e1b22"
+      },
+      {
+        "id": "cmp-nb-collar",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#d4af37"
+      },
+      {
+        "id": "cmp-nb-sleeves",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#c5a059"
+      },
+      {
+        "id": "cmp-nb-head",
+        "layerOrder": 5,
+        "isRequired": false,
+        "type": "headwear",
+        "defaultColor": "#1d3557"
+      },
+      {
+        "id": "cmp-nb-kimboi",
+        "layerOrder": 6,
+        "isRequired": false,
+        "type": "accessory",
+        "defaultColor": "#e9c46a"
+      },
+      {
+        "id": "cmp-nb-fan",
+        "layerOrder": 6,
+        "isRequired": false,
+        "type": "accessory",
+        "defaultColor": "#d8b4e2"
+      },
+      {
+        "id": "cmp-nb-shoes",
+        "layerOrder": 7,
+        "isRequired": false,
+        "type": "footwear",
+        "defaultColor": "#8a1c14"
+      }
+    ],
+    "events": [
+      "evt-wedding",
+      "evt-tet",
+      "evt-festival",
+      "evt-yearbook",
+      "evt-art",
+      "evt-street"
+    ]
+  },
+  {
+    "id": "cos-ao-tac",
+    "slug": "ao-tac-tay-thung",
+    "coverImage": "/assets/costumes/ao-tac-bat-bao.jpeg",
+    "components": [
+      "cmp-at-model",
+      "cmp-at-inner",
+      "cmp-at-pants",
+      "cmp-at-main",
+      "cmp-at-sleeves",
+      "cmp-at-buttons",
+      "cmp-at-khan",
+      "cmp-at-quat",
+      "cmp-at-guoc"
+    ],
+    "colorVariants": [
+      "col-at-navy",
+      "col-at-maroon",
+      "col-at-olive",
+      "col-at-cream"
+    ],
+    "materials": [
+      "mat-at-to-tam",
+      "mat-at-gam-hoa",
+      "mat-at-dui"
+    ],
+    "accessories": [
+      "acc-at-khandong",
+      "acc-at-thebai",
+      "acc-at-quat",
+      "acc-at-giay"
+    ],
+    "details": [
+      "dtl-at-co",
+      "dtl-at-tay"
+    ],
+    "layers": [
+      {
+        "id": "cmp-at-model",
+        "layerOrder": 1,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#f7ede2"
+      },
+      {
+        "id": "cmp-at-inner",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#ffffff"
+      },
+      {
+        "id": "cmp-at-pants",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#f8f9fa"
+      },
+      {
+        "id": "cmp-at-main",
+        "layerOrder": 3,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#2b4162"
+      },
+      {
+        "id": "cmp-at-sleeves",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#2b4162"
+      },
+      {
+        "id": "cmp-at-buttons",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#e0a96d"
+      },
+      {
+        "id": "cmp-at-khan",
+        "layerOrder": 5,
+        "isRequired": false,
+        "type": "headwear",
+        "defaultColor": "#1a1a1a"
+      },
+      {
+        "id": "cmp-at-quat",
+        "layerOrder": 6,
+        "isRequired": false,
+        "type": "accessory",
+        "defaultColor": "#f4a261"
+      },
+      {
+        "id": "cmp-at-guoc",
+        "layerOrder": 7,
+        "isRequired": false,
+        "type": "footwear",
+        "defaultColor": "#382212"
+      }
+    ],
+    "events": [
+      "evt-tet",
+      "evt-wedding",
+      "evt-yearbook",
+      "evt-formal",
+      "evt-festival",
+      "evt-street"
+    ]
+  },
+  {
+    "id": "cos-ngu-than-tay-chen",
+    "slug": "ao-ngu-than-tay-chen",
+    "coverImage": "/assets/costumes/ao-ngu-than-vnp.jpg",
+    "components": [
+      "cmp-tc-model",
+      "cmp-tc-inner",
+      "cmp-tc-pants",
+      "cmp-tc-main",
+      "cmp-tc-sleeves",
+      "cmp-tc-buttons",
+      "cmp-tc-acc",
+      "cmp-tc-shoes"
+    ],
+    "colorVariants": [
+      "col-tc-emerald",
+      "col-tc-charcoal",
+      "col-tc-sand",
+      "col-tc-burgundy"
+    ],
+    "materials": [
+      "mat-tc-linen",
+      "mat-tc-cotton-silk"
+    ],
+    "accessories": [
+      "acc-tc-dongho",
+      "acc-tc-tui",
+      "acc-tc-giay"
+    ],
+    "details": [
+      "dtl-tc-cuc",
+      "dtl-tc-xe"
+    ],
+    "layers": [
+      {
+        "id": "cmp-tc-model",
+        "layerOrder": 1,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#f7ede2"
+      },
+      {
+        "id": "cmp-tc-inner",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#ffffff"
+      },
+      {
+        "id": "cmp-tc-pants",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#1c1c1c"
+      },
+      {
+        "id": "cmp-tc-main",
+        "layerOrder": 3,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#457b9d"
+      },
+      {
+        "id": "cmp-tc-sleeves",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#457b9d"
+      },
+      {
+        "id": "cmp-tc-buttons",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#e0a96d"
+      },
+      {
+        "id": "cmp-tc-acc",
+        "layerOrder": 6,
+        "isRequired": false,
+        "type": "accessory",
+        "defaultColor": "#d4af37"
+      },
+      {
+        "id": "cmp-tc-shoes",
+        "layerOrder": 7,
+        "isRequired": false,
+        "type": "footwear",
+        "defaultColor": "#2b2d42"
+      }
+    ],
+    "events": [
+      "evt-street",
+      "evt-yearbook",
+      "evt-tet",
+      "evt-art",
+      "evt-formal"
+    ]
+  },
+  {
+    "id": "cos-giao-linh",
+    "slug": "ao-giao-linh-thoi-le",
+    "coverImage": "/assets/costumes/ao-giao-linh.jpg",
+    "components": [
+      "cmp-gl-model",
+      "cmp-gl-inner",
+      "cmp-gl-skirt",
+      "cmp-gl-main",
+      "cmp-gl-belt",
+      "cmp-gl-head",
+      "cmp-gl-ngoc",
+      "cmp-gl-shoes"
+    ],
+    "colorVariants": [
+      "col-gl-indigo",
+      "col-gl-crimson",
+      "col-gl-cloud"
+    ],
+    "materials": [
+      "mat-gl-to-tam",
+      "mat-gl-gam-the"
+    ],
+    "accessories": [
+      "acc-gl-dai",
+      "acc-gl-kiem"
+    ],
+    "details": [
+      "dtl-gl-co"
+    ],
+    "layers": [
+      {
+        "id": "cmp-gl-model",
+        "layerOrder": 1,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#f7ede2"
+      },
+      {
+        "id": "cmp-gl-inner",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#ffffff"
+      },
+      {
+        "id": "cmp-gl-skirt",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#2b2d42"
+      },
+      {
+        "id": "cmp-gl-main",
+        "layerOrder": 3,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#1b4965"
+      },
+      {
+        "id": "cmp-gl-belt",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "accessory",
+        "defaultColor": "#c1121f"
+      },
+      {
+        "id": "cmp-gl-head",
+        "layerOrder": 5,
+        "isRequired": false,
+        "type": "headwear",
+        "defaultColor": "#000000"
+      },
+      {
+        "id": "cmp-gl-ngoc",
+        "layerOrder": 6,
+        "isRequired": false,
+        "type": "accessory",
+        "defaultColor": "#bee1e6"
+      },
+      {
+        "id": "cmp-gl-shoes",
+        "layerOrder": 7,
+        "isRequired": false,
+        "type": "footwear",
+        "defaultColor": "#495057"
+      }
+    ],
+    "events": [
+      "evt-festival",
+      "evt-art",
+      "evt-yearbook",
+      "evt-tet",
+      "evt-street"
+    ]
+  },
+  {
+    "id": "cos-doi-kham",
+    "slug": "ao-doi-kham",
+    "coverImage": "/assets/costumes/ao-nhat-binh-tu-cung.jpg",
+    "components": [
+      "cmp-dk-model",
+      "cmp-dk-inner",
+      "cmp-dk-skirt",
+      "cmp-dk-main",
+      "cmp-dk-acc",
+      "cmp-dk-shoes"
+    ],
+    "colorVariants": [
+      "col-dk-moss",
+      "col-dk-crimson",
+      "col-dk-ivory"
+    ],
+    "materials": [
+      "mat-dk-sa",
+      "mat-dk-gam"
+    ],
+    "accessories": [
+      "acc-dk-kieng",
+      "acc-dk-quat"
+    ],
+    "details": [
+      "dtl-dk-nep"
+    ],
+    "layers": [
+      {
+        "id": "cmp-dk-model",
+        "layerOrder": 1,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#f7ede2"
+      },
+      {
+        "id": "cmp-dk-inner",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#c1121f"
+      },
+      {
+        "id": "cmp-dk-skirt",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#fdf0d5"
+      },
+      {
+        "id": "cmp-dk-main",
+        "layerOrder": 3,
+        "isRequired": true,
+        "type": "outer",
+        "defaultColor": "#588157"
+      },
+      {
+        "id": "cmp-dk-acc",
+        "layerOrder": 6,
+        "isRequired": false,
+        "type": "accessory",
+        "defaultColor": "#e0e1dd"
+      },
+      {
+        "id": "cmp-dk-shoes",
+        "layerOrder": 7,
+        "isRequired": false,
+        "type": "footwear",
+        "defaultColor": "#780001"
+      }
+    ],
+    "events": [
+      "evt-art",
+      "evt-yearbook",
+      "evt-tet",
+      "evt-wedding"
+    ]
+  },
+  {
+    "id": "cos-ao-dai",
+    "slug": "ao-dai-viet-nam",
+    "coverImage": "https://upload.wikimedia.org/wikipedia/commons/4/4b/%C3%81o_d%C3%A0i_%286405924827%29.jpg",
+    "components": [
+      "cmp-ad-model",
+      "cmp-ad-inner",
+      "cmp-ad-main",
+      "cmp-ad-collar",
+      "cmp-ad-head",
+      "cmp-ad-acc",
+      "cmp-ad-shoes"
+    ],
+    "colorVariants": [
+      "col-ad-white",
+      "col-ad-red",
+      "col-ad-yellow",
+      "col-ad-teal",
+      "col-ad-purple",
+      "col-ad-black"
+    ],
+    "materials": [
+      "mat-ad-to-tam",
+      "mat-ad-gam-hoa",
+      "mat-ad-nhung",
+      "mat-ad-dui"
+    ],
+    "accessories": [
+      "acc-ad-nonla",
+      "acc-ad-kieng",
+      "acc-ad-ngoc-trai",
+      "acc-ad-quat",
+      "acc-ad-guoc"
+    ],
+    "details": [
+      "dtl-ad-co",
+      "dtl-ad-raglan",
+      "dtl-ad-xe"
+    ],
+    "layers": [
+      {
+        "id": "cmp-ad-model",
+        "layerOrder": 1,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#f7ede2"
+      },
+      {
+        "id": "cmp-ad-inner",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#ffffff"
+      },
+      {
+        "id": "cmp-ad-main",
+        "layerOrder": 3,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#c92a2a"
+      },
+      {
+        "id": "cmp-ad-collar",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#c92a2a"
+      },
+      {
+        "id": "cmp-ad-head",
+        "layerOrder": 5,
+        "isRequired": false,
+        "type": "headwear",
+        "defaultColor": "#fef3c7"
+      },
+      {
+        "id": "cmp-ad-acc",
+        "layerOrder": 6,
+        "isRequired": false,
+        "type": "accessory",
+        "defaultColor": "#e0e1dd"
+      },
+      {
+        "id": "cmp-ad-shoes",
+        "layerOrder": 7,
+        "isRequired": false,
+        "type": "footwear",
+        "defaultColor": "#382212"
+      }
+    ],
+    "events": [
+      "evt-tet",
+      "evt-wedding",
+      "evt-yearbook",
+      "evt-formal",
+      "evt-street"
+    ]
+  },
+  {
+    "id": "cos-vien-linh",
+    "slug": "ao-vien-linh",
+    "coverImage": "/assets/costumes/ao-vien-linh.jpg",
+    "components": [
+      "cmp-vl-model",
+      "cmp-vl-inner",
+      "cmp-vl-main",
+      "cmp-vl-belt"
+    ],
+    "colorVariants": [
+      "col-vl-crimson",
+      "col-vl-purple"
+    ],
+    "materials": [
+      "mat-vl-gam"
+    ],
+    "accessories": [
+      "acc-vl-mu"
+    ],
+    "details": [
+      "dtl-vl-co"
+    ],
+    "layers": [
+      {
+        "id": "cmp-vl-model",
+        "layerOrder": 1,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#f7ede2"
+      },
+      {
+        "id": "cmp-vl-inner",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#ffffff"
+      },
+      {
+        "id": "cmp-vl-main",
+        "layerOrder": 3,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#9e2a2b"
+      },
+      {
+        "id": "cmp-vl-belt",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "accessory",
+        "defaultColor": "#d4af37"
+      }
+    ],
+    "events": [
+      "evt-formal",
+      "evt-art"
+    ]
+  },
+  {
+    "id": "cos-tu-than",
+    "slug": "ao-tu-than",
+    "coverImage": "/assets/costumes/ao-tu-than.jpg",
+    "components": [
+      "cmp-tt-model",
+      "cmp-tt-yem",
+      "cmp-tt-vay",
+      "cmp-tt-main",
+      "cmp-tt-thatlung"
+    ],
+    "colorVariants": [
+      "col-tt-brown",
+      "col-tt-plum"
+    ],
+    "materials": [
+      "mat-tt-dui"
+    ],
+    "accessories": [
+      "acc-tt-non"
+    ],
+    "details": [
+      "dtl-tt-vat"
+    ],
+    "layers": [
+      {
+        "id": "cmp-tt-model",
+        "layerOrder": 1,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#f7ede2"
+      },
+      {
+        "id": "cmp-tt-yem",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#e63946"
+      },
+      {
+        "id": "cmp-tt-vay",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#1a1a1a"
+      },
+      {
+        "id": "cmp-tt-main",
+        "layerOrder": 3,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#582f0e"
+      },
+      {
+        "id": "cmp-tt-thatlung",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "accessory",
+        "defaultColor": "#2a9d8f"
+      }
+    ],
+    "events": [
+      "evt-festival",
+      "evt-art"
+    ]
+  },
+  {
+    "id": "cos-ba-ba",
+    "slug": "ao-ba-ba",
+    "coverImage": "/assets/costumes/ao-ba-ba.jpg",
+    "components": [
+      "cmp-bb-model",
+      "cmp-bb-main",
+      "cmp-bb-pants",
+      "cmp-bb-khan"
+    ],
+    "colorVariants": [
+      "col-bb-black",
+      "col-bb-sky"
+    ],
+    "materials": [
+      "mat-bb-lua"
+    ],
+    "accessories": [
+      "acc-bb-nonla"
+    ],
+    "details": [
+      "dtl-bb-tui"
+    ],
+    "layers": [
+      {
+        "id": "cmp-bb-model",
+        "layerOrder": 1,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#f7ede2"
+      },
+      {
+        "id": "cmp-bb-main",
+        "layerOrder": 3,
+        "isRequired": true,
+        "type": "main",
+        "defaultColor": "#2a9d8f"
+      },
+      {
+        "id": "cmp-bb-pants",
+        "layerOrder": 2,
+        "isRequired": true,
+        "type": "inner",
+        "defaultColor": "#1a1a1a"
+      },
+      {
+        "id": "cmp-bb-khan",
+        "layerOrder": 4,
+        "isRequired": true,
+        "type": "accessory",
+        "defaultColor": "#2b2d42"
+      }
+    ],
+    "events": [
+      "evt-festival",
+      "evt-street"
+    ]
+  }
+]
