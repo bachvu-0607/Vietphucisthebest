@@ -277,7 +277,7 @@ export const HomePage: React.FC<HomePageProps> = ({
               <div className="lg:col-span-7 space-y-6">
                 <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-[#C84B69]/10 border border-[#C84B69]/25 text-[#C84B69] text-xs font-serif font-bold tracking-wider uppercase">
                   <ChimLacIcon className="w-4 h-3.5 text-[#C84B69]" />
-                  <span>Việt Phục Remix • Tôn Vinh Di Sản</span>
+                  <span>Nam Phục Chính Tông • Tôn Vinh Di Sản</span>
                 </div>
 
                 <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-bold text-[#1C1917] tracking-tight leading-[1.2]">
@@ -286,7 +286,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </h1>
 
                 <p className="text-sm sm:text-base text-[#57534E] font-light leading-relaxed">
-                  <strong>Việt Phục Remix</strong> là nền tảng số hóa di sản trang phục truyền thống Việt Nam. Ứng dụng giúp bạn tìm hiểu trang phục qua các triều đại (Nguyễn, Lê, Lý, Trần), đối chiếu bối cảnh sự kiện thực tế, gợi ý chất liệu theo thời tiết và tự do phối thử trang phục trên Studio 2D hiện đại.
+                  <strong>Việt phục của PUB League</strong> là nền tảng số hóa di sản trang phục truyền thống Việt Nam. Ứng dụng giúp bạn tìm hiểu trang phục qua các triều đại (Nguyễn, Lê, Lý, Trần), đối chiếu bối cảnh sự kiện thực tế, gợi ý chất liệu theo thời tiết và tự do phối thử trang phục trên Studio 2D hiện đại.
                 </p>
 
                 {/* Core Feature Highlights */}
