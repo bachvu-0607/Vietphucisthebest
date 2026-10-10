@@ -510,7 +510,7 @@
   {
     "id": "cos-ao-dai",
     "slug": "ao-dai-viet-nam",
-    "coverImage": "https://upload.wikimedia.org/wikipedia/commons/4/4b/%C3%81o_d%C3%A0i_%286405924827%29.jpg",
+    "coverImage": "/assets/costumes/ao-dai-viet-nam.jpg",
     "components": [
       "cmp-ad-model",
       "cmp-ad-inner",

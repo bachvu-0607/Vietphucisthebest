@@ -8,7 +8,7 @@ export const aoDaiVietNam: Costume = {
   "region": "Toàn quốc (Hà Nội, Huế, Sài Gòn)",
   "gender": "unisex",
   "formality": "formal",
-  "coverImage": "https://upload.wikimedia.org/wikipedia/commons/4/4b/%C3%81o_d%C3%A0i_%286405924827%29.jpg",
+  "coverImage": "/assets/costumes/ao-dai-viet-nam.jpg",
   "lineageCategory": "lap-linh",
   "lineageSubcategory": "tay-chen",
   "lineageLabel": "Áo dài hiện đại • Nhiều kiểu cổ và tay",
