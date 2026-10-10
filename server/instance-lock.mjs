@@ -1,10 +1,10 @@
-import 'dotenv/config';
+import { DATA_DIR } from './storage.ts';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import lockfile from 'proper-lockfile';
 
-export const storageDir = path.resolve(process.env.DATA_DIR || 'data');
+export const storageDir = DATA_DIR;
 const options = { stale: 30000, update: 5000, lockfilePath: path.join(storageDir, '.server.lock') };
 
 export function lockStorageForRestore() {

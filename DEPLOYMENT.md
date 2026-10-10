@@ -20,6 +20,8 @@ Khi triển khai, đặt `NODE_ENV=production`, `JWT_SECRET` là chuỗi bí m�
 
 **Cloud Run:** filesystem mặc định không đủ để giữ file SQLite và ảnh qua các lần thay container. Code sẽ từ chối chạy trên Cloud Run nếu chưa xác nhận cấu hình lưu trữ bằng `SQLITE_PERSISTENT_STORAGE=true`. Biến này chỉ là xác nhận của người vận hành, không tự tạo hay chứng minh ổ đĩa bền vững. Với kiến trúc SQLite này, phương án đơn giản là một VPS/máy chủ có ổ bền vững. Nếu giữ Cloud Run cần thiết kế dịch vụ database/lưu trữ phù hợp; chưa có cấu hình đó trong repo. Không coi bucket Cloud Storage/FUSE là một ổ SQLite thông thường.
 
+**Preview trong AI Studio:** `npm run dev` cho phép thử giao diện và backend trên môi trường có `K_SERVICE`, với dữ liệu tạm riêng tại `<thư mục tạm>/vietphuc-preview`. Không cần thêm biến lưu trữ. Chỉ dùng tài khoản/bản phối/ảnh thử; dữ liệu này không đồng bộ với Railway và có thể mất khi container bị thay. Để `NODE_ENV` trống hoặc `development` trong preview. Không đặt `SQLITE_PERSISTENT_STORAGE=true` để bỏ qua lỗi khi chưa có ổ bền vững. `npm start` và mọi tiến trình có `NODE_ENV=production` vẫn bị chặn trên Cloud Run nếu chưa xác nhận lưu trữ; trên Railway có Volume, cấu hình và đường dẫn dữ liệu giữ nguyên.
+
 Ảnh mới nằm trong `DATA_DIR/results`, không được copy vào bundle frontend. Ảnh cũ có bản ghi sở hữu vẫn đọc được từ `public/assets/results` qua route bảo vệ; ảnh không có chủ bị từ chối. Ảnh từng commit trên GitHub vẫn có thể tồn tại trong lịch sử Git: chặn truy cập web không xóa được các bản đã công khai đó.
 
 ## Đăng nhập và khôi phục tài khoản
