@@ -191,7 +191,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   });
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#FFF5F7] via-[#FDF0F3] to-[#FFF5F7] text-[#1C1917] relative">
+    <div className="min-h-screen bg-gradient-to-b from-[#FFF5F7] via-[#FDF0F3] to-[#FFF5F7] text-[#1C1917] relative overflow-x-clip">
       {/* Background Subtle Watermark (Trống Đồng Đông Sơn) */}
       <div className="absolute top-12 -right-20 text-[#D84B6F]/5 pointer-events-none select-none">
         <TrongDongWatermark className="w-[600px] h-[600px]" />

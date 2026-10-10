@@ -18,6 +18,11 @@
     --color-border-subtle: #E8E2D8;
   }
 
+  /* iOS Safari ignores overflow-x on body alone; clip at the root too. */
+  html {
+    overflow-x: clip;
+  }
+
   body {
     background-color: var(--color-paper);
     color: var(--color-ink);
