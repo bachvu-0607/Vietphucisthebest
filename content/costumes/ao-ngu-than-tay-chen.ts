@@ -12,7 +12,7 @@ export const aoNguThanTayChen: Costume = {
   "lineageCategory": "lap-linh",
   "lineageSubcategory": "tay-chen",
   "lineageLabel": "Áo Lập Lĩnh • Tay gọn (Thường phục)",
-  "shortDescription": "Biến thể tiện dụng thường nhật của áo Ngũ Thân, với ống tay ôm vừa vặn vào cổ tay, năng động, thoải mái nhưng vẫn bảo toàn trọn vẹn nét tôn nghiêm.",
+  "shortDescription": "Áo ngũ thân cổ đứng, hàng năm khuy cài bên phải; tay thu nhỏ dần về cổ tay, thân và nách vẫn có độ rộng để cử động.",
   "historicalContext": "Áo ngũ thân có năm thân vải, cổ đứng và hàng cúc lệch; dạng tay chẽn thu gọn ống tay để thuận tiện cử động. Áo ngũ thân phát triển ở Đàng Trong từ thế kỷ XVIII và được phổ biến dưới triều Nguyễn; không chỉ dành cho nam giới hay quan lại.",
   "culturalSignificance": "Ngũ thân là một tiền đề của áo dài hiện đại. Dạng tay chẽn trong danh mục nhấn mạnh phom truyền thống gọn gàng; không đồng nhất nó với tất cả kiểu áo dài hai tà hiện nay.",
   "isVerifiedHistoricalData": false,
@@ -51,12 +51,12 @@ export const aoNguThanTayChen: Costume = {
       "layerOrder": 3,
       "isRequired": true,
       "type": "main",
-      "description": "Vạt áo lượn cong nhẹ nhàng ôm lấy vóc dáng",
+      "description": "Thân và nách có độ rộng; tà xòe nhẹ, vạt con giúp che kín phần eo và hông.",
       "defaultColor": "#457b9d"
     },
     {
       "id": "cmp-tc-sleeves",
-      "name": "Tay áo chẽn bó cổ tay",
+      "name": "Tay áo chẽn vừa cổ tay",
       "layerOrder": 4,
       "isRequired": true,
       "type": "main",
@@ -97,14 +97,14 @@ export const aoNguThanTayChen: Costume = {
       "name": "Xanh lam hoa râm",
       "hex": "#264653",
       "meaning": "Hài hòa, trẻ trung và tràn đầy sinh khí",
-      "popularity": "Bán chạy nhất"
+      "popularity": "Gợi ý phối dạo phố"
     },
     {
       "id": "col-tc-charcoal",
       "name": "Xám than chì / Đen tuyền",
       "hex": "#2b2d42",
       "meaning": "Chững chạc, bí ẩn và tôn dáng",
-      "popularity": "Rất chuộng dạo phố"
+      "popularity": "Gợi ý phối dạo phố"
     },
     {
       "id": "col-tc-sand",
@@ -124,17 +124,17 @@ export const aoNguThanTayChen: Costume = {
   "materials": [
     {
       "id": "mat-tc-linen",
-      "name": "Vải Linen tơ tằm dệt thoáng khí",
+      "name": "Vải linen dệt trơn",
       "textureType": "linen",
-      "origin": "Việt Nam",
-      "description": "Thoát mồ hôi cực tốt, phom vải đứng cứng cáp"
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
+      "description": "Chọn độ dày và độ mềm phù hợp; linen không mặc định là tơ tằm."
     },
     {
       "id": "mat-tc-cotton-silk",
       "name": "Cotton pha tơ tằm dệt hoa chìm",
       "textureType": "cotton_silk",
-      "origin": "Bảo Lộc",
-      "description": "Co giãn nhẹ, thân thiện với làn da khi hoạt động cả ngày"
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
+      "description": "Độ co giãn và độ thoáng tùy tỉ lệ sợi, kiểu dệt và hoàn tất vải."
     }
   ],
   "accessories": [
@@ -144,7 +144,7 @@ export const aoNguThanTayChen: Costume = {
       "category": "jewelry",
       "layerOrder": 6,
       "description": "Đeo cổ tay tạo phong thái tri thức thế kỷ 20",
-      "traditionalMeaning": "Giao thoa thời đại",
+      "traditionalMeaning": "Phụ kiện hiện đại đi cùng phom ngũ thân.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -154,7 +154,7 @@ export const aoNguThanTayChen: Costume = {
       "category": "handheld",
       "layerOrder": 6,
       "description": "Phụ kiện dạo phố tiện ích",
-      "traditionalMeaning": "Hơi thở dân gian đương đại",
+      "traditionalMeaning": "Đưa họa tiết trang trí vào túi dùng hằng ngày.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -164,7 +164,7 @@ export const aoNguThanTayChen: Costume = {
       "category": "footwear",
       "layerOrder": 7,
       "description": "Remix phong cách đường phố cá tính",
-      "traditionalMeaning": "Tự do bước tiến",
+      "traditionalMeaning": "Giày hiện đại dùng trong bộ phối đường phố.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     }
@@ -178,9 +178,9 @@ export const aoNguThanTayChen: Costume = {
     },
     {
       "id": "dtl-tc-xe",
-      "name": "Đường xẻ tà cao vừa phải",
+      "name": "Đường xẻ sườn và vạt con",
       "type": "hem",
-      "description": "Dễ dàng ngồi xe máy hoặc di chuyển linh hoạt"
+      "description": "Vạt con che phần eo và hông; độ xẻ không làm mất phom ngũ thân."
     }
   ],
   "suitability": [
@@ -188,37 +188,36 @@ export const aoNguThanTayChen: Costume = {
       "eventId": "evt-street",
       "score": 99,
       "label": "Hoàn hảo",
-      "reason": "Đây chính là trang phục lý tưởng nhất để mặc dạo phố, đi cà phê, bảo tàng cuối tuần."
+      "reason": "Tay gọn thuận tiện hơn cho sinh hoạt và đi bộ; chọn áo vừa người."
     },
     {
       "eventId": "evt-yearbook",
       "score": 94,
       "label": "Hoàn hảo",
-      "reason": "Trẻ trung, thuận tiện chạy nhảy chụp ảnh tập thể ngoài trời suốt cả ngày."
+      "reason": "Phom ngũ thân tay gọn phù hợp bộ ảnh nhóm theo chủ đề Việt phục."
     },
     {
       "eventId": "evt-tet",
       "score": 91,
       "label": "Rất phù hợp",
-      "reason": "Đi chúc Tết bạn bè, dạo đường hoa vô cùng thoải mái và chỉn chu."
+      "reason": "Có thể phối cho chúc Tết và dạo đường hoa."
     },
     {
       "eventId": "evt-art",
       "score": 86,
       "label": "Rất phù hợp",
-      "reason": "Biểu diễn nhạc acoustic hoặc nghệ thuật đương đại."
+      "reason": "Gợi ý cho tiết mục dùng hình ảnh ngũ thân; chọn độ vừa theo động tác."
     },
     {
       "eventId": "evt-formal",
       "score": 78,
       "label": "Phù hợp",
-      "reason": "Nên chọn màu trầm và chất liệu gấm để tăng tính trang trọng."
+      "reason": "Có thể phối cho sự kiện trang trọng; kiểm tra quy định trang phục của nơi tổ chức."
     }
   ],
   "usageConsiderations": [
-    "Ống tay may chẽn vừa vặn, không nên may quá chật làm khó gập khuỷu tay.",
-    "Dễ kết hợp với trang phục hiện đại nhưng cần giữ phom cổ đứng và nếp khuy ngũ thân.",
-    "Màu, vật liệu, phụ kiện và điểm phù hợp sự kiện trong ứng dụng là gợi ý phối hiện nay; không chứng nhận một bộ phục dựng lịch sử."
+    "Tay chẽn ôm vừa cổ tay; thân và nách không bó như áo dài ôm sát. Thử gập khuỷu, giơ tay và ngồi để kiểm tra độ vừa.",
+    "Cài hàng khuy bên phải, giữ cổ đứng và vạt con nằm ổn định khi phối theo phom truyền thống."
   ],
   "stylingGuide": {
     "accessories": [
@@ -246,11 +245,12 @@ export const aoNguThanTayChen: Costume = {
       "Lụa pha cotton",
       "Hoa văn kỷ hà tối giản"
     ],
-    "traditionalStyling": "Mặc cùng quần lụa trắng, khăn đóng đen, giày da đen trơn thanh lịch.",
-    "modernRemixAdvice": "Remix đường phố: Mặc áo Ngũ Thân tay chẽn màu trơn cùng quần tây âu suông xếp ly, mang giày Loafer hoặc sneaker trắng tối giản, khoác thêm túi da đeo chéo.",
+    "traditionalStyling": "Giữ năm thân, vạt con, cổ đứng và hàng năm khuy bên phải. Tay thu nhỏ về cổ tay nhưng thân và nách còn rộng, tà không để hở eo/hông như áo dài tân thời. Có thể phối quần dài trắng ống rộng và khăn vấn/khăn đóng; giày và phụ kiện chọn theo bộ phối cụ thể.",
+    "modernRemixAdvice": "Gợi ý cách tân: giữ kết cấu ngũ thân và tay chẽn vừa vặn, thử vải trơn hoặc họa tiết nhỏ, phối quần âu suông, jeans không quá chật, loafer hoặc sneaker. Đồng hồ, kính, túi và trang sức là lựa chọn hiện đại; chú ý dây túi không kéo lệch cổ hoặc vạt áo.",
     "avoidCombinations": [
-      "Tránh mặc cùng quần short ngắn trên gối gây phản cảm.",
-      "Tránh mang dép tông lê cao su khi dự sự kiện."
+      "Tránh may thân, nách hoặc tay quá chật làm căng hàng khuy, hạn chế cử động và mất phom ngũ thân.",
+      "Tránh xẻ sườn để hở eo/hông khi muốn giữ kết cấu ngũ thân truyền thống.",
+      "Khi dự lễ, vào nơi thờ tự hoặc tham gia hoạt động học đường, chọn độ kín và độ dài phù hợp nội quy nơi đến; kiểm tra áo khi ngồi, cúi và giơ tay để tránh lộ ngoài ý muốn."
     ]
   },
   "aiProfile": {
@@ -283,7 +283,7 @@ export const aoNguThanTayChen: Costume = {
       {
         "sourceId": "hcmute-2024",
         "scope": "Giới thiệu cấu trúc ngũ thân, tay chẽn và cách mặc.",
-        "locator": "Tập san Thời trang và Du lịch, số 1 (2024), mục 3.2, tr. 60–61"
+        "locator": "Mục 3.1.2 và 3.2, tr. 60–61; dùng mô tả cấu trúc, không dùng lỗi mốc năm trong phần lịch sử."
       }
     ],
     "modernUse": "Giữ cổ đứng và kết cấu ngũ thân khi chọn phong cách truyền thống. Quần âu, đồng hồ, túi tote và sneaker là gợi ý phối hiện đại, phù hợp dạo phố hoặc sự kiện theo quy định của nơi tổ chức.",

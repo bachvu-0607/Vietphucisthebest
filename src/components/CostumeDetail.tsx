@@ -229,7 +229,7 @@ export const CostumeDetail: React.FC<CostumeDetailProps> = ({
           <section className="bg-white border border-[#F4C2CE] rounded-3xl p-6 sm:p-7 shadow-xs space-y-4">
             <h2 className="text-lg sm:text-xl font-serif font-bold text-[#1C1917] flex items-center gap-2.5">
               <Info className="w-5 h-5 text-[#C84B69]" />
-              <span>Lưu ý lễ nghi khi sử dụng</span>
+              <span>Cách mặc & Lưu ý khi sử dụng</span>
             </h2>
 
             <ul className="space-y-2.5 text-xs text-[#57534E]">
@@ -343,7 +343,7 @@ export const CostumeDetail: React.FC<CostumeDetailProps> = ({
               <div className="p-3.5 rounded-2xl bg-[#FFF9FA] border border-[#F4C2CE] space-y-1">
                 <div className="font-serif font-semibold text-[#C84B69] flex items-center gap-1.5">
                   <CheckCircle2 className="w-4 h-4 text-[#C84B69]" />
-                  <span>Cách phối truyền thống:</span>
+                  <span>Phối theo phom truyền thống:</span>
                 </div>
                 <p className="text-[#57534E] text-[11px] leading-relaxed font-light">
                   {costume.stylingGuide.traditionalStyling}
@@ -365,7 +365,7 @@ export const CostumeDetail: React.FC<CostumeDetailProps> = ({
               <div className="p-3.5 rounded-2xl bg-[#FEF2F2] border border-[#FECACA] space-y-1">
                 <div className="font-serif font-semibold text-[#B91C1C] flex items-center gap-1.5">
                   <XCircle className="w-4 h-4 text-[#B91C1C]" />
-                  <span>Những kết hợp nên tránh:</span>
+                  <span>Những điểm cần tránh khi phối:</span>
                 </div>
                 <ul className="list-disc list-inside space-y-0.5 text-[#991B1B] text-[11px] leading-relaxed font-light">
                   {costume.stylingGuide.avoidCombinations.map((avoid, i) => (

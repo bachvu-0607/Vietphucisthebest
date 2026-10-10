@@ -11,8 +11,8 @@ export const aoDaiVietNam: Costume = {
   "coverImage": "https://upload.wikimedia.org/wikipedia/commons/4/4b/%C3%81o_d%C3%A0i_%286405924827%29.jpg",
   "lineageCategory": "lap-linh",
   "lineageSubcategory": "tay-chen",
-  "lineageLabel": "Áo Dài ngũ thân cách tân • Hệ Lập Lĩnh",
-  "shortDescription": "Quốc phục biểu tượng của văn hóa Việt Nam với hai tà trước - sau buông rủ thướt tha, xẻ sườn và mặc cùng quần lụa dài.",
+  "lineageLabel": "Áo dài hiện đại • Nhiều kiểu cổ và tay",
+  "shortDescription": "Trang phục tiêu biểu của văn hóa Việt Nam, với hai tà trước và sau, đường xẻ sườn và thường phối cùng quần dài; cổ, tay và độ ôm có nhiều biến thể.",
   "historicalContext": "Áo dài hiện đại kế thừa ngũ thân và trải qua nhiều thay đổi trong thế kỷ XX, trong đó có thiết kế Lemur của Cát Tường vào nửa đầu thế kỷ XX. Cổ, tay, phom thân và độ dài tà ngày nay đa dạng; áo dài hai tà không mặc định có kết cấu năm thân, năm cúc.",
   "culturalSignificance": "Áo dài được sử dụng trong lễ cưới, học đường, giao tiếp và biểu diễn. Mặc với quần dài là cách phối quen thuộc; các biến thể cách tân cần được mô tả theo thiết kế và hoàn cảnh sử dụng, không áp một tiêu chuẩn cung đình cho mọi mẫu.",
   "isVerifiedHistoricalData": false,
@@ -33,7 +33,7 @@ export const aoDaiVietNam: Costume = {
       "layerOrder": 2,
       "isRequired": true,
       "type": "inner",
-      "description": "Quần lụa ống suông quét đất giữ vẻ kín đáo",
+      "description": "Quần dài ống suông; gấu vừa tầm giày để không chạm đất.",
       "defaultColor": "#ffffff"
     },
     {
@@ -99,7 +99,7 @@ export const aoDaiVietNam: Costume = {
     },
     {
       "id": "col-ad-yellow",
-      "name": "Vàng mù tạt Sài Gòn Retro 1968",
+      "name": "Vàng mù tạt (Cảm hứng retro)",
       "hex": "#d97706",
       "meaning": "Hoài niệm thập niên 60-70 rực rỡ",
       "popularity": "Du xuân dạo phố"
@@ -129,30 +129,30 @@ export const aoDaiVietNam: Costume = {
   "materials": [
     {
       "id": "mat-ad-to-tam",
-      "name": "Lụa Vạn Phúc Hà Đông",
+      "name": "Lụa tơ tằm",
       "textureType": "silk",
-      "origin": "Hà Đông, Hà Nội",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Mềm mát, độ rủ tự nhiên bay bổng"
     },
     {
       "id": "mat-ad-gam-hoa",
       "name": "Gấm dệt tơ hoa chìm",
       "textureType": "brocade",
-      "origin": "Bảo Lộc",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Đứng phom, hoa văn ẩn hiện sang trọng"
     },
     {
       "id": "mat-ad-nhung",
       "name": "Nhung the tuyết",
       "textureType": "velvet",
-      "origin": "Việt Nam",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Ấm áp, quý phái cho mùa đông và dạ tiệc"
     },
     {
       "id": "mat-ad-dui",
       "name": "Đũi tơ tằm thoáng khí",
       "textureType": "linen_silk",
-      "origin": "Nam Định",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Mộc mạc, thấm hút tốt cho ngày nắng nóng"
     }
   ],
@@ -163,7 +163,7 @@ export const aoDaiVietNam: Costume = {
       "category": "headwear",
       "layerOrder": 5,
       "description": "Che nghiêng nụ cười e ấp",
-      "traditionalMeaning": "Nét duyên thuần khiết",
+      "traditionalMeaning": "Phụ kiện đội hoặc cầm tay theo bộ phối.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -173,7 +173,7 @@ export const aoDaiVietNam: Costume = {
       "category": "jewelry",
       "layerOrder": 6,
       "description": "Ôm vừa vặn cổ áo dài trơn",
-      "traditionalMeaning": "Hồi môn hạnh phúc",
+      "traditionalMeaning": "Trang sức phối quanh cổ; không mặc định là hồi môn.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -182,8 +182,8 @@ export const aoDaiVietNam: Costume = {
       "name": "Chuỗi ngọc trai tự nhiên",
       "category": "jewelry",
       "layerOrder": 6,
-      "description": "Phối cùng áo dài cổ thuyền thập niên 60",
-      "traditionalMeaning": "Đài các quý phái",
+      "description": "Có thể phối với áo dài cổ thuyền hoặc mẫu áo phù hợp.",
+      "traditionalMeaning": "Điểm nhấn quanh cổ trong bộ phối hiện đại.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -193,7 +193,7 @@ export const aoDaiVietNam: Costume = {
       "category": "handheld",
       "layerOrder": 6,
       "description": "Cầm tay tạo dáng thanh tao",
-      "traditionalMeaning": "Hương sen thuần tịnh",
+      "traditionalMeaning": "Đạo cụ cầm tay dùng khi tạo dáng.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -203,7 +203,7 @@ export const aoDaiVietNam: Costume = {
       "category": "footwear",
       "layerOrder": 7,
       "description": "Tiếng guốc lách cách hoài niệm",
-      "traditionalMeaning": "Bước đi thanh thoát",
+      "traditionalMeaning": "Giày dép theo phong cách bộ phối.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     }
@@ -217,9 +217,9 @@ export const aoDaiVietNam: Costume = {
     },
     {
       "id": "dtl-ad-raglan",
-      "name": "Tay áo nối raglan 1960",
+      "name": "Tay áo nối raglan",
       "type": "sleeve",
-      "description": "Triệt tiêu nếp nhăn nách, phẳng phiu"
+      "description": "Đường ráp từ cổ xuống nách; độ phẳng và độ vừa còn phụ thuộc rập, số đo và vải."
     },
     {
       "id": "dtl-ad-xe",
@@ -233,38 +233,37 @@ export const aoDaiVietNam: Costume = {
       "eventId": "evt-tet",
       "score": 99,
       "label": "Hoàn hảo",
-      "reason": "Áo dài là quốc phục không thể thiếu trong ngày mùng 1 Tết du xuân và lễ chùa cầu may."
+      "reason": "Có thể chọn cho chúc Tết, du xuân hoặc chụp ảnh; không bắt buộc một màu hoặc một kiểu cổ."
     },
     {
       "eventId": "evt-wedding",
       "score": 96,
       "label": "Hoàn hảo",
-      "reason": "Áo dài cô dâu chú rể là biểu tượng thiêng liêng nhất trong hôn lễ gia tiên Việt Nam."
+      "reason": "Lựa chọn cho lễ cưới và gia tiên theo vai trò người mặc và yêu cầu của gia đình."
     },
     {
       "eventId": "evt-yearbook",
       "score": 100,
       "label": "Hoàn hảo",
-      "reason": "Áo dài trắng nữ sinh là biểu tượng trường tồn của tuổi thanh xuân học trò."
+      "reason": "Gợi ý bộ ảnh học đường; chọn màu và kiểu áo theo quy định trường nếu có."
     },
     {
       "eventId": "evt-formal",
       "score": 95,
       "label": "Hoàn hảo",
-      "reason": "Trang phục đại diện quốc gia trong các sự kiện ngoại giao và khánh tiết quốc tế."
+      "reason": "Có thể chọn cho sự kiện trang trọng theo quy định của nơi tổ chức."
     },
     {
       "eventId": "evt-street",
       "score": 92,
       "label": "Hoàn hảo",
-      "reason": "Biến thể tà lửng cách tân cực kỳ được giới trẻ ưa chuộng dạo phố cuối tuần."
+      "reason": "Tà lửng và giày bệt là gợi ý cách tân thuận tiện đi bộ."
     }
   ],
   "usageConsiderations": [
-    "Quần dài là gợi ý phối thông dụng cho lễ cưới, học đường và nghi lễ; chọn biến thể phù hợp quy định của nơi tổ chức.",
-    "Nếu vải mỏng xuyên thấu, bắt buộc có lớp lót kín đáo hoặc áo lót tệp màu da.",
-    "Khi bước đi, giữ lưng thẳng, tà áo buông thả tự nhiên khoan thai.",
-    "Màu, vật liệu, phụ kiện và điểm phù hợp sự kiện trong ứng dụng là gợi ý phối hiện nay; không chứng nhận một bộ phục dựng lịch sử."
+    "Chọn áo vừa người: có thể ôm dáng nhưng không kéo căng đường may, cổ hoặc nách; thử ngồi và bước lên bậc trước khi mặc.",
+    "Với vải mỏng hoặc đường xẻ cao, chọn lớp lót và quần phù hợp để tránh lộ ngoài ý muốn.",
+    "Khi dự lễ, vào nơi thờ tự hoặc tham gia hoạt động học đường, chọn độ kín và độ dài phù hợp nội quy nơi đến; kiểm tra áo khi ngồi, cúi và giơ tay để tránh lộ ngoài ý muốn."
   ],
   "stylingGuide": {
     "accessories": [
@@ -294,12 +293,12 @@ export const aoDaiVietNam: Costume = {
       "Nhung the",
       "Hoa sen thêu tay"
     ],
-    "traditionalStyling": "Áo dài lụa trắng hoặc đỏ cổ đứng 3cm, quần lụa suông dài chạm đất, đầu đội nón lá quai lụa, cổ đeo kiềng bạc.",
-    "modernRemixAdvice": "Remix dạo phố: Áo dài tà lửng hoa nhí hoặc trơn màu pastel, phối quần ống lửng và giày Mary Jane hoặc sneaker trắng, mang túi cói.",
+    "traditionalStyling": "Một cách phối quen thuộc là áo dài hai tà với quần dài ống suông, gấu quần vừa tầm giày. Cổ đứng, cổ thuyền và tay raglan là các lựa chọn thiết kế; không có một chiều cao cổ cố định cho mọi áo. Nón, khăn vấn, kiềng và ngọc trai đều là phụ kiện tùy chọn.",
+    "modernRemixAdvice": "Gợi ý cách tân: đổi màu, chất liệu, họa tiết, kiểu cổ hoặc tay; thử tà lửng với quần suông và giày bệt/sneaker. Chân váy có thể dùng trong bộ phối đương đại, nhưng nên ghi rõ là cách tân. Chọn độ ôm, độ mở cổ và độ xẻ theo hoạt động và quy định sự kiện.",
     "avoidCombinations": [
-      "Trong nghi lễ và học đường, nên mặc cùng quần dài phù hợp quy định.",
-      "Tránh mặc quần short lộ đùi dưới tà áo.",
-      "Chọn giày thuận tiện di chuyển, phù hợp độ dài tà và mức trang trọng của sự kiện."
+      "Tránh áo quá chật làm căng khuy hoặc đường may; độ ôm vừa vặn của áo dài hiện đại không đồng nghĩa với sai cách mặc.",
+      "Tránh để đường xẻ, vải xuyên thấu hoặc quần quá ngắn gây lộ ngoài ý muốn khi ngồi và di chuyển.",
+      "Khi dự lễ, vào nơi thờ tự hoặc tham gia hoạt động học đường, chọn độ kín và độ dài phù hợp nội quy nơi đến; kiểm tra áo khi ngồi, cúi và giơ tay để tránh lộ ngoài ý muốn."
     ]
   },
   "aiProfile": {

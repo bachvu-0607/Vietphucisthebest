@@ -22,6 +22,8 @@ shared/types.ts     Kiểu dữ liệu dùng chung frontend và backend
 - `partially_reviewed` nghĩa là đã đối chiếu phạm vi ghi kèm. `needs_review` nghĩa là còn thiếu căn cứ. Đợt rà soát 10/10/2026 chưa chứng nhận một hồ sơ nguyên bộ; `isVerifiedHistoricalData` được giữ để tương thích nhưng không bật nhãn kiểm chứng toàn bộ.
 - AI profile giữ đặc điểm nhận diện của mẫu; ảnh do AI tạo không phải nguồn nghiên cứu. `aiProfile` không được trả trong API danh mục để tránh gửi chỉ dẫn tạo ảnh cho mọi lượt đọc.
 - Chưa xác minh đầy đủ nguồn gốc áo bà ba, từng nguyên bộ phục dựng, xuất xứ mỗi mẫu vải và hồ sơ giấy phép từng ảnh lookbook. Giao diện ghi phạm vi này, không coi gợi ý phối đồ là quy chế lịch sử.
+- Viết cách mặc theo kết cấu và mẫu tham chiếu; tách gợi ý cách tân khỏi bằng chứng phục dựng. Không cấm choker, sneaker hoặc trang sức hiện đại chỉ vì khác phong cách. Mỗi lưu ý cần nêu vấn đề cụ thể về phom, độ vừa, che phủ, cử động hoặc nội quy nơi mặc; không dùng “thuần phong mỹ tục” làm nhãn phán xét chung.
+- Không gán xuất xứ vải, phẩm cấp, ý nghĩa đạo đức hoặc số đo cố định khi chưa có căn cứ. Thay đổi kết cấu lớn cần ghi rõ là thiết kế lấy cảm hứng. Xem [ghi chú rà soát cách mặc và cách tân](REVIEW-2026-10-10.md).
 
 ## Giữ tương thích
 

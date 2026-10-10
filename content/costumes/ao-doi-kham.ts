@@ -12,9 +12,9 @@ export const aoDoiKham: Costume = {
   "lineageCategory": "dich-chuyen",
   "lineageSubcategory": "nhat-binh",
   "lineageLabel": "Áo Đối Khâm • Song song (Hệ Dịch Chuyển)",
-  "shortDescription": "Chiếc áo khoác cổ dài với hai vạt song song buông thẳng trước ngực, phô diễn trọn vẹn lớp áo ngực thêu hoa bên trong lộng lẫy.",
+  "shortDescription": "Áo khoác có hai vạt đối nhau phía trước, để thấy lớp mặc bên trong; mẫu yếm và váy trong Studio là một gợi ý tạo hình.",
   "historicalContext": "Đối khâm mô tả hai vạt áo đối nhau ở phía trước. Khảo cứu về tượng thời Lê Trung Hưng ghi nhận áo khoác đối khâm cùng trang phục bên trong. Không thể suy từ một mẫu thành bộ y phục chung cho toàn thời Lý–Trần–Lê.",
-  "culturalSignificance": "Hai vạt mở tạo không gian cho lớp áo bên trong và màu phối. Ý nghĩa “ngay thẳng, chính trực” là diễn giải thẩm mỹ của ứng dụng, chưa phải kết luận lịch sử.",
+  "culturalSignificance": "Hai vạt đối nhau cho thấy lớp mặc bên trong và tạo bố cục màu khi xếp lớp. Cách phối còn phụ thuộc đối tượng, thời kỳ và sinh hoạt; kiểu vạt mở không tự xác định một bộ y phục quý tộc.",
   "isVerifiedHistoricalData": false,
   "verificationNote": "Đã đối chiếu các thông tin chính trong phạm vi nguồn bên dưới; phụ kiện và màu phối là gợi ý biên tập.",
   "components": [
@@ -29,11 +29,11 @@ export const aoDoiKham: Costume = {
     },
     {
       "id": "cmp-dk-inner",
-      "name": "Yếm lụa hoặc áo ôm ngực thêu sen",
+      "name": "Lớp áo trong hoặc yếm theo mẫu phối",
       "layerOrder": 2,
       "isRequired": true,
       "type": "inner",
-      "description": "Lớp yếm mặc bên trong tạo điểm nhấn màu sắc",
+      "description": "Chọn lớp trong ổn định, đủ độ che phủ qua hai vạt mở.",
       "defaultColor": "#c1121f"
     },
     {
@@ -42,7 +42,7 @@ export const aoDoiKham: Costume = {
       "layerOrder": 2,
       "isRequired": true,
       "type": "inner",
-      "description": "Váy quét đất nhẹ nhàng",
+      "description": "Váy dài xếp nếp; gấu không vướng khi di chuyển.",
       "defaultColor": "#fdf0d5"
     },
     {
@@ -85,7 +85,7 @@ export const aoDoiKham: Costume = {
       "id": "col-dk-crimson",
       "name": "Đỏ hồng đào",
       "hex": "#b5179e",
-      "meaning": "Duyên dáng, tươi trẻ của tiểu thư khuê các",
+      "meaning": "Sắc hồng tím nổi bật trong bộ phối hiện nay.",
       "popularity": "Mùa xuân"
     },
     {
@@ -101,14 +101,14 @@ export const aoDoiKham: Costume = {
       "id": "mat-dk-sa",
       "name": "Sa mỏng dệt tơ bóng mờ",
       "textureType": "gauze",
-      "origin": "Vạn Phúc",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Mỏng nhẹ, phất phơ theo làn gió"
     },
     {
       "id": "mat-dk-gam",
       "name": "Gấm dệt vân mây hoa lá",
       "textureType": "brocade",
-      "origin": "Hà Đông",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Sang trọng cho ngày lễ hội lớn"
     }
   ],
@@ -119,7 +119,7 @@ export const aoDoiKham: Costume = {
       "category": "jewelry",
       "layerOrder": 6,
       "description": "Đeo vừa vặn ôm cổ",
-      "traditionalMeaning": "Vẻ đẹp tròn đầy viên mãn",
+      "traditionalMeaning": "Điểm nhấn quanh cổ trong bộ phối.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -129,7 +129,7 @@ export const aoDoiKham: Costume = {
       "category": "handheld",
       "layerOrder": 6,
       "description": "Phụ kiện che nghiêng nụ cười duyên",
-      "traditionalMeaning": "Khuê các e ấp",
+      "traditionalMeaning": "Phụ kiện cầm tay tạo bố cục cho ảnh.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     }
@@ -147,31 +147,30 @@ export const aoDoiKham: Costume = {
       "eventId": "evt-art",
       "score": 95,
       "label": "Hoàn hảo",
-      "reason": "Tạo hình bay bổng, lãng mạn rất thích hợp cho các video ca nhạc cổ phong và múa dân tộc."
+      "reason": "Hai vạt mở và lớp trong tạo hiệu ứng khi di chuyển; chọn trang phục theo tiết mục."
     },
     {
       "eventId": "evt-yearbook",
       "score": 90,
       "label": "Rất phù hợp",
-      "reason": "Rất tôn dáng nữ sinh, chụp ảnh nhóm nữ vô cùng ăn ý và thơ mộng."
+      "reason": "Gợi ý ảnh nhóm với các lớp áo và màu tương phản."
     },
     {
       "eventId": "evt-tet",
       "score": 86,
       "label": "Rất phù hợp",
-      "reason": "Sắc xuân ngập tràn khi kết hợp cùng yếm đào rực rỡ."
+      "reason": "Có thể thử màu tươi sáng cho du xuân; bảo đảm lớp trong phù hợp nơi đến."
     },
     {
       "eventId": "evt-wedding",
       "score": 82,
       "label": "Phù hợp",
-      "reason": "Lựa chọn ngọt ngào cho dàn phù dâu hoặc tiệc cưới phong cách cổ truyền."
+      "reason": "Gợi ý bộ phối cho tiệc cưới theo yêu cầu gia đình; không mặc định là lễ phục cưới lịch sử."
     }
   ],
   "usageConsiderations": [
-    "Áo khoác đối khâm không có khuy cài trước, cần buộc dải yếm lót bên trong thật cẩn thận và kín đáo.",
-    "Nên chọn màu áo khoác ngoài tương phản hài hòa với màu yếm lót bên trong.",
-    "Màu, vật liệu, phụ kiện và điểm phù hợp sự kiện trong ứng dụng là gợi ý phối hiện nay; không chứng nhận một bộ phục dựng lịch sử."
+    "Hai vạt mở nên chọn lớp trong đủ ổn định và kín đáo theo hoàn cảnh; có thể dùng yếm, áo trong hoặc đầm phù hợp.",
+    "Chọn độ dài áo và váy để không giẫm lên gấu; kiểm tra lớp trong khi giơ tay hoặc cúi người."
   ],
   "stylingGuide": {
     "accessories": [
@@ -192,15 +191,15 @@ export const aoDoiKham: Costume = {
       "Áo trắng ngà phối yếm hồng cánh sen"
     ],
     "materialsAndMotifs": [
-      "Sa tơ tằm mềm",
-      "Thêu hoa phù dung",
-      "Hoa cúc thời Lý"
+      "Sa tơ tằm",
+      "Hoa lá thêu theo mẫu phối"
     ],
-    "traditionalStyling": "Yếm thêu hoa lót trong, váy lụa trắng dài xếp ly, khoác áo Đối Khâm buông thả tự nhiên, cổ đeo kiềng bạc.",
-    "modernRemixAdvice": "Remix tiệc tối: áo đối khâm sa mỏng khoác ngoài đầm lụa hiện đại. Đây là phối đồ đương đại, không phải một bộ y phục lịch sử đã xác minh.",
+    "traditionalStyling": "Giữ hai vạt đối nhau, khoác ngoài lớp áo trong và phần mặc dưới phù hợp bộ phối. Tư liệu tượng thời Lê có nhiều cách xếp lớp; không mặc định áo đối khâm luôn chỉ khoác trực tiếp ngoài yếm. Bộ yếm–váy–kiềng trong Studio là gợi ý, không phải nguyên bộ đã được xác minh.",
+    "modernRemixAdvice": "Gợi ý cách tân: dùng áo đối khâm làm lớp khoác ngoài đầm lụa, áo trơn với quần suông hoặc chân váy. Có thể đổi độ dài và chất liệu, giữ hai vạt đối nhau làm điểm nhận diện. Túi, choker hoặc trang sức hiện đại có thể phối nếu không làm vạt áo lệch hoặc vướng.",
     "avoidCombinations": [
-      "Tránh để lộ áo lót hiện đại (dây áo nịt ngực) khi mặc yếm.",
-      "Tránh phối cùng ba lô thể thao nặng nề."
+      "Tránh lớp trong quá lỏng, quá ngắn hoặc xuyên thấu gây lộ ngoài ý muốn qua hai vạt mở.",
+      "Khi giữ mẫu đối khâm, tránh buộc chéo hai vạt thành cổ giao lĩnh rồi vẫn gọi là cùng một kết cấu.",
+      "Khi dự lễ, vào nơi thờ tự hoặc tham gia hoạt động học đường, chọn độ kín và độ dài phù hợp nội quy nơi đến; kiểm tra áo khi ngồi, cúi và giơ tay để tránh lộ ngoài ý muốn."
     ]
   },
   "aiProfile": {
@@ -226,11 +225,22 @@ export const aoDoiKham: Costume = {
         "sourceId": "ngan-nam-ao-mu",
         "scope": "Áo đối khâm trên một số tượng hậu phi thời Lê Trung Hưng.",
         "locator": "Chương III, Trang phục hậu cung, tr. 229–232 (bản 2013)"
+      },
+      {
+        "sourceId": "mat-son-costumes",
+        "scope": "Các lớp yếm, áo cổ chéo và áo choàng mở trên một số tượng nữ quý tộc thế kỷ XVII; không áp thành nguyên bộ cho mọi đối khâm.",
+        "locator": "Tr. 28, phần Trang phục."
+      },
+      {
+        "sourceId": "hoang-thanh-layering",
+        "scope": "Ví dụ bộ phối hiện nay có áo giao lĩnh/viên lĩnh bên trong áo đối khâm; đây là hướng dẫn của đơn vị cung cấp, không phải quy chế lịch sử.",
+        "locator": "Mục Hướng dẫn mặc áo Giao Lĩnh/Viên Lĩnh x Đối khâm."
       }
     ],
     "modernUse": "Có thể dùng áo đối khâm như lớp khoác khi chụp ảnh hoặc phối cùng trang phục hiện đại. Bộ yếm–váy–kiềng đang có là gợi ý tạo hình; lựa chọn kín đáo và độ dài phù hợp hoàn cảnh.",
     "limitations": [
-      "Chưa xác minh bộ phối hiện tại là nguyên bộ y phục quý tộc thời Lý hoặc Trần."
+      "Chưa xác minh bộ phối hiện tại là nguyên bộ y phục quý tộc thời Lý hoặc Trần.",
+      "Ảnh minh họa chưa được xác nhận là mẫu đối khâm tương ứng với hồ sơ này."
     ]
   }
 };

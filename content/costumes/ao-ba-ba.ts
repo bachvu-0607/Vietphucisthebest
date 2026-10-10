@@ -16,7 +16,7 @@ export const aoBaBa: Costume = {
   "historicalContext": "Áo Bà Ba gắn với đời sống Nam Bộ, có hàng cúc trước và phom gọn thuận tiện cử động. Nguồn gốc tên gọi và mốc xuất hiện còn có nhiều cách giải thích; danh mục chưa đủ chứng cứ để chốt giả thuyết Penang hay Baba–Nyonya.",
   "culturalSignificance": "Trong văn hóa hiện nay, áo bà ba thường gợi sự gần gũi với đời sống phương Nam. Khăn rằn và nón lá có thể phối kèm, không phải thành phần bắt buộc của mọi bộ.",
   "isVerifiedHistoricalData": false,
-  "verificationNote": "Mô tả khái quát phục vụ phối đồ; phần nguồn gốc cần bổ sung tư liệu.",
+  "verificationNote": "Có tư liệu tham khảo về kiểu áo và biến thể tại Hội An; nguồn gốc chung và nguyên bộ Nam Bộ còn cần đối chiếu.",
   "components": [
     {
       "id": "cmp-bb-model",
@@ -42,7 +42,7 @@ export const aoBaBa: Costume = {
       "layerOrder": 2,
       "isRequired": true,
       "type": "inner",
-      "description": "Quần lụa đen mềm dễ lội nước di chuyển",
+      "description": "Quần dài ống suông, đủ rộng để ngồi và bước đi.",
       "defaultColor": "#1a1a1a"
     },
     {
@@ -60,7 +60,7 @@ export const aoBaBa: Costume = {
       "id": "col-bb-black",
       "name": "Đen tuyền miệt vườn",
       "hex": "#1c1917",
-      "meaning": "Chất phác, chịu thương chịu khó",
+      "meaning": "Màu tối, dễ phối với quần cùng màu hoặc màu sáng.",
       "popularity": "Rất truyền thống"
     },
     {
@@ -74,10 +74,10 @@ export const aoBaBa: Costume = {
   "materials": [
     {
       "id": "mat-bb-lua",
-      "name": "Lụa tơ tằm Nam Bộ & Vải ú",
+      "name": "Lụa hoặc cotton dệt trơn",
       "textureType": "cotton_silk",
-      "origin": "Tân Châu, An Giang",
-      "description": "Lụa lãnh Mỹ A hoặc vải mát lạnh"
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
+      "description": "Chọn độ dày, độ thoáng và độ rủ phù hợp hoạt động; mẫu minh họa không xác nhận là lãnh Mỹ A."
     }
   ],
   "accessories": [
@@ -87,7 +87,7 @@ export const aoBaBa: Costume = {
       "category": "headwear",
       "layerOrder": 5,
       "description": "Nón lá chóp tròn che nắng",
-      "traditionalMeaning": "Gần gũi mộc mạc",
+      "traditionalMeaning": "Phụ kiện che nắng hoặc tạo hình cùng áo bà ba.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     }
@@ -105,18 +105,18 @@ export const aoBaBa: Costume = {
       "eventId": "evt-festival",
       "score": 92,
       "label": "Rất phù hợp",
-      "reason": "Lễ hội sông nước Nam Bộ, đờn ca tài tử và chợ nổi."
+      "reason": "Gợi ý cho hoạt động văn hóa Nam Bộ hoặc chụp ảnh sông nước; chọn theo chương trình cụ thể."
     },
     {
       "eventId": "evt-street",
       "score": 90,
       "label": "Rất phù hợp",
-      "reason": "Mộc mạc, thoải mái khi dạo phố cuối tuần hoặc về miền quê."
+      "reason": "Dáng áo gọn với quần thoải mái phù hợp sinh hoạt và dạo phố."
     }
   ],
   "usageConsiderations": [
-    "Mặc cùng quần lụa đen ống suông và quấn khăn rằn ở cổ hoặc đầu.",
-    "Màu, vật liệu, phụ kiện và điểm phù hợp sự kiện trong ứng dụng là gợi ý phối hiện nay; không chứng nhận một bộ phục dựng lịch sử."
+    "Chọn thân áo, cổ và tay vừa người; hàng cúc không kéo căng khi ngồi hoặc giơ tay.",
+    "Quần dài ống suông là một cách phối thông dụng; khăn rằn và nón lá là tùy chọn."
   ],
   "stylingGuide": {
     "accessories": [
@@ -131,18 +131,20 @@ export const aoBaBa: Costume = {
       "Guốc mộc hoặc dép quai xuồng"
     ],
     "recommendedColors": [
-      "Đen lãnh Mỹ A",
-      "Xanh ngọc sông Tiền",
+      "Đen tuyền",
+      "Xanh ngọc",
       "Hồng cánh sen"
     ],
     "materialsAndMotifs": [
-      "Lụa Lãnh Mỹ A",
-      "Vải ú mát mịn"
+      "Lụa hoặc cotton dệt trơn",
+      "Họa tiết nhỏ theo mẫu phối"
     ],
-    "traditionalStyling": "Áo Bà Ba mặc cùng quần đen, quấn khăn rằn cổ, đội nón lá.",
-    "modernRemixAdvice": "Remix dạo phố: Áo Bà Ba lụa màu pastel phối cùng quần culottes trắng và túi cói.",
+    "traditionalStyling": "Phối áo bà ba cài giữa với quần dài thoải mái, giữ độ vừa để thuận tiện sinh hoạt. Khăn rằn và nón lá có thể thêm theo nhu cầu. Kiểu cổ, độ dài áo, màu và vật liệu có nhiều biến thể; không mặc định tất cả phải là áo đen hoặc cùng một kiểu cổ.",
+    "modernRemixAdvice": "Gợi ý cách tân: thử màu pastel, họa tiết nhỏ hoặc thay chi tiết cổ/tay, phối quần culottes hay quần suông và túi hiện đại. Giữ hàng cài giữa cùng dáng áo gọn để còn nhận diện bà ba. Trang sức có thể chọn theo sở thích và hoạt động.",
     "avoidCombinations": [
-      "Tránh phối với trang sức vàng kim cương quá rườm rà."
+      "Tránh áo quá chật làm hở khe giữa hàng cúc hoặc hạn chế cử động.",
+      "Tránh vải quá mỏng không có lớp che phủ phù hợp, hoặc đường xẻ gây lộ ngoài ý muốn.",
+      "Khi dự lễ, vào nơi thờ tự hoặc tham gia hoạt động học đường, chọn độ kín và độ dài phù hợp nội quy nơi đến; kiểm tra áo khi ngồi, cúi và giơ tay để tránh lộ ngoài ý muốn."
     ]
   },
   "aiProfile": {
@@ -163,7 +165,13 @@ export const aoBaBa: Costume = {
   "research": {
     "status": "needs_review",
     "reviewedAt": "2026-10-10",
-    "sources": [],
+    "sources": [
+      {
+        "sourceId": "hoi-an-ba-ba",
+        "scope": "Áo cài giữa, hai túi và các biến thể cổ, độ dài trong ghi chép tại Hội An; không đủ kết luận nguồn gốc chung của áo bà ba Nam Bộ.",
+        "locator": "Trang PDF 2, đoạn mô tả kiểu cổ, hai túi và vật liệu."
+      }
+    ],
     "modernUse": "Mặc với quần dài thoải mái, chọn chất liệu theo hoạt động và thời tiết. Màu pastel, quần culottes, túi cói và khăn rằn là các lựa chọn phối đương đại.",
     "limitations": [
       "Cần bổ sung nguồn bảo tàng hoặc nghiên cứu về niên đại và nguồn gốc tên gọi; chưa đánh dấu phần này là đã kiểm chứng."

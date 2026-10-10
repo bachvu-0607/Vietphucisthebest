@@ -12,7 +12,7 @@ export const aoNhatBinh: Costume = {
   "lineageCategory": "dich-chuyen",
   "lineageSubcategory": "nhat-binh",
   "lineageLabel": "Hệ Dịch Chuyển • Lễ phục cung đình nữ",
-  "shortDescription": "Thường phục trang trọng của bậc Hậu phi, Công chúa và Cung tần triều Nguyễn, nổi bật với cổ áo hình chữ nhật viền hoa văn tinh xảo.",
+  "shortDescription": "Áo nữ cung đình triều Nguyễn, có hai vạt đối nhau, nẹp cổ rộng tạo khung chữ nhật trước ngực, thân và tay áo rộng.",
   "historicalContext": "Nhật Bình thuộc hệ trang phục nữ cung đình Nguyễn, với quy định được ghi nhận từ năm 1807. Áo có hai vạt đối nhau và nẹp cổ rộng tạo khung chữ nhật trước ngực. Cách phối xiêm, quần và đồ đội đầu thay đổi theo thời kỳ.",
   "culturalSignificance": "Màu áo, hoa văn và trang sức từng phân biệt phẩm cấp. Dải ngũ sắc thường gặp ở tay áo nhưng có ngoại lệ, như áo hoàng hậu. Khi phục dựng cần chọn một thời kỳ và đối tượng cụ thể; màu trong Studio là bảng phối tham khảo.",
   "isVerifiedHistoricalData": false,
@@ -38,11 +38,11 @@ export const aoNhatBinh: Costume = {
     },
     {
       "id": "cmp-nb-pants",
-      "name": "Quần lụa trắng hoặc ngũ sắc",
+      "name": "Quần dài ống rộng trong mẫu phối",
       "layerOrder": 2,
       "isRequired": true,
       "type": "inner",
-      "description": "Quần sa/lụa ống rộng mềm mại",
+      "description": "Quần trắng là gợi ý phối; không đồng nhất dải ngũ sắc tay áo với màu quần.",
       "defaultColor": "#faf8f5"
     },
     {
@@ -51,7 +51,7 @@ export const aoNhatBinh: Costume = {
       "layerOrder": 3,
       "isRequired": true,
       "type": "main",
-      "description": "Thân áo gấm dệt hoa tròn, vạt cài dải cúc ngọc",
+      "description": "Thân áo rộng có hoa văn; hai vạt cố định theo cách buộc/cài của mẫu.",
       "defaultColor": "#9e1b22"
     },
     {
@@ -65,7 +65,7 @@ export const aoNhatBinh: Costume = {
     },
     {
       "id": "cmp-nb-sleeves",
-      "name": "Tay áo dải ngũ hành",
+      "name": "Tay áo rộng với dải ngũ sắc",
       "layerOrder": 4,
       "isRequired": true,
       "type": "main",
@@ -87,7 +87,7 @@ export const aoNhatBinh: Costume = {
       "layerOrder": 6,
       "isRequired": false,
       "type": "accessory",
-      "description": "Dây ngọc bội đeo trước ngực tạo âm thanh trang nhã khi cử động",
+      "description": "Trang sức cài/đeo theo lựa chọn trong mẫu phối; không phải khóa áo bắt buộc.",
       "defaultColor": "#e9c46a"
     },
     {
@@ -114,22 +114,22 @@ export const aoNhatBinh: Costume = {
       "id": "col-nb-red",
       "name": "Đỏ son cung đình",
       "hex": "#a61c1c",
-      "meaning": "Tượng trưng cho hỷ sự, tôn nghiêm và phẩm giá Công chúa",
+      "meaning": "Sắc đỏ nổi bật cho bộ phối lễ cưới hoặc lễ hội hiện nay; không tự xác nhận phẩm cấp.",
       "popularity": "Rất chuộng lễ cưới"
     },
     {
       "id": "col-nb-ivory",
       "name": "Trắng ngà lụa bạch",
       "hex": "#FAF7F0",
-      "meaning": "Sắc trắng ngà thuần khiết, thanh thoát, phong cách cách tân cưới hoàng gia hiện đại",
-      "popularity": "Hot cách tân cưới"
+      "meaning": "Sắc sáng nhẹ trong bộ phối đương đại.",
+      "popularity": "Gợi ý phối lễ cưới"
     },
     {
       "id": "col-nb-pink",
       "name": "Hồng phấn pastel",
       "hex": "#FBCFE8",
       "meaning": "Ngọt ngào, tươi trẻ của thiếu nữ đương đại nhưng vẫn giữ trọn nét đài các",
-      "popularity": "Hot chụp ảnh xuân"
+      "popularity": "Gợi ý chụp ảnh"
     },
     {
       "id": "col-nb-yellow",
@@ -142,7 +142,7 @@ export const aoNhatBinh: Costume = {
       "id": "col-nb-teal",
       "name": "Xanh ngọc bích",
       "hex": "#1b6b68",
-      "meaning": "Thanh lịch, điềm tĩnh của bậc cung tần hiền thục",
+      "meaning": "Sắc xanh trầm, tạo tương phản với nẹp sáng màu.",
       "popularity": "Chụp ảnh xuân"
     },
     {
@@ -158,22 +158,22 @@ export const aoNhatBinh: Costume = {
       "id": "mat-gam-hue",
       "name": "Gấm dệt tơ tằm cổ điển",
       "textureType": "damask",
-      "origin": "Vạn Phúc & Huế",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Dệt hoa văn bát bửu ẩn hiện sang trọng"
     },
     {
       "id": "mat-lua-to-tam",
       "name": "Lụa tơ tằm mềm tự nhiên",
       "textureType": "silk",
-      "origin": "Làng dệt Nha Xá",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Rũ tự nhiên, nhẹ thoáng và mát vào mùa hè"
     },
     {
       "id": "mat-sa-nam-nha",
-      "name": "Sa Nam Nhã gấm mỏng",
+      "name": "Sa mỏng dệt tơ",
       "textureType": "gauze",
-      "origin": "Phục dựng theo mẫu cổ",
-      "description": "Chất liệu xuyên thấu tinh tế mặc vào dịp lễ tiết cung đình"
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
+      "description": "Vải mỏng cần lớp trong phù hợp; đây là lựa chọn chất liệu minh họa."
     }
   ],
   "accessories": [
@@ -183,7 +183,7 @@ export const aoNhatBinh: Costume = {
       "category": "headwear",
       "layerOrder": 5,
       "description": "Quấn tỉ mỉ theo kỹ thuật cung đình Huế",
-      "traditionalMeaning": "Giữ nếp tóc gọn gàng tôn gương mặt đoan trang",
+      "traditionalMeaning": "Giữ tóc gọn và tạo bố cục quanh gương mặt.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -193,7 +193,7 @@ export const aoNhatBinh: Costume = {
       "category": "headwear",
       "layerOrder": 5,
       "description": "Cài ngang giấu thân trâm sau búi tóc, chỉ để lộ đầu trâm hoa sen cẩn ngọc và chuỗi tua rua buông rủ thanh nhã",
-      "traditionalMeaning": "Bình an, đoan trang và tiết hạnh",
+      "traditionalMeaning": "Trang trí búi tóc; chọn kiểu trâm theo bộ phối.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -203,7 +203,7 @@ export const aoNhatBinh: Costume = {
       "category": "jewelry",
       "layerOrder": 6,
       "description": "Trang sức cài ngực rủ tua rua đỏ theo mẫu phối; không bắt buộc cho mọi áo Nhật Bình.",
-      "traditionalMeaning": "Phước lộc, quyền quý và thanh khiết",
+      "traditionalMeaning": "Điểm nhấn trang sức ở trước ngực trong mẫu phối.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -213,7 +213,7 @@ export const aoNhatBinh: Costume = {
       "category": "handheld",
       "layerOrder": 6,
       "description": "Quạt tròn lụa tơ tằm thêu hoa mẫu đơn, chuôi gỗ quý đính hạt ngọc và dải tua rua tơ tằm rủ mềm",
-      "traditionalMeaning": "Đoan trang, viên mãn và phú quý",
+      "traditionalMeaning": "Đạo cụ cầm tay làm rõ hoa văn và màu của bộ phối.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -223,7 +223,7 @@ export const aoNhatBinh: Costume = {
       "category": "handheld",
       "layerOrder": 6,
       "description": "Quạt gỗ sáng màu hoặc vật liệu giả ngà, chạm hoa văn; gợi ý tạo hình hiện nay.",
-      "traditionalMeaning": "Đài các, uy quyền chốn hoàng cung",
+      "traditionalMeaning": "Điểm nhấn cầm tay; không tự xác định quyền vị hoàng gia.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -233,7 +233,7 @@ export const aoNhatBinh: Costume = {
       "category": "handheld",
       "layerOrder": 6,
       "description": "Nâng niu đóa sen hồng Tây Hồ nhiều cánh tỏa hương thanh tao",
-      "traditionalMeaning": "Thuần khiết, thoát tục",
+      "traditionalMeaning": "Chi tiết hoa cầm tay trong bộ ảnh.",
       "isRecommended": false,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -243,7 +243,7 @@ export const aoNhatBinh: Costume = {
       "category": "footwear",
       "layerOrder": 7,
       "description": "Đế lót lụa mềm mại truyền thống",
-      "traditionalMeaning": "Bước đi thanh thoát nhẹ nhàng",
+      "traditionalMeaning": "Hoàn thiện phần chân của bộ phối.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     }
@@ -259,7 +259,7 @@ export const aoNhatBinh: Costume = {
       "id": "dtl-nb-vien",
       "name": "Dải ngũ sắc viền tay áo",
       "type": "sleeve",
-      "description": "Ngũ hành tương sinh tương khắc"
+      "description": "Dải năm màu thường gặp trên tay; chọn theo mẫu và phẩm cấp khi phục dựng."
     },
     {
       "id": "dtl-nb-hoa-van",
@@ -273,45 +273,44 @@ export const aoNhatBinh: Costume = {
       "eventId": "evt-wedding",
       "score": 98,
       "label": "Hoàn hảo",
-      "reason": "Áo Nhật Bình sắc đỏ son hoặc hoàng yến là trang phục cưới danh giá, vừa tôn vinh văn hóa cội nguồn vừa cực kỳ lộng lẫy."
+      "reason": "Thân rộng và hoa văn tạo điểm nhấn cho lễ cưới; chọn bộ phối theo vai trò và yêu cầu gia đình."
     },
     {
       "eventId": "evt-tet",
       "score": 92,
       "label": "Rất phù hợp",
-      "reason": "Rực rỡ không khí tân niên, thích hợp chụp ảnh tại di tích, cung điện hoặc chùa cổ đầu năm."
+      "reason": "Có thể dùng cho du xuân và chụp ảnh di tích; chọn độ dài thuận tiện đi bộ."
     },
     {
       "eventId": "evt-festival",
       "score": 88,
       "label": "Rất phù hợp",
-      "reason": "Tham gia các lễ hội truyền thống, đại lễ rước thánh và ngày hội văn hóa cổ phong."
+      "reason": "Gợi ý cho sự kiện văn hóa; phục trang nghi lễ cụ thể cần theo ban tổ chức."
     },
     {
       "eventId": "evt-yearbook",
       "score": 85,
       "label": "Phù hợp",
-      "reason": "Tạo nên bộ ảnh tốt nghiệp đậm chất cổ phong quý tộc khác biệt với số đông."
+      "reason": "Phù hợp bộ ảnh có chủ đề cổ phục; cần dự tính thời gian và không gian thay đồ."
     },
     {
       "eventId": "evt-art",
       "score": 90,
       "label": "Rất phù hợp",
-      "reason": "Họa tiết rực rỡ và dải ngũ sắc bắt đèn sân khấu hoàn hảo."
+      "reason": "Khung cổ và tay rộng giúp nhận diện trên sân khấu; chọn lớp trong ổn định khi cử động."
     },
     {
       "eventId": "evt-street",
       "score": 40,
       "label": "Cách tân độc đáo",
-      "reason": "Bản gốc khá nặng và trang trọng, chỉ nên mặc phiên bản Nhật Bình vạt ngắn khi dạo phố."
+      "reason": "Có thể mặc nguyên dáng rộng khi dạo phố; ưu tiên vải và độ dài thuận tiện, không bắt buộc cắt ngắn áo."
     }
   ],
   "usageConsiderations": [
-    "Cần mặc áo lót kín cổ bên trong; không để lộ áo hiện đại ở phần cổ chữ nhật.",
-    "Khi bước đi, nhấc nhẹ vạt trước hoặc bước ngắn khoan thai để giữ dáng áo trang trọng.",
-    "Khăn vành dây là một lựa chọn phối theo phong cách Huế; không quy định chung số vòng quấn cho mọi thời kỳ.",
-    "Tránh kết hợp với trang sức tây phương kim loại to bản hầm hố.",
-    "Màu, vật liệu, phụ kiện và điểm phù hợp sự kiện trong ứng dụng là gợi ý phối hiện nay; không chứng nhận một bộ phục dựng lịch sử."
+    "Giữ thân áo buông rộng, nẹp cổ ngay ngắn và hai vạt ổn định; không siết eo nếu muốn giữ phom Nhật Bình truyền thống.",
+    "Chọn lớp trong phù hợp độ mở của áo; khi dự lễ cần bảo đảm kín đáo cả lúc ngồi và cúi người.",
+    "Khăn vành là một lựa chọn phối; màu áo, dải ngũ sắc và đồ đội đầu của bộ phục dựng phải theo thời kỳ, phẩm cấp cụ thể.",
+    "Giữ gấu áo và tay áo không vướng khi bước đi hoặc cầm đồ."
   ],
   "stylingGuide": {
     "accessories": [
@@ -338,12 +337,12 @@ export const aoNhatBinh: Costume = {
       "Hoa văn Bát Bửu",
       "Thêu chim Phượng và mây lành"
     ],
-    "traditionalStyling": "Gợi ý phối theo phong cách truyền thống: áo Nhật Bình, quần lụa và khăn vành. Khi phục dựng cung đình cần xác định phẩm cấp và thời kỳ trước khi chọn màu, hoa văn và đồ đội đầu.",
-    "modernRemixAdvice": "Remix phong cách đương đại: Giữ lại cổ áo hình chữ nhật đặc trưng nhưng rút ngắn thân áo qua hông một chút, phối cùng quần culottes lụa ống suông hoặc chân váy xếp ly đơn sắc.",
+    "traditionalStyling": "Giữ thân rộng, tay rộng và nẹp cổ tạo khung chữ nhật; cố định hai vạt bằng cách buộc/cài của mẫu áo. Quần trắng và khăn vành là cách phối được ghi nhận ở giai đoạn muộn thời Nguyễn; không áp cho mọi thời kỳ. Lớp trong, hoa văn và đồ đội đầu của bộ phục dựng cần theo tư liệu cụ thể.",
+    "modernRemixAdvice": "Gợi ý cách tân: giữ khung cổ chữ nhật, thân buông rộng và tay rộng; thử màu mới, giảm mật độ hoa văn hoặc phối quần suông, giày và trang sức hiện đại. Choker có thể dùng nếu vừa cổ, không kéo lệch nẹp hoặc che mất khung cổ. Khi thay hẳn phom thân hay kiểu cổ, gọi rõ là thiết kế lấy cảm hứng từ Nhật Bình.",
     "avoidCombinations": [
-      "Tránh mặc cùng quần jean bó hoặc đi giày sneaker thể thao thô kệch.",
-      "Tránh đeo vòng cổ chocker hiện đại làm rối phần cổ áo chữ nhật thiêng liêng.",
-      "Tuyệt đối không xẻ vạt hoặc khoét ngực sâu làm biến dạng form áo cung đình."
+      "Tránh bó sát thân hoặc siết eo bằng đai nếu muốn giữ phom Nhật Bình; nếp kéo căng làm mất dáng áo buông rộng.",
+      "Tránh khoét hoặc sửa nẹp làm mất khung chữ nhật khi vẫn giới thiệu là Nhật Bình theo phom truyền thống.",
+      "Khi dự lễ, vào nơi thờ tự hoặc tham gia hoạt động học đường, chọn độ kín và độ dài phù hợp nội quy nơi đến; kiểm tra áo khi ngồi, cúi và giơ tay để tránh lộ ngoài ý muốn."
     ]
   },
   "aiProfile": {
@@ -374,11 +373,17 @@ export const aoNhatBinh: Costume = {
     "sources": [
       {
         "sourceId": "nhat-binh-hai",
-        "scope": "Quy chế năm 1807; cổ áo, phẩm cấp, ngoại lệ dải ngũ sắc và thay đổi đồ phối."
+        "scope": "Quy chế năm 1807; cổ áo, phẩm cấp, ngoại lệ dải ngũ sắc và thay đổi đồ phối.",
+        "locator": "Các đoạn quy chế 1807, ngoại lệ dải ngũ sắc và cách phối thay đổi theo thời kỳ."
       },
       {
         "sourceId": "nhat-binh-modern",
         "scope": "Ứng dụng và cách tân Nhật Bình trong thời trang hiện nay."
+      },
+      {
+        "sourceId": "nhat-binh-fitting",
+        "scope": "Phom thân rộng, không chiết eo và một bộ phối hiện nay của đơn vị cung cấp; không xác nhận quy chế cho mọi thời kỳ.",
+        "locator": "Đoạn mô tả phom áo và mục Hướng dẫn mặc áo."
       }
     ],
     "modernUse": "Ngày nay có thể mặc Nhật Bình trong lễ cưới, chụp ảnh hoặc sự kiện văn hóa. Khăn vành, trâm, quạt và màu pastel là lựa chọn phối đồ; không mặc định mọi bộ đều tái hiện một phẩm cấp cung đình.",

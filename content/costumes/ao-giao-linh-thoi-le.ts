@@ -12,9 +12,9 @@ export const aoGiaoLinhThoiLe: Costume = {
   "lineageCategory": "giao-linh",
   "lineageSubcategory": "giao-linh",
   "lineageLabel": "Áo Giao Lĩnh • Cổ chéo",
-  "shortDescription": "Cổ phục cổ xưa với thiết kế cổ áo bắt chéo trước ngực (vạt trái đè lên vạt phải), tay áo thụng dài bay bổng uy nghiêm.",
+  "shortDescription": "Áo có cổ giao chéo; mẫu Studio dùng vạt trái phủ vạt phải, tay rộng và lớp mặc bên trong, gợi phong cách trang phục thời Lê.",
   "historicalContext": "Giao lĩnh chỉ kiểu cổ giao chéo. Khảo cứu của Trần Quang Đức ghi nhận nhiều dạng áo này trong y phục thời Lê. Mẫu tay rộng trong ứng dụng là một lựa chọn tạo hình, không đại diện mọi tầng lớp và thời kỳ.",
-  "culturalSignificance": "Cổ chéo là đặc điểm nhận diện của mẫu này. Những diễn giải về âm dương và phẩm chất người mặc chưa được xác minh thành ý nghĩa bắt buộc của kết cấu áo.",
+  "culturalSignificance": "Cổ giao chéo giúp nhận diện kết cấu áo. Giao lĩnh xuất hiện trong nhiều cách xếp lớp và bộ phối; cần tư liệu cụ thể để xác định người mặc, niên đại và phụ kiện.",
   "isVerifiedHistoricalData": false,
   "verificationNote": "Đã đối chiếu các thông tin chính trong phạm vi nguồn bên dưới; phụ kiện và màu phối là gợi ý biên tập.",
   "components": [
@@ -38,11 +38,11 @@ export const aoGiaoLinhThoiLe: Costume = {
     },
     {
       "id": "cmp-gl-skirt",
-      "name": "Thường / Váy dài quét đất",
+      "name": "Thường / Váy dài trong mẫu phối",
       "layerOrder": 2,
       "isRequired": true,
       "type": "inner",
-      "description": "Váy xếp ly bên dưới tạo dáng uy nghi khi di chuyển",
+      "description": "Lớp mặc dưới; độ dài chọn để không giẫm lên gấu.",
       "defaultColor": "#2b2d42"
     },
     {
@@ -96,21 +96,21 @@ export const aoGiaoLinhThoiLe: Costume = {
       "id": "col-gl-indigo",
       "name": "Chàm thẫm Thăng Long",
       "hex": "#1d3557",
-      "meaning": "Đậm nét Bắc Bộ ngàn năm văn hiến",
+      "meaning": "Sắc xanh trầm, tạo tương phản với lớp trong sáng màu.",
       "popularity": "Rất trang trọng"
     },
     {
       "id": "col-gl-crimson",
       "name": "Đỏ gạch nung cổ kính",
       "hex": "#9d0208",
-      "meaning": "Hào khí Đại Việt thời Lê Sơ",
+      "meaning": "Sắc đỏ đậm, làm nổi bật nẹp hoặc đai khác màu.",
       "popularity": "Biểu diễn & Lễ hội"
     },
     {
       "id": "col-gl-cloud",
       "name": "Trắng mây sương khói",
       "hex": "#edf2f4",
-      "meaning": "Thoát tục, thanh khiết của thi nhân xưa",
+      "meaning": "Sắc sáng nhẹ, dễ phối với đai hoặc lớp áo trầm.",
       "popularity": "Chụp ảnh nghệ thuật"
     }
   ],
@@ -119,15 +119,15 @@ export const aoGiaoLinhThoiLe: Costume = {
       "id": "mat-gl-to-tam",
       "name": "Tơ tằm dệt sa hạt lựu",
       "textureType": "silk_gauze",
-      "origin": "Làng dệt Cổ Đô",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Bay bổng phiêu dật trong gió"
     },
     {
       "id": "mat-gl-gam-the",
-      "name": "Thao sa gấm mỏng thời Lê",
+      "name": "Vải dệt hoa chìm",
       "textureType": "damask",
-      "origin": "Phục dựng theo tượng chùa",
-      "description": "Dày dặn, giữ nếp cổ áo giao chéo thẳng tắp"
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
+      "description": "Gợi ý bề mặt hoa chìm; chọn độ dày theo dáng áo."
     }
   ],
   "accessories": [
@@ -137,7 +137,7 @@ export const aoGiaoLinhThoiLe: Costume = {
       "category": "waist",
       "layerOrder": 4,
       "description": "Buông dài hai dải phía trước ngực",
-      "traditionalMeaning": "Khí khái và trật tự",
+      "traditionalMeaning": "Dải đai làm rõ bố cục eo và các lớp áo.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -147,7 +147,7 @@ export const aoGiaoLinhThoiLe: Costume = {
       "category": "handheld",
       "layerOrder": 6,
       "description": "Phụ kiện chụp ảnh cổ trang",
-      "traditionalMeaning": "Văn võ toàn tài",
+      "traditionalMeaning": "Đạo cụ theo ý tưởng bộ ảnh; cần tư liệu nếu gắn với nhân vật lịch sử.",
       "isRecommended": false,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     }
@@ -155,9 +155,9 @@ export const aoGiaoLinhThoiLe: Costume = {
   "details": [
     {
       "id": "dtl-gl-co",
-      "name": "Viền cổ áo màu tương phản (Tố lĩnh)",
+      "name": "Viền cổ áo màu tương phản",
       "type": "collar",
-      "description": "Làm nổi bật đường chéo giao hòa âm dương"
+      "description": "Nẹp làm rõ đường cổ giao chéo."
     }
   ],
   "suitability": [
@@ -165,37 +165,37 @@ export const aoGiaoLinhThoiLe: Costume = {
       "eventId": "evt-festival",
       "score": 98,
       "label": "Hoàn hảo",
-      "reason": "Hoàn hảo cho các lễ hội tưởng niệm vua Lê, đền Hùng, chùa cổ Bắc Bộ."
+      "reason": "Gợi ý tạo hình cổ phục trong lễ hội; phục trang nghi lễ phải theo yêu cầu của ban tổ chức."
     },
     {
       "eventId": "evt-art",
       "score": 96,
       "label": "Hoàn hảo",
-      "reason": "Rất ăn ảnh, tà áo và dải đai bay bổng cực kỳ ấn tượng trên sân khấu nghệ thuật."
+      "reason": "Cổ chéo, tay rộng và các lớp áo tạo điểm nhấn sân khấu; kiểm tra độ vướng theo động tác."
     },
     {
       "eventId": "evt-yearbook",
       "score": 88,
       "label": "Rất phù hợp",
-      "reason": "Mang đến bộ ảnh phong cách cổ phong Thăng Long khác biệt và đậm chất điện ảnh."
+      "reason": "Có thể dùng cho bộ ảnh chủ đề cổ phục thời Lê; ghi rõ phạm vi phục dựng."
     },
     {
       "eventId": "evt-tet",
       "score": 80,
       "label": "Phù hợp",
-      "reason": "Thích hợp đi lễ đền chùa trang nghiêm ngày đầu năm."
+      "reason": "Có thể phối cho du xuân; chọn lớp trong và độ dài phù hợp nơi đến."
     },
     {
       "eventId": "evt-street",
       "score": 35,
       "label": "Cách tân độc đáo",
-      "reason": "Tà áo quá dài và quét đất, chỉ nên mặc khi chụp ảnh có hỗ trợ viên."
+      "reason": "Mẫu tay rộng và thường dài có thể vướng khi đi bộ; điều chỉnh bộ phối theo hoạt động."
     }
   ],
   "usageConsiderations": [
-    "Mẫu Studio sử dụng vạt trái phủ vạt phải. Khi phục dựng cần đối chiếu cách mặc trong tư liệu cụ thể, không suy diễn ý nghĩa tang lễ cho mọi trường hợp.",
-    "Cần có áo lót trung đơn màu trắng bên trong để tôn viền cổ áo.",
-    "Màu, vật liệu, phụ kiện và điểm phù hợp sự kiện trong ứng dụng là gợi ý phối hiện nay; không chứng nhận một bộ phục dựng lịch sử."
+    "Mẫu Studio dùng vạt trái của người mặc phủ vạt phải; cố định vạt theo dây buộc/cách cài của áo. Ảnh lật gương có thể làm nhầm hướng.",
+    "Chọn lớp trong và quần/thường theo bộ phối; áo lót trắng trong Studio là một lựa chọn minh họa, không bắt buộc cho mọi mẫu.",
+    "Giữ tay áo, dải đai và gấu áo không mắc vào vật xung quanh khi di chuyển."
   ],
   "stylingGuide": {
     "accessories": [
@@ -217,19 +217,20 @@ export const aoGiaoLinhThoiLe: Costume = {
       "Trắng ngà phối đai xanh lam"
     ],
     "materialsAndMotifs": [
-      "Sa dệt hoa cúc dây thời Lê",
-      "Họa tiết mây cuộn Đại Việt"
+      "Sa hoặc vải dệt hoa chìm",
+      "Hoa văn theo mẫu tham chiếu khi phục dựng"
     ],
-    "traditionalStyling": "Áo Giao Lĩnh phủ ngoài thường xếp ly, thắt đai lụa ngang eo, đầu búi tóc cài trâm sừng hoặc kim loại, chân mang hài mây.",
-    "modernRemixAdvice": "Remix sân khấu: áo giao lĩnh ngắn vạt khoác ngoài áo thun trơn và quần suông tối màu. Ghi rõ đây là cách tân, không dùng làm mẫu phục dựng.",
+    "traditionalStyling": "Giữ cổ giao chéo và cố định vạt để cổ nằm ổn định. Mẫu này dùng vạt trái phủ vạt phải, lớp áo trong và thường dài; quần, thường, đai và đồ đội đầu của một bộ phục dựng phải chọn theo tư liệu thời kỳ cụ thể, không ghép tùy ý thành quan phục.",
+    "modernRemixAdvice": "Gợi ý cách tân: giữ đường cổ chéo, thử màu trơn hoặc họa tiết nhẹ, phối quần suông và giày hiện đại. Có thể điều chỉnh độ dài áo hoặc tay cho sinh hoạt thường ngày; nếu biến thành áo khoác mở hoàn toàn thì ghi rõ là thiết kế lấy cảm hứng từ giao lĩnh.",
     "avoidCombinations": [
-      "Giữ hướng cổ chéo nhất quán với mẫu phối đã chọn; ảnh bị lật gương có thể gây nhầm hướng vạt.",
-      "Tránh mang phụ kiện đồ nhựa phát sáng hay kính râm tráng gương."
+      "Tránh vạt tuột hoặc đai quá chặt kéo lệch cổ chéo; kiểm tra độ che phủ khi ngồi và cúi.",
+      "Không ghép mũ, phù hiệu hoặc hoa văn từ nhiều thời kỳ rồi giới thiệu là một bộ phục dựng đã xác minh.",
+      "Khi dự lễ, vào nơi thờ tự hoặc tham gia hoạt động học đường, chọn độ kín và độ dài phù hợp nội quy nơi đến; kiểm tra áo khi ngồi, cúi và giơ tay để tránh lộ ngoài ý muốn."
     ]
   },
   "aiProfile": {
     "constructionDetails": [
-      "Authentic Vietnamese historical Áo Giao Lĩnh (Lý, Trần, Lê Dynasty crossed-collar robe).",
+      "Vietnamese Giao Lĩnh-inspired crossed-collar robe; this catalogue suggests a Lê-period visual reference, not one verified outfit for all dynasties.",
       "Crossed Y-shaped collar construction where the left lapel wraps over the right (vạt trái đè vạt phải).",
       "Tied at the right waist with a traditional soft fabric sash (dây bao / thắt lưng lụa).",
       "Flowing wide sleeves and historical layered under-robes with delicate silk drape."
@@ -252,6 +253,16 @@ export const aoGiaoLinhThoiLe: Costume = {
         "sourceId": "ngan-nam-ao-mu",
         "scope": "Các dạng giao lĩnh trong y phục thời Lê.",
         "locator": "Chương III, phần Trang phục dân gian, tr. 240–243 (bản 2013)"
+      },
+      {
+        "sourceId": "mat-son-costumes",
+        "scope": "Áo cổ giao chéo như một lớp trong một số bộ trang phục nữ thế kỷ XVII.",
+        "locator": "Tr. 28, phần Trang phục."
+      },
+      {
+        "sourceId": "hoang-thanh-layering",
+        "scope": "Bộ phối giao lĩnh, quần và thường tại đơn vị cung cấp hiện nay; không xác nhận mọi biến thể lịch sử.",
+        "locator": "Mục Hướng dẫn mặc áo Giao Lĩnh dáng dài."
       }
     ],
     "modernUse": "Mẫu phối có thể dùng để chụp ảnh hoặc trình diễn. Đai, ngọc bội, kiếm/tiêu và mũ hiện có là tùy chọn; cần chọn tư liệu cụ thể trước khi gọi bộ phối là phục dựng thời Lê.",

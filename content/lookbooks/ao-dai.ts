@@ -26,14 +26,14 @@ interface StyleLookbookItem {
 export const styleMatrix: Record<VibeKey, StyleLookbookItem> = {
     traditional: {
       id: 'traditional',
-      name: 'Truyền Thống Chuẩn Mực',
+      name: 'Phong cách truyền thống',
       subtitle: 'Thướt tha, trang trọng, đậm cốt cách Việt',
       imageUrl: 'https://upload.wikimedia.org/wikipedia/commons/4/4b/%C3%81o_d%C3%A0i_%286405924827%29.jpg',
       imageAlt: 'Thiếu nữ bên hoa sen trong tà Áo dài truyền thống',
       photoCredit: 'Trần Hải Nam (Flickr: trunghainam)',
       licenseText: 'CC BY 2.0 (Wikimedia Commons)',
-      topDesc: 'Áo dài lụa tơ tằm Vạn Phúc cổ đứng 3cm, tay dài ôm raglan, tà dài chấm mắt cá',
-      bottomDesc: 'Quần lụa trắng hoặc đen ống suông rộng chạm đất',
+      topDesc: 'Áo dài cổ đứng, tay dài, thân ôm vừa; chọn độ dài tà và độ rủ của vải theo vóc dáng',
+      bottomDesc: 'Quần trắng hoặc đen ống suông, gấu không quét đất',
       accDesc: 'Nón lá bài thơ quai lụa + Kiềng bạc chạm hoa cúc + Guốc mộc quai nhung',
       culturalNote: 'Gợi ý phối áo dài hiện đại cho dịp trang trọng; điều chỉnh theo yêu cầu của gia đình và nơi tổ chức.',
       factBite: 'Áo dài hiện đại trải qua nhiều thay đổi trong thế kỷ XX; mẫu hai tà này không mặc định có kết cấu ngũ thân.',
@@ -57,8 +57,8 @@ export const styleMatrix: Record<VibeKey, StyleLookbookItem> = {
       culturalNote: 'Gợi ý áo dài cổ thuyền kết hợp phụ kiện dạ tiệc hiện nay.',
       factBite: 'Cổ thuyền là một biến thể thiết kế áo dài hiện đại; danh mục chưa xác minh riêng niên đại và tác giả của kiểu cổ này.',
       safetyLevel: 'SAFE',
-      safetyLabel: '✓ Thanh lịch & Hợp chuẩn dạ tiệc',
-      safetyTip: 'Cổ khoét thuyền nhẹ nhàng, không xẻ ngực sâu để giữ nét quý phái.',
+      safetyLabel: '✓ Gợi ý phối dạ tiệc',
+      safetyTip: 'Chọn độ mở cổ và lớp trong phù hợp buổi tiệc; kiểm tra độ che phủ khi cúi, ngồi và giơ tay.',
       recommendedHex: '#0F766E', // Xanh cổ vịt
       recommendedTrouserHex: '#FAF5FF' // Be ngọc trai
     },
@@ -89,14 +89,14 @@ export const styleMatrix: Record<VibeKey, StyleLookbookItem> = {
       imageAlt: 'Áo dài hoa Sài Gòn vintage',
       photoCredit: 'Hoàng Duy Khang (Flickr/Wikimedia)',
       licenseText: 'CC BY 2.0',
-      topDesc: 'Áo dài hoa nhí hoặc chấm bi phom Raglan Đakao, eo chít con kiến tôn ngực',
+      topDesc: 'Áo dài hoa nhí hoặc chấm bi, tay raglan, thân ôm vừa theo số đo',
       bottomDesc: 'Quần lụa đen ống rộng patte hơi vẩy nhẹ',
       accDesc: 'Băng đô tóc retro vải hoa cùng tone + Kính mắt mèo + Guốc gỗ gót cong',
-      culturalNote: 'Dấu ấn rực rỡ của thời trang Sài Gòn trước 1975, tươi vui và đầy sức sống thanh xuân.',
+      culturalNote: 'Gợi ý phối hiện nay lấy cảm hứng từ thời trang Sài Gòn thập niên 1960–1970; không phải bản phục dựng đã xác minh.',
       factBite: 'Tay raglan có đường ráp từ cổ xuống nách; vẻ đẹp và độ vừa vặn còn phụ thuộc cách cắt may, không chỉ tên kiểu tay.',
       safetyLevel: 'SAFE',
       safetyLabel: '✦ Dấu ấn hoài niệm 1960s',
-      safetyTip: 'Phom chít eo khá ôm, nên chọn vải có độ co giãn nhẹ để dễ thở.',
+      safetyTip: 'Thân áo có thể ôm vừa nhưng không siết eo hoặc kéo căng đường may; thử ngồi và nâng tay trước khi chọn độ ôm.',
       recommendedHex: '#D97706', // Vàng mù tạt
       recommendedTrouserHex: '#18181B' // Quần đen
     },
@@ -111,7 +111,7 @@ export const styleMatrix: Record<VibeKey, StyleLookbookItem> = {
       topDesc: 'Áo dài gấm xốp tà lửng ngang bắp chân, tay bồng nhẹ tiểu thư, cổ tròn thoáng',
       bottomDesc: 'Quần lụa ống lửng hoặc chân váy xòe xếp ly nhẹ nhàng',
       accDesc: 'Giày Mary Jane đế bệt hoặc Sneaker trắng + Kẹp tóc ruy băng lụa + Túi cói mini',
-      culturalNote: 'Dành cho thế hệ trẻ dạo phố cà phê cuối tuần, dễ bước đi và ngồi xe máy.',
+      culturalNote: 'Gợi ý phối cho dạo phố, cà phê hoặc chụp ảnh; kiểm tra tà áo không mắc vào phương tiện khi di chuyển.',
       factBite: 'Tà lửng và tay bồng ở đây là gợi ý cách tân; không dùng làm mẫu phục dựng một giai đoạn lịch sử.',
       safetyLevel: 'CAUTION',
       safetyLabel: '✦ Biến thể cách tân trẻ trung',
@@ -130,11 +130,11 @@ export const styleMatrix: Record<VibeKey, StyleLookbookItem> = {
       topDesc: 'Áo dài tơ dập ly hoặc loang màu ombré, vạt áo nhiều tầng xếp lớp bay bổng',
       bottomDesc: 'Quần lụa ống suông rộng đen mờ xếp nếp',
       accDesc: 'Trang sức bạc thủ công đương đại + Ankle boots da mềm',
-      culturalNote: 'Ngôn ngữ thời trang cao cấp (haute couture) giao lưu quốc tế.',
+      culturalNote: 'Gợi ý thử nghiệm màu loang, nếp gấp và lớp vạt trong thiết kế hiện nay.',
       factBite: 'Hiệu ứng dập ly và độ rủ phụ thuộc cấu trúc vải; nên kiểm tra khả năng giữ nếp của chất liệu thực tế.',
       safetyLevel: 'SAFE',
       safetyLabel: '✦ Nghệ thuật biểu đạt đương đại',
-      safetyTip: 'Tạo cảm giác bay bổng khi di chuyển trong không gian triển lãm nghệ thuật.',
+      safetyTip: 'Kiểm tra các lớp vạt không mắc vào giày, ghế hoặc phụ kiện khi di chuyển.',
       recommendedHex: '#7C3AED', // Tím thạch anh
       recommendedTrouserHex: '#1F2937' // Xám than
     },
@@ -153,7 +153,7 @@ export const styleMatrix: Record<VibeKey, StyleLookbookItem> = {
       factBite: 'Ngũ thân từng phổ biến trong xã hội thời Nguyễn; cách mặc khác nhau theo vùng, nghề nghiệp và hoàn cảnh.',
       safetyLevel: 'CAUTION',
       safetyLabel: '✦ Giao thoa văn hóa đường phố',
-      safetyTip: 'Vẫn giữ khuy cài ngay ngắn và quần dài, tránh mặc cùng quần đùi lộ gối.',
+      safetyTip: 'Chọn phần mặc dưới phù hợp độ mở hai tà; khi dự lễ hoặc vào di tích, theo nội quy nơi đến.',
       recommendedHex: '#1E293B', // Xanh than navy
       recommendedTrouserHex: '#475569' // Xám đá
     }
@@ -206,26 +206,26 @@ export const weatherGuidance = {
 hot: {
           title: 'Thời tiết Nắng Nóng (> 30°C)',
           tag: '☀️ Ưu tiên thoáng mát',
-          fabricTip: 'Khuyên dùng: Lụa tơ tằm dệt thưa, Đũi tơ, Voan cát mềm. Tránh nhung dày, gấm xốp ép.',
-          cutTip: 'Cổ đứng thấp 2cm hoặc cổ tròn, tay lỡ 3/4 nhẹ nhàng.'
+          fabricTip: 'Ưu tiên vải mỏng, nhẹ và thoáng; kiểm tra độ xuyên thấu cùng lớp trong. Độ thoáng phụ thuộc kiểu dệt và độ dày, không chỉ tên chất liệu.',
+          cutTip: 'Có thể chọn cổ thấp, cổ tròn hoặc tay lỡ cho áo dài hiện đại; điều chỉnh độ vừa để cử động thoải mái.'
         },
 cold: {
           title: 'Thời tiết Se Lạnh (< 18°C)',
           tag: '❄️ Giữ ấm thanh lịch',
-          fabricTip: 'Khuyên dùng: Nhung tuyết cao cấp, Gấm dệt chỉ vàng, Lụa trần bông nhẹ.',
+          fabricTip: 'Chọn vải dày hơn hoặc thêm lớp mặc trong, áo khoác; không mặc định gấm dệt chỉ vàng giữ ấm tốt hơn các loại vải khác.',
           cutTip: 'Khoác thêm áo măng tô dạ dáng dài hoặc choàng khăn len cashmere màu tương phản.'
         },
 rainy: {
           title: 'Thời tiết Mưa & Ẩm',
           tag: '🌧️ Chống vấy bẩn',
-          fabricTip: 'Khuyên dùng: Lụa nhân tạo mau khô, phối Quần lụa đen tối màu để tránh bùn bẩn.',
+          fabricTip: 'Chọn vải dễ chăm sóc và kiểm tra hướng dẫn giặt, khả năng khô của mẫu thực tế; quần tối màu chỉ giúp vết bẩn ít nổi bật hơn.',
           cutTip: 'Nên chọn tà áo lửng cách tân hoặc nâng gấu áo cách đất khi di chuyển.'
         },
 mild: {
           title: 'Thời tiết Mát Mẻ (20°C - 28°C)',
-          tag: '🍃 Thời tiết lý tưởng nhất',
+          tag: '🍃 Linh hoạt chọn chất liệu',
           fabricTip: 'Có thể chọn lụa, gấm hoặc đũi theo độ dày, độ rủ và hoạt động; nhiệt độ chỉ là một yếu tố.',
-          cutTip: 'Phô diễn trọn vẹn tà áo dài truyền thống thướt tha chạm mắt cá chân.'
+          cutTip: 'Có thể giữ tà dài nếu không vướng; chọn độ dài theo vóc dáng, giày và hoạt động.'
         }
 } satisfies Record<WeatherKey, { title: string; tag: string; fabricTip: string; cutTip: string }>;
 
@@ -257,7 +257,7 @@ street: {
 tet: {
           name: 'Tết & Du Xuân',
           badge: 'Đón tân niên may mắn',
-          note: 'Sắc màu rực rỡ (Đỏ, Vàng, Xanh lá non), mang lại hỷ khí và tài lộc khi chúc Tết họ hàng.',
+          note: 'Có thể thử đỏ, vàng hoặc xanh lá để gợi sắc xuân; màu sắc là lựa chọn phối đồ, không quyết định may mắn.',
           isStrict: false
         }
 } satisfies Record<OccasionKey, { name: string; badge: string; note: string; isStrict: boolean }>;

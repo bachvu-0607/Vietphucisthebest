@@ -294,6 +294,10 @@ export default function App() {
                 selectedEvent={selectedEvent}
                 onSelectEvent={(evt) => setSelectedEvent(evt)}
                 onSelectCostume={handleSelectCostume}
+                onOpenCostumes={() => {
+                  setCurrentView('costumes');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 onStartStudio={() => {
                   if (costumes.length > 0) {
                     setSelectedCostume(selectedCostume || costumes[0]);

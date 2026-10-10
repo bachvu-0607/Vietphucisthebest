@@ -40,6 +40,7 @@ interface HomePageProps {
   selectedEvent?: EventItem;
   onSelectEvent: (event: EventItem) => void;
   onSelectCostume: (costume: Costume) => void;
+  onOpenCostumes: () => void;
   onStartStudio?: () => void;
 }
 
@@ -49,6 +50,7 @@ export const HomePage: React.FC<HomePageProps> = ({
   selectedEvent,
   onSelectEvent,
   onSelectCostume,
+  onOpenCostumes,
   onStartStudio
 }) => {
   const [activeSubTab, setActiveSubTab] = useState<'intro' | 'events' | 'costumes'>('intro');
@@ -799,7 +801,8 @@ export const HomePage: React.FC<HomePageProps> = ({
             </div>
 
             <button
-              onClick={() => onSelectCostume(sortedCostumes[0])}
+              type="button"
+              onClick={onOpenCostumes}
               className="px-4 py-2 rounded-xl bg-[#C84B69] hover:bg-[#B33B58] text-white text-xs font-serif font-bold transition-all shadow-xs shrink-0 cursor-pointer flex items-center gap-1.5"
             >
               <span>Tìm hiểu thêm</span>

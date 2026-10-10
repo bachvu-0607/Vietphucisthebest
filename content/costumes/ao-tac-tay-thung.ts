@@ -12,7 +12,7 @@ export const aoTacTayThung: Costume = {
   "lineageCategory": "lap-linh",
   "lineageSubcategory": "ao-tac",
   "lineageLabel": "Áo Lập Lĩnh • Tay rộng (Lễ phục)",
-  "shortDescription": "Lễ phục trang trọng của cả nam và nữ thời Nguyễn, có ống tay áo rộng thụng dài một tấc, tượng trưng cho sự đĩnh đạc và lễ độ.",
+  "shortDescription": "Dạng áo ngũ thân tay rộng, cổ đứng và cài bên phải, thường được chọn cho dịp trang trọng; dùng cho cả nam và nữ.",
   "historicalContext": "Áo Tấc trong danh mục này là dạng áo ngũ thân tay rộng dùng cho dịp trang trọng. Nó nằm trong quá trình phát triển của áo dài cổ đứng từ Đàng Trong thế kỷ XVIII đến thời Nguyễn. Chưa có căn cứ ở đây để chốt một năm chuẩn hóa riêng hoặc kích thước từ tên “tấc”.",
   "culturalSignificance": "Phom tay rộng tạo vẻ trang trọng và cần không gian cử động. Các diễn giải về năm thân, năm cúc và đạo đức Nho giáo là cách lý giải biểu tượng, không thay thế tư liệu về cách cắt may.",
   "isVerifiedHistoricalData": false,
@@ -24,7 +24,7 @@ export const aoTacTayThung: Costume = {
       "layerOrder": 1,
       "isRequired": true,
       "type": "inner",
-      "description": "Tư thế chắp tay hoặc đứng nghiêm trang",
+      "description": "Tư thế đứng tự nhiên hoặc chắp tay khi tạo dáng.",
       "defaultColor": "#f7ede2"
     },
     {
@@ -42,7 +42,7 @@ export const aoTacTayThung: Costume = {
       "layerOrder": 2,
       "isRequired": true,
       "type": "inner",
-      "description": "Quần lụa dài quét nhẹ gót chân",
+      "description": "Quần dài ống rộng; gấu vừa tầm giày để không vướng bước chân.",
       "defaultColor": "#f8f9fa"
     },
     {
@@ -56,11 +56,11 @@ export const aoTacTayThung: Costume = {
     },
     {
       "id": "cmp-at-sleeves",
-      "name": "Tay áo thụng dài 1 tấc",
+      "name": "Tay áo thụng rộng",
       "layerOrder": 4,
       "isRequired": true,
       "type": "main",
-      "description": "Tay áo rộng xòe, khi chắp tay tạo thế trang nghiêm",
+      "description": "Ống tay rộng, buông theo cử động; không suy kích thước từ tên áo Tấc.",
       "defaultColor": "#2b4162"
     },
     {
@@ -69,7 +69,7 @@ export const aoTacTayThung: Costume = {
       "layerOrder": 4,
       "isRequired": true,
       "type": "main",
-      "description": "Biểu trưng cho Ngũ Thường (Nhân Lễ Nghĩa Trí Tín)",
+      "description": "Hàng năm khuy cài từ cổ xuống phía thân phải.",
       "defaultColor": "#e0a96d"
     },
     {
@@ -103,10 +103,10 @@ export const aoTacTayThung: Costume = {
   "colorVariants": [
     {
       "id": "col-at-navy",
-      "name": "Lam thẫm (Xanh navy cung đình)",
+      "name": "Lam thẫm / Xanh navy",
       "hex": "#1d3557",
-      "meaning": "Điềm đạm, trí tuệ và sự chuẩn mực của bậc trí thức",
-      "popularity": "Rất phổ biến cho nam"
+      "meaning": "Sắc trầm, dễ phối quần trắng hoặc sáng màu.",
+      "popularity": "Gợi ý dịp trang trọng"
     },
     {
       "id": "col-at-maroon",
@@ -133,23 +133,23 @@ export const aoTacTayThung: Costume = {
   "materials": [
     {
       "id": "mat-at-to-tam",
-      "name": "Lụa tơ tằm dệt trơn Bảo Lộc",
+      "name": "Lụa tơ tằm dệt trơn",
       "textureType": "silk",
-      "origin": "Lâm Đồng & Hà Đông",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Mềm mát, độ bóng mờ quý phái, tà bay bổng"
     },
     {
       "id": "mat-at-gam-hoa",
       "name": "Gấm dệt vân mây chữ Thọ",
       "textureType": "brocade",
-      "origin": "Vạn Phúc, Hà Đông",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Đứng form áo, hoa văn ẩn hiện tôn vẻ bề thế"
     },
     {
       "id": "mat-at-dui",
       "name": "Đũi tơ tằm dệt thô thủ công",
       "textureType": "linen_silk",
-      "origin": "Nam Định",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Mộc mạc, gần gũi thiên nhiên, thoát nhiệt tốt"
     }
   ],
@@ -160,7 +160,7 @@ export const aoTacTayThung: Costume = {
       "category": "headwear",
       "layerOrder": 5,
       "description": "Đội ngay ngắn phía trên trán hình chữ Nhân",
-      "traditionalMeaning": "Đầu đội trời, tâm ngay thẳng",
+      "traditionalMeaning": "Điểm nhấn ở đầu và giữ tóc gọn trong bộ phối.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -170,7 +170,7 @@ export const aoTacTayThung: Costume = {
       "category": "waist",
       "layerOrder": 6,
       "description": "Đạo cụ thẻ bài tạo hình; cần nguồn riêng để gắn với quan chức hoặc nhân vật cụ thể.",
-      "traditionalMeaning": "Danh dự và chức phận",
+      "traditionalMeaning": "Đạo cụ tạo hình; không tự xác nhận danh phận của người mặc.",
       "isRecommended": false,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -180,7 +180,7 @@ export const aoTacTayThung: Costume = {
       "category": "handheld",
       "layerOrder": 6,
       "description": "Cầm tay nho nhã thi vị",
-      "traditionalMeaning": "Gió lành đức độ",
+      "traditionalMeaning": "Phụ kiện cầm tay và tạo dáng.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     },
@@ -189,8 +189,8 @@ export const aoTacTayThung: Costume = {
       "name": "Giày vải đen đế bọc vải hoặc guốc mộc",
       "category": "footwear",
       "layerOrder": 7,
-      "description": "Đi êm chân, không phát ra tiếng kêu thất lễ",
-      "traditionalMeaning": "Bước đi chừng mực",
+      "description": "Chọn giày hoặc guốc vừa chân, thuận tiện di chuyển.",
+      "traditionalMeaning": "Hoàn thiện bộ phối và hỗ trợ di chuyển.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     }
@@ -198,15 +198,15 @@ export const aoTacTayThung: Costume = {
   "details": [
     {
       "id": "dtl-at-co",
-      "name": "Cổ đứng lập lĩnh cao 3-4cm",
+      "name": "Cổ đứng lập lĩnh",
       "type": "collar",
-      "description": "Kín đáo và giữ đầu luôn ngay ngắn"
+      "description": "Chiều cao cổ chọn theo số đo và mẫu áo, không có một mức cố định cho mọi người."
     },
     {
       "id": "dtl-at-tay",
-      "name": "Tay áo thụng dài che kín mu bàn tay",
+      "name": "Tay áo thụng rộng buông tự nhiên",
       "type": "sleeve",
-      "description": "Khi chắp tay tạo sự kính cẩn tột cùng"
+      "description": "Độ dài và độ rộng chọn theo mẫu; cần đủ khoảng trống cho cử động."
     }
   ],
   "suitability": [
@@ -214,44 +214,43 @@ export const aoTacTayThung: Costume = {
       "eventId": "evt-tet",
       "score": 96,
       "label": "Hoàn hảo",
-      "reason": "Áo Tấc là biểu tượng tuyệt hảo cho ngày mùng 1 Tết đi chúc thọ ông bà cha mẹ và vãn cảnh chùa."
+      "reason": "Phom tay rộng tạo vẻ trang trọng khi chúc Tết hoặc chụp ảnh."
     },
     {
       "eventId": "evt-wedding",
       "score": 95,
       "label": "Hoàn hảo",
-      "reason": "Lễ phục chuẩn mực cho chú rể, đội bê tráp hoặc hai họ trong nghi thức hôn phối trang trọng."
+      "reason": "Có thể phối cho chú rể, người thân hoặc đội lễ theo yêu cầu của gia đình."
     },
     {
       "eventId": "evt-yearbook",
       "score": 92,
       "label": "Rất phù hợp",
-      "reason": "Rất được học sinh sinh viên lựa chọn vì phom dáng nho nhã, uyên bác và thanh lịch."
+      "reason": "Gợi ý bộ ảnh theo phong cách ngũ thân tay rộng."
     },
     {
       "eventId": "evt-formal",
       "score": 94,
       "label": "Hoàn hảo",
-      "reason": "Đại diện tiêu biểu cho quốc phục Việt Nam tiếp đón quan khách ngoại giao."
+      "reason": "Có thể chọn cho sự kiện trang trọng nếu phù hợp quy định trang phục của nơi tổ chức."
     },
     {
       "eventId": "evt-festival",
       "score": 89,
       "label": "Rất phù hợp",
-      "reason": "Đoan trang, kính cẩn bước vào không gian đình làng và đền thánh."
+      "reason": "Gợi ý dự lễ hội; giữ tay và gấu áo không vướng khi đi lại."
     },
     {
       "eventId": "evt-street",
       "score": 55,
       "label": "Phù hợp",
-      "reason": "Tay thụng hơi vướng khi vận động dạo phố nhiều, nhưng chụp hình thì tuyệt đẹp."
+      "reason": "Tay rộng có thể vướng khi hoạt động nhiều; chọn độ dài và địa điểm phù hợp."
     }
   ],
   "usageConsiderations": [
-    "Khi làm lễ hoặc chụp ảnh trang nghiêm, cần giữ tư thế chắp hai tay lại với nhau (tay áo buông dài tạo hình chữ V ngược).",
-    "Luôn cài đủ 5 khuy từ cổ xuống nách và hông phải; không buông cúc cổ.",
-    "Khăn đóng đội thẳng, không lệch quá nhiều về sau gáy.",
-    "Màu, vật liệu, phụ kiện và điểm phù hợp sự kiện trong ứng dụng là gợi ý phối hiện nay; không chứng nhận một bộ phục dựng lịch sử."
+    "Cài hàng khuy bên phải để cổ và vạt áo nằm ngay ngắn khi mặc theo phom truyền thống.",
+    "Tay áo rộng cần khoảng trống khi cử động; giữ tay áo tránh đồ ăn, nến và vật dễ mắc.",
+    "Khăn đóng hoặc khăn vấn là lựa chọn phối. Chắp tay là một tư thế tạo dáng, không phải tư thế bắt buộc suốt buổi."
   ],
   "stylingGuide": {
     "accessories": [
@@ -280,12 +279,12 @@ export const aoTacTayThung: Costume = {
       "Gấm vân hoa mây",
       "Chữ Thọ dệt chìm"
     ],
-    "traditionalStyling": "Áo Tấc lụa tơ tằm đơn sắc, bên trong lót áo cánh trắng, quần lụa trắng ống rộng, đầu đội khăn đóng đen chữ Nhân, chân đi giày đen hoặc guốc mộc.",
-    "modernRemixAdvice": "Remix hiện đại: Thay quần lụa trắng dài bằng quần âu tây dáng đứng (tapered trousers), phối với giày da Oxford đen bóng hoặc bốt da cổ thấp, tay áo có thể xắn gọn một nếp khi dạo phố.",
+    "traditionalStyling": "Giữ kết cấu ngũ thân, cổ đứng, hàng năm khuy bên phải và tay rộng; phối quần dài ống rộng. Quần trắng và khăn vấn/khăn đóng là cách phối thường được nhắc tới cùng ngũ thân. Chọn giày vừa chân và độ dài áo phù hợp hoạt động; phụ kiện nghi lễ cần tư liệu riêng.",
+    "modernRemixAdvice": "Gợi ý cách tân: giữ cổ đứng, năm thân và tay rộng, phối quần âu suông, giày da hoặc giày hiện đại phù hợp sự kiện; có thể thử màu và chất liệu nhẹ hơn. Không cần xắn tay để tạo vẻ hiện đại. Nếu thu tay thành tay chẽn thì đó là biến thể ngũ thân tay chẽn, không còn mẫu tay thụng này.",
     "avoidCombinations": [
-      "Tránh mang dép lê, dép tổ ong xỏ ngón khi mặc Áo Tấc.",
-      "Tránh mặc quần đùi hoặc quần lửng lộ ra dưới tà áo.",
-      "Khi dự lễ, nên cài áo gọn gàng và giữ tay áo không vướng hoạt động."
+      "Tránh chiết eo bó sát hoặc thu hẹp tay đến mức mất phom ngũ thân tay rộng.",
+      "Tránh chọn gấu áo, ống quần hoặc tay áo dài đến mức vướng bước chân và thao tác.",
+      "Khi dự lễ, vào nơi thờ tự hoặc tham gia hoạt động học đường, chọn độ kín và độ dài phù hợp nội quy nơi đến; kiểm tra áo khi ngồi, cúi và giơ tay để tránh lộ ngoài ý muốn."
     ]
   },
   "aiProfile": {
@@ -293,9 +292,9 @@ export const aoTacTayThung: Costume = {
       "Vietnamese Áo Tấc: a five-panel, wide-sleeved robe suitable for a formal traditional-inspired ensemble.",
       "Standing collar (Lập Lĩnh) with a neat right-side closure; proportions follow the selected reference rather than a universal fixed height.",
       "Ngũ Thân 5-panel tailored construction: 2 front panels, 2 back panels, and 1 inner under-panel (vạt con), overlapping securely on the right side.",
-      "Five traditional buttons (Ngũ thường buttons) curving gracefully from the neck collar across the right clavicle and down the right side seam.",
+      "Five buttons fastening from the standing collar down the right side of the garment.",
       "Wide, loose sleeves (tay thụng) with natural fabric drape; do not force an unverified length or measurement.",
-      "Worn over pristine white inner silk pants (quần bạch quy) and an inner high-collar white undergarment."
+      "Wear over long trousers and an appropriate inner layer; white trousers are a traditional-inspired option, not a required color for every styling."
     ],
     "mandatoryFeatures": [
       "Erect standing Lập Lĩnh collar buttoned on the right.",

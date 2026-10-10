@@ -4,7 +4,7 @@ export const aoTuThan: Costume = {
   "id": "cos-tu-than",
   "name": "Áo Tứ Thân (Dân Gian Kinh Bắc)",
   "slug": "ao-tu-than",
-  "era": "Thế kỷ 12 - 20 (Đặc trưng Bắc Bộ)",
+  "era": "Trang phục dân gian Bắc Bộ; có nhiều biến thể theo thời kỳ",
   "region": "Đồng bằng Bắc Bộ (Kinh Bắc)",
   "gender": "female",
   "formality": "casual_refined",
@@ -14,7 +14,7 @@ export const aoTuThan: Costume = {
   "lineageLabel": "Hệ Dịch Chuyển • Dân gian miền Bắc",
   "shortDescription": "Trang phục duyên dáng gồm bốn vạt áo, thường mặc buông vạt hoặc buộc chéo trước bụng, phối yếm đào, nón quai thao và bao tượng lụa.",
   "historicalContext": "Áo Tứ Thân gắn với văn hóa mặc của phụ nữ Bắc Bộ. Trong sinh hoạt Quan họ và Hội Lim, áo tứ thân thường xuất hiện cùng nón quai thao. Bộ phối lễ hội hiện nay không đại diện mọi dạng thường phục xưa.",
-  "culturalSignificance": "Trang phục góp phần tạo hình ảnh quen thuộc của liền chị Quan họ. Cách hiểu bốn thân tượng trưng “tứ thân phụ mẫu” là diễn giải biểu tượng, chưa được xác minh là nguồn gốc của kiểu may.",
+  "culturalSignificance": "Áo tứ thân gắn với hình ảnh liền chị Quan họ trong sinh hoạt lễ hội hiện nay. Bộ yếm, váy, bao tượng và nón quai thao trong Studio là một cách tạo hình lễ hội, không đại diện mọi cách mặc của phụ nữ Bắc Bộ.",
   "isVerifiedHistoricalData": false,
   "verificationNote": "Đã đối chiếu các thông tin chính trong phạm vi nguồn bên dưới; phụ kiện và màu phối là gợi ý biên tập.",
   "components": [
@@ -51,7 +51,7 @@ export const aoTuThan: Costume = {
       "layerOrder": 3,
       "isRequired": true,
       "type": "main",
-      "description": "Bốn vạt áo bay bổng buộc eo trước ngực",
+      "description": "Hai vạt trước buông hoặc buộc ở eo theo mẫu.",
       "defaultColor": "#582f0e"
     },
     {
@@ -69,7 +69,7 @@ export const aoTuThan: Costume = {
       "id": "col-tt-brown",
       "name": "Nâu non đồng nội",
       "hex": "#6f4e37",
-      "meaning": "Cần cù mộc mạc",
+      "meaning": "Sắc nâu trầm, nổi bật khi đi cùng yếm hoặc bao tượng sáng màu.",
       "popularity": "Dân gian truyền thống"
     },
     {
@@ -85,7 +85,7 @@ export const aoTuThan: Costume = {
       "id": "mat-tt-dui",
       "name": "Đũi tơ tằm thô",
       "textureType": "raw_silk",
-      "origin": "Làng dệt Bắc Ninh",
+      "origin": "Mẫu chất liệu tham khảo; chưa xác nhận xuất xứ.",
       "description": "Bền chắc, đượm màu thiên nhiên"
     }
   ],
@@ -96,7 +96,7 @@ export const aoTuThan: Costume = {
       "category": "headwear",
       "layerOrder": 5,
       "description": "Nón tròn lớn quai thao dệt tơ buông dài",
-      "traditionalMeaning": "Che nắng mưa và e ấp nụ cười duyên",
+      "traditionalMeaning": "Đồ đội/cầm tay trong tạo hình Quan họ, Hội Lim.",
       "isRecommended": true,
       "contextNote": "Lựa chọn phối đồ của ứng dụng; chưa xác nhận thuộc một bộ phục dựng cụ thể."
     }
@@ -114,18 +114,18 @@ export const aoTuThan: Costume = {
       "eventId": "evt-festival",
       "score": 100,
       "label": "Hoàn hảo",
-      "reason": "Trang phục trứ danh của lễ hội Lim và không gian dân gian truyền thống Bắc Bộ."
+      "reason": "Gắn với hình ảnh liền chị Quan họ và Hội Lim; không đại diện mọi lễ hội Bắc Bộ."
     },
     {
       "eventId": "evt-art",
       "score": 96,
       "label": "Hoàn hảo",
-      "reason": "Rực rỡ sắc màu và rất có hồn dân ca trên sân khấu biểu diễn."
+      "reason": "Gợi ý cho biểu diễn dân ca; cố định yếm, vạt và bao tượng theo động tác."
     }
   ],
   "usageConsiderations": [
-    "Mặc cùng yếm đào lót trong và nón quai thao để hoàn chỉnh dáng hình liền chị.",
-    "Màu, vật liệu, phụ kiện và điểm phù hợp sự kiện trong ứng dụng là gợi ý phối hiện nay; không chứng nhận một bộ phục dựng lịch sử."
+    "Mẫu lễ hội có thể phối yếm, váy dài và bao tượng; nón quai thao, khăn mỏ quạ là lựa chọn theo bộ phối, không bắt buộc cho mọi cách mặc.",
+    "Cố định yếm và hai vạt trước, giữ dải thắt lưng không vướng chân khi di chuyển."
   ],
   "stylingGuide": {
     "accessories": [
@@ -147,23 +147,25 @@ export const aoTuThan: Costume = {
       "Đũi dệt thô",
       "Lụa tơ tằm mềm"
     ],
-    "traditionalStyling": "Áo Tứ Thân khoác ngoài yếm đào, thắt bao tượng lụa, đầu vấn khăn mỏ quạ đội nón quai thao.",
-    "modernRemixAdvice": "Remix chụp ảnh: Kết hợp áo Tứ Thân vạt ngắn cùng chân váy đen xếp ly hiện đại.",
+    "traditionalStyling": "Giữ bốn thân áo và hai vạt trước buông hoặc buộc theo mẫu. Cách phối lễ hội trong Studio dùng yếm, váy dài và bao tượng; có thể chọn khăn mỏ quạ, nón quai thao. Khi tái hiện một sinh hoạt hoặc thời kỳ cụ thể cần đối chiếu tư liệu thay vì áp bộ lễ hội cho mọi trường hợp.",
+    "modernRemixAdvice": "Gợi ý cách tân: thay bảng màu, chất liệu hoặc phối chân váy hiện đại, giữ hai vạt trước và điểm thắt làm nhận diện. Có thể thử độ dài ngắn hơn nhưng vẫn cần lớp trong ổn định. Trang sức và túi hiện đại là tùy chọn, không bị loại chỉ vì khác phong cách truyền thống.",
     "avoidCombinations": [
-      "Tránh phối với phụ kiện kim loại tây âu to bản."
+      "Tránh yếm hoặc vạt buộc dễ tuột, gây lộ ngoài ý muốn khi biểu diễn và cúi người.",
+      "Tránh dải bao tượng và gấu váy quá dài làm vướng bước chân.",
+      "Khi dự lễ, vào nơi thờ tự hoặc tham gia hoạt động học đường, chọn độ kín và độ dài phù hợp nội quy nơi đến; kiểm tra áo khi ngồi, cúi và giơ tay để tránh lộ ngoài ý muốn."
     ]
   },
   "aiProfile": {
     "constructionDetails": [
       "Authentic Northern Vietnamese folk attire Áo Tứ Thân (Kinh Bắc region).",
       "4-panel open outer robe where the two long front panels are tied gracefully in front at the waist.",
-      "Worn over an inner red/pink halter top (Yếm đào), a white shirt, and flowing black silk skirt (váy đụp / váy lụa đen) with a contrasting green/pink silk waist sash (bao tượng / thắt lưng lụa).",
-      "Accompanied by Nón Ba Tầm (large flat palm hat with silk chin straps) or Khăn Mỏ Quạ headscarf."
+      "Wear an inner yếm or appropriate inner layer with a long lower garment and waist sash for this suggested ensemble; follow selected colors rather than forcing red, black or green.",
+      "Add Nón Ba Tầm or Khăn Mỏ Quạ only when selected; do not add unselected headwear."
     ],
     "mandatoryFeatures": [
       "4 panels with tied front tails at the waist.",
       "Inner Yếm đào halter top.",
-      "Flowing black silk skirt and colorful waist sash."
+      "Long lower garment and waist sash for the selected ensemble; do not force a fixed color."
     ],
     "strictProhibitions": [
       "NO single-piece modern dress.",

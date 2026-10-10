@@ -924,8 +924,8 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
 
               <p className="text-[11px] text-[#78716C] font-light leading-relaxed">
                 {remixStyle === 'traditional' && '✨ Gợi ý phối truyền thống: giữ đặc điểm nhận diện của áo và chọn phụ kiện theo nhu cầu.'}
-                {remixStyle === 'subtle_modern' && '✨ Tinh giản đương đại: đường may thanh thoát, tóc búi nhẹ nhàng, giảm bớt hoa văn rườm rà.'}
-                {remixStyle === 'remix_fusion' && '✨ Đương đại phá cách: phối màu tương phản cao, phong thái street-fusion và phụ kiện ấn tượng.'}
+                {remixStyle === 'subtle_modern' && '✨ Gợi ý cách tân nhẹ: giữ phom nhận diện, thử màu hoặc chất liệu mới và chọn phụ kiện theo nhu cầu.'}
+                {remixStyle === 'remix_fusion' && '✨ Gợi ý remix hiện đại: có thể thử màu tương phản, giày, túi và trang sức hiện đại phù hợp bộ phối.'}
               </p>
             </div>
 
@@ -970,7 +970,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
             <div>
               <label className="block text-xs font-serif font-bold text-[#1C1917] mb-2 flex items-center gap-1.5">
                 <Palette className="w-3.5 h-3.5 text-[#C84B69]" />
-                3. Biến thể màu sắc {remixStyle === 'traditional' ? '(4 màu truyền thống)' : '(2 màu cách tân)'}:
+                3. Màu sắc trong mẫu phối:
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {availableColors.map((col: ColorVariant) => {

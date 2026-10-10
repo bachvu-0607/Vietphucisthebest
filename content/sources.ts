@@ -52,6 +52,34 @@ export const CONTENT_SOURCES: Record<string, ContentSource> = {
     publisher: 'Đài Truyền hình Việt Nam',
     url: 'https://vtv.vn/trong-nuoc/du-khach-nhon-nhip-tray-hoi-lim-vung-kinh-bac-ngay-dau-nam-moi-20160220143353108.htm',
   },
+  'mat-son-costumes': {
+    id: 'mat-son-costumes',
+    title: 'Trang phục hoàng hậu – phi tần trên nhóm tượng cổ chùa Mật Sơn – Thanh Hóa (2014)',
+    author: 'Nguyễn Thị Thu Hà',
+    publisher: 'Tạp chí Di sản văn hóa, số 3 (48), tr. 27–30',
+    url: 'https://dsvh.gov.vn/Upload/files/Tap%20chi%20DSVH/So%2048/4806_Trang%20phuc%20hoang%20hau%20phi%20tan%20tren%20nhom%20tuong%20co%20chua%20Mat%20Son.pdf',
+  },
+  'hoang-thanh-layering': {
+    id: 'hoang-thanh-layering',
+    title: 'Hướng dẫn mặc Giao lĩnh – Viên lĩnh – Đối khâm',
+    author: 'Việt Phục Hoàng Thành',
+    publisher: 'Đơn vị cung cấp trang phục Việt Phục Hoàng Thành',
+    url: 'https://vietphuchoangthanh.com/vien-linh-giao-linh/',
+  },
+  'nhat-binh-fitting': {
+    id: 'nhat-binh-fitting',
+    title: 'Nhật Bình: phom áo và bộ phối tại Việt Phục Hoàng Thành',
+    author: 'Việt Phục Hoàng Thành',
+    publisher: 'Đơn vị cung cấp trang phục Việt Phục Hoàng Thành',
+    url: 'https://vietphuchoangthanh.com/nhat-binh/',
+  },
+  'hoi-an-ba-ba': {
+    id: 'hoi-an-ba-ba',
+    title: 'Quần chân con và áo bà ba (2014)',
+    author: 'Lê Thị Tuấn',
+    publisher: 'Bản tin Bảo tồn Di sản Hội An, số 03 (27)',
+    url: 'https://hoianheritage.net/uploads/download/thi-tuan-quan-chan-con-va-ao-ba-ba.pdf',
+  },
 };
 
-export const STYLING_CONTEXT = 'Các màu, chất liệu và phụ kiện dưới đây là lựa chọn phối đồ hiện nay. Ý nghĩa kèm theo là gợi ý diễn giải; bộ phục dựng cần tư liệu về thời kỳ và người mặc cụ thể.';
+export const STYLING_CONTEXT = 'Phối theo phom truyền thống chú trọng kết cấu và cách mặc của mẫu áo. Gợi ý cách tân dưới đây là đề xuất biên tập, có thể đổi màu, chất liệu và phụ kiện; khi thay đổi kết cấu cần nói rõ là thiết kế lấy cảm hứng. Lưu ý dựa trên độ vừa, độ che phủ, khả năng cử động và hoàn cảnh sử dụng, không cấm chung một loại trang sức hay giày.';
