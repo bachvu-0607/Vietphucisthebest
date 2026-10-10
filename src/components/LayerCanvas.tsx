@@ -402,17 +402,28 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
         // Thân trên & vai nam
         ctx.beginPath();
         ctx.moveTo(280, 256);
-        ctx.lineTo(225, 276); // Vai trái rộng
-        ctx.lineTo(238, 385); // Khuỷu tay
-        ctx.lineTo(264, 442); // Cổ tay
+        ctx.quadraticCurveTo(244, 262, 232, 271);
+        ctx.quadraticCurveTo(222, 277, 226, 291); // Vai trái bo nhẹ
+        if (!mainActive) {
+          ctx.lineTo(238, 385); // Khuỷu tay khi ẩn áo
+          ctx.lineTo(264, 442); // Cổ tay
+        } else {
+          ctx.quadraticCurveTo(248, 312, 258, 335);
+        }
         ctx.lineTo(270, 435); // Eo trái
         ctx.lineTo(265, 520); // Hông trái
         ctx.lineTo(335, 520); // Hông phải
         ctx.lineTo(330, 435); // Eo phải
-        ctx.lineTo(336, 442); // Cổ tay phải
-        ctx.lineTo(362, 385); // Khuỷu tay phải
-        ctx.lineTo(375, 276); // Vai phải rộng
-        ctx.lineTo(320, 256);
+        if (!mainActive) {
+          ctx.lineTo(336, 442); // Cổ tay phải
+          ctx.lineTo(362, 385); // Khuỷu tay phải
+        } else {
+          ctx.lineTo(342, 335);
+          ctx.quadraticCurveTo(352, 312, 374, 291);
+        }
+        if (!mainActive) ctx.lineTo(374, 291);
+        ctx.quadraticCurveTo(378, 277, 368, 271); // Vai phải bo nhẹ
+        ctx.quadraticCurveTo(356, 262, 320, 256);
         ctx.closePath();
         ctx.fill();
 
@@ -538,15 +549,17 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
         ctx.fillStyle = bodySkinGrad;
         ctx.beginPath();
         ctx.moveTo(284, 252); // Chân cổ trái hạ xuống y=252 khớp đường viền vai áo Nhật Bình
-        ctx.quadraticCurveTo(262, 256, 246, 260); // Bờ vai trái dốc êm nữ tính
+        ctx.quadraticCurveTo(264, 254, 252, 259);
+        ctx.quadraticCurveTo(244, 262, 248, 276); // Vai trái bo nhẹ
         ctx.quadraticCurveTo(252, 305, 256, 335); // Sườn ngực trái đầy đặn
         ctx.quadraticCurveTo(262, 365, 264, 375); // Vòng eo mềm mại thon nhỏ
         ctx.quadraticCurveTo(250, 420, 248, 456); // Hông nở trái tròn trịa
         ctx.lineTo(352, 456); // Hông nở phải
         ctx.quadraticCurveTo(350, 420, 336, 375); // Vòng eo phải
         ctx.quadraticCurveTo(338, 365, 344, 335); // Sườn ngực phải đầy đặn
-        ctx.quadraticCurveTo(348, 305, 354, 260); // Bờ vai phải dốc êm
-        ctx.quadraticCurveTo(338, 256, 316, 252); // Chân cổ phải
+        ctx.quadraticCurveTo(348, 305, 352, 276);
+        ctx.quadraticCurveTo(356, 262, 348, 259); // Vai phải bo nhẹ
+        ctx.quadraticCurveTo(336, 254, 316, 252); // Chân cổ phải
         ctx.closePath();
         ctx.fill();
 
@@ -560,13 +573,15 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
         ctx.beginPath();
         ctx.moveTo(280, 254); // Cổ áo tròn thanh lịch bên trái
         ctx.quadraticCurveTo(300, 264, 320, 254); // Cổ áo khoét nhẹ khoe xương quai xanh
-        ctx.lineTo(248, 262); // Nách áo bên trái
-        ctx.quadraticCurveTo(254, 305, 258, 335); // Ôm khuôn ngực mềm mại
-        ctx.quadraticCurveTo(260, 344, 263, 348); // Gấu áo bên trái trên rốn
-        ctx.quadraticCurveTo(300, 352, 337, 348); // Gấu áo lượn cong mềm mại
-        ctx.quadraticCurveTo(340, 344, 342, 335);
-        ctx.quadraticCurveTo(346, 305, 352, 262);
-        ctx.lineTo(320, 254);
+        ctx.quadraticCurveTo(336, 256, 345, 261);
+        ctx.quadraticCurveTo(352, 264, 350, 276);
+        ctx.quadraticCurveTo(346, 305, 342, 335);
+        ctx.quadraticCurveTo(340, 344, 337, 348);
+        ctx.quadraticCurveTo(300, 352, 263, 348); // Gấu áo lượn cong mềm mại
+        ctx.quadraticCurveTo(260, 344, 258, 335);
+        ctx.quadraticCurveTo(254, 305, 250, 276);
+        ctx.quadraticCurveTo(248, 264, 255, 261);
+        ctx.quadraticCurveTo(264, 256, 280, 254);
         ctx.closePath();
         ctx.fill();
 
@@ -632,7 +647,8 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
 
           // Cánh tay trái dang A-pose tự nhiên đầy đặn hơn
           ctx.beginPath();
-          ctx.moveTo(246, 258); // Khớp vai trái
+          ctx.moveTo(252, 259); // Khớp vai nối tròn với thân người mẫu
+          ctx.quadraticCurveTo(244, 258, 239, 272);
           ctx.quadraticCurveTo(222, 305, 210, 345); // Bắp tay đầy đặn hơn
           ctx.quadraticCurveTo(198, 385, 186, 415); // Cẳng tay thon thả
           ctx.lineTo(168, 445); // Cổ tay ngoài
@@ -656,7 +672,8 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
 
           // Cánh tay phải dang A-pose tự nhiên đầy đặn hơn
           ctx.beginPath();
-          ctx.moveTo(354, 258); // Khớp vai phải
+          ctx.moveTo(348, 259);
+          ctx.quadraticCurveTo(356, 258, 361, 272);
           ctx.quadraticCurveTo(378, 305, 390, 345); // Bắp tay đầy đặn hơn
           ctx.quadraticCurveTo(402, 385, 414, 415); // Cẳng tay thon thả
           ctx.lineTo(432, 445); // Cổ tay ngoài
@@ -1008,6 +1025,39 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
       robeGrad.addColorStop(1, adjustBrightness(robeBaseColor, -25));
       ctx.fillStyle = robeGrad;
 
+      // Tay chẽn dùng chung vai mềm và ống tay thẳng; từng áo giữ riêng thân và gấu.
+      const drawNarrowSleevedRobe = ({ waistX, waistY, hemX, hemY, hemCurve }: {
+        waistX: number;
+        waistY: number;
+        hemX: number;
+        hemY: number;
+        hemCurve: number;
+      }) => {
+        const shoulderX = isMale ? 228 : 244;
+        const shoulderY = isMale ? 267 : 260;
+        const cuffX = isMale ? 202 : 218;
+        ctx.beginPath();
+        ctx.moveTo(284, 248);
+        ctx.quadraticCurveTo(252, 250, shoulderX, shoulderY);
+        ctx.quadraticCurveTo(shoulderX - 8, shoulderY + 5, shoulderX - 8, 285);
+        ctx.lineTo(cuffX, 465); // Mép ngoài ống tay thẳng, gọn
+        ctx.lineTo(cuffX + 22, 469); // Cửa tay nhỏ
+        ctx.lineTo(252, 350); // Mép trong nối vào nách
+        ctx.lineTo(waistX, waistY);
+        ctx.lineTo(hemX, hemY);
+        ctx.quadraticCurveTo(300, hemY + hemCurve, 600 - hemX, hemY);
+        ctx.lineTo(600 - waistX, waistY);
+        ctx.lineTo(348, 350);
+        ctx.lineTo(578 - cuffX, 469);
+        ctx.lineTo(600 - cuffX, 465);
+        ctx.lineTo(608 - shoulderX, 285);
+        ctx.quadraticCurveTo(608 - shoulderX, shoulderY + 5, 600 - shoulderX, shoulderY);
+        ctx.quadraticCurveTo(348, 250, 316, 248);
+        ctx.quadraticCurveTo(300, 252, 284, 248);
+        ctx.closePath();
+        ctx.fill();
+      };
+
       if (isNhatBinh) {
         // 🌟 TOÀN BỘ THÂN ÁO, VẠT ÁO VÀ HAI TAY THỤNG LIỀN MẠCH TỪ CHÂN CỔ SUỐT RA CỬA TAY
         ctx.fillStyle = robeGrad;
@@ -1168,83 +1218,32 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
         }
 
       } else if (isAoDai) {
-        ctx.beginPath();
-        ctx.moveTo(275, 255);
-        ctx.quadraticCurveTo(240, 275, 205, 360);
-        ctx.lineTo(225, 460);
-        ctx.quadraticCurveTo(255, 450, 272, 420);
-        ctx.lineTo(252, 735);
-        ctx.quadraticCurveTo(300, 742, 348, 735);
-        ctx.lineTo(328, 420);
-        ctx.quadraticCurveTo(345, 450, 375, 460);
-        ctx.lineTo(395, 360);
-        ctx.quadraticCurveTo(360, 275, 325, 255);
-        ctx.closePath();
-        ctx.fill();
+        drawNarrowSleevedRobe({ waistX: 260, waistY: 420, hemX: 252, hemY: 735, hemCurve: 7 });
 
       } else if (isNguThan) {
-        ctx.beginPath();
-        ctx.moveTo(isMale ? 255 : 265, 258);
-        ctx.lineTo(isMale ? 200 : 215, 310);
-        ctx.lineTo(190, 410);
-        ctx.lineTo(230, 475);
-        ctx.lineTo(252, 440);
-        ctx.lineTo(240, 665);
-        ctx.quadraticCurveTo(300, 678, 360, 665);
-        ctx.lineTo(348, 440);
-        ctx.lineTo(370, 475);
-        ctx.lineTo(410, 410);
-        ctx.lineTo(isMale ? 400 : 385, 310);
-        ctx.lineTo(isMale ? 345 : 335, 258);
-        ctx.closePath();
-        ctx.fill();
+        drawNarrowSleevedRobe({ waistX: 252, waistY: 440, hemX: 240, hemY: 665, hemCurve: 13 });
 
       } else if (isAoTac) {
         ctx.beginPath();
-        ctx.moveTo(isMale ? 255 : 265, 258);
-        ctx.quadraticCurveTo(185, 280, 110, 370);
-        ctx.quadraticCurveTo(95, 520, 180, 555);
+        ctx.moveTo(284, 248);
+        ctx.quadraticCurveTo(195, 266, 115, 380);
+        ctx.lineTo(180, 500); // Cửa tay thụng theo dáng Nhật Bình
         ctx.lineTo(235, 455);
         ctx.lineTo(228, 715);
         ctx.quadraticCurveTo(300, 728, 372, 715);
         ctx.lineTo(365, 455);
-        ctx.lineTo(420, 555);
-        ctx.quadraticCurveTo(505, 520, 490, 370);
-        ctx.quadraticCurveTo(415, 280, isMale ? 345 : 335, 258);
+        ctx.lineTo(420, 500);
+        ctx.lineTo(485, 380);
+        ctx.quadraticCurveTo(405, 266, 316, 248);
+        ctx.quadraticCurveTo(300, 252, 284, 248);
         ctx.closePath();
         ctx.fill();
 
       } else if (isTuThan) {
-        ctx.beginPath();
-        ctx.moveTo(268, 258);
-        ctx.quadraticCurveTo(220, 290, 195, 390);
-        ctx.lineTo(230, 460);
-        ctx.lineTo(250, 420);
-        ctx.lineTo(240, 700);
-        ctx.quadraticCurveTo(300, 710, 360, 700);
-        ctx.lineTo(350, 420);
-        ctx.lineTo(370, 460);
-        ctx.lineTo(405, 390);
-        ctx.quadraticCurveTo(380, 290, 332, 258);
-        ctx.closePath();
-        ctx.fill();
+        drawNarrowSleevedRobe({ waistX: 250, waistY: 420, hemX: 240, hemY: 700, hemCurve: 10 });
 
       } else if (isBaBa) {
-        ctx.beginPath();
-        ctx.moveTo(272, 255);
-        ctx.lineTo(isMale ? 210 : 220, 305);
-        ctx.lineTo(205, 415);
-        ctx.lineTo(235, 470);
-        ctx.lineTo(256, 440);
-        ctx.lineTo(250, 515);
-        ctx.lineTo(350, 515);
-        ctx.lineTo(344, 440);
-        ctx.lineTo(365, 470);
-        ctx.lineTo(395, 415);
-        ctx.lineTo(isMale ? 390 : 380, 305);
-        ctx.lineTo(328, 255);
-        ctx.closePath();
-        ctx.fill();
+        drawNarrowSleevedRobe({ waistX: 256, waistY: 440, hemX: 250, hemY: 515, hemCurve: 0 });
       }
 
       // Khi mặc áo truyền thống, tay áo thụng dài che kín hoàn toàn bàn tay ("áo che hết r"), không vẽ bàn tay thò ra ngoài
