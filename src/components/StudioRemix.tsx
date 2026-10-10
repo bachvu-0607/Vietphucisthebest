@@ -305,7 +305,7 @@ export const StudioRemix: React.FC<StudioRemixProps> = ({
     if (pollingRef.current) clearInterval(pollingRef.current);
 
     let attempts = 0;
-    const maxAttempts = 60; // 60 * 1.5s = 90s max wait time
+    const maxAttempts = 200; // 200 * 1.5s = 5 min max wait time
 
     pollingRef.current = setInterval(async () => {
       attempts++;

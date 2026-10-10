@@ -36,7 +36,7 @@ function getOpenAIClient(): { client: OpenAI | null; key: string } {
     const client = new OpenAI({
       apiKey: key.trim(),
       maxRetries: 0, // No SDK backoff retries on quota limit
-      timeout: 15000 // 15s timeout
+      timeout: 120000 // GPT image generation commonly takes 30-90s
     });
     return { client, key: key.trim() };
   } catch (err) {

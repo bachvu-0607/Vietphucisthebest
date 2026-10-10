@@ -84,7 +84,8 @@ export function recordFailure(source: 'api' | 'ai_provider' | 'backup' | 'http',
     : status===401 || status===403 ? 'credentials'
     : code==='ENOSPC' || error?.errcode===13 ? 'disk_full'
     : code==='EACCES' || code==='EPERM' ? 'permission'
-    : code==='ETIMEDOUT' || error?.name==='AbortError' ? 'timeout'
+    : code==='ETIMEDOUT' || error?.name==='AbortError' || error?.name==='APIConnectionTimeoutError' ? 'timeout'
+    : status===400 || status===404 ? 'bad_request'
     : code==='ECONNRESET' || code==='ENOTFOUND' || code==='ECONNREFUSED' ? 'network'
     : code==='ERR_SQLITE_ERROR' ? 'database'
     : status>=500 ? 'upstream' : 'unknown';
