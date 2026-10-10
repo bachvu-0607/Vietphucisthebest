@@ -77,7 +77,7 @@ export class Monitor {
 }
 export const monitor = new Monitor(DATA_DIR);
 
-export function recordFailure(source: 'api' | 'ai_provider' | 'backup' | 'http', error: any) {
+export function recordFailure(source: 'api' | 'ai_provider' | 'chat' | 'backup' | 'http', error: any) {
   const status=Number(error?.status);
   const code=error?.code;
   const category = status===429 ? 'rate_limited'

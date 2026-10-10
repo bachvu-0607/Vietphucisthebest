@@ -14,6 +14,7 @@
 - **Studio 2D**: chọn hướng phối (truyền thống, cách tân nhẹ, remix hiện đại), màu, chất liệu, phụ kiện theo vị trí, bật/tắt từng lớp.
 - **Tạo ảnh AI**: chọn bối cảnh, tư thế, chỉ dẫn và ảnh tham khảo; theo dõi tiến trình, thử lại khi lỗi; so sánh phác thảo với kết quả và tải ảnh.
 - **Tủ đồ cá nhân**: lưu, mở lại và xóa bản phối; xem tác phẩm AI và tiến trình.
+- **Trợ lý chat**: nút "Hỏi trợ lý" ở góc phải mọi trang. Hướng dẫn dùng ứng dụng và tư vấn chọn, phối trang phục dựa trên nội dung của app (biết mẫu áo người dùng đang xem). Chạy bằng Gemini.
 
 ## Phân quyền
 
@@ -21,6 +22,7 @@
 |---|:-:|:-:|:-:|
 | Xem danh mục, chi tiết, gợi ý, sổ tay | ✅ | ✅ | ✅ |
 | Phối thử trên Studio 2D | ✅ | ✅ | ✅ |
+| Hỏi trợ lý chat | ✅ 10 câu/ngày | ✅ 30 câu/ngày | ✅ 30 câu/ngày |
 | Lưu, mở lại, xóa bản phối | ❌ | ✅ | ✅ |
 | Tạo ảnh AI, xem/xóa tác phẩm của mình | ❌ | ✅ | ✅ |
 | Bảng Theo dõi hệ thống, danh sách backup | ❌ | ❌ | ✅ |
@@ -37,6 +39,17 @@ Mỗi người chỉ xem được bản phối và ảnh AI của chính mình, 
 | `AI_ENABLED` | `true` | Đặt `false` để tắt tạo ảnh AI |
 
 Mỗi tài khoản chạy tối đa 1 yêu cầu AI cùng lúc. Lượt được tính khi gửi yêu cầu hoặc thử lại, kể cả khi yêu cầu thất bại.
+
+**Trợ lý chat** có hạn mức riêng:
+
+| Biến | Mặc định | Ý nghĩa |
+|---|---|---|
+| `CHAT_GUEST_DAILY_LIMIT` | 10 | Câu hỏi mỗi ngày cho khách (theo IP) |
+| `CHAT_USER_DAILY_LIMIT` | 30 | Câu hỏi mỗi ngày cho mỗi tài khoản |
+| `CHAT_GLOBAL_DAILY_LIMIT` | 1000 | Câu hỏi mỗi ngày toàn hệ thống |
+| `CHAT_MODEL` / `CHAT_FALLBACK_MODEL` | `gemini-3.5-flash-lite` / `gemini-3.5-flash` | Model chính và dự phòng |
+
+Câu hỏi lỗi phía Gemini được hoàn lượt. Lịch sử chat không lưu trên server, tải lại trang là mất.
 
 ## Đăng nhập và bảo mật
 
@@ -61,7 +74,7 @@ Lần đầu cần có SSH key (`ssh-keygen -t ed25519`) và đăng ký nó vớ
 
 - **Frontend**: React 19, TypeScript, Vite, Tailwind CSS, Motion. Bản phác thảo 2D vẽ bằng Canvas trên trình duyệt.
 - **Backend**: Node.js (≥ 22.18), Express, SQLite (`node:sqlite`), sharp.
-- **AI**: OpenAI Images (ưu tiên), Google Gemini/Imagen (dự phòng).
+- **AI**: OpenAI Images để tạo ảnh (Gemini làm dự phòng, cần bật billing vì model ảnh không có free tier); Gemini Flash cho trợ lý chat (dùng được free tier).
 - **Triển khai**: giao diện trên Vercel, chuyển tiếp `/api` và ảnh sang backend Railway (`vercel.json`). Dữ liệu và ảnh lưu trên Railway Volume.
 
 ## Chạy ở máy
@@ -89,12 +102,12 @@ Không đưa API key vào biến có tiền tố `VITE_`, và không commit file
 ```text
 src/            Giao diện React (components, services/api.ts)
 server.ts       Khởi tạo Express, phục vụ ảnh riêng tư và giao diện
-server/         API, đăng nhập, SQLite, AI, giám sát, lưu trữ
+server/         API, đăng nhập, SQLite, AI tạo ảnh, trợ lý chat (chat.ts), giám sát, lưu trữ
 content/        Hồ sơ trang phục, sổ tay, gợi ý áo dài, phụ kiện, dịp, bối cảnh
 shared/         Kiểu dữ liệu dùng chung frontend và backend
 public/assets/  Ảnh trang phục và sự kiện
 scripts/        Công cụ sao lưu/khôi phục và cấp quyền admin
-tests/          Test bảo mật, lưu trữ, danh mục, giám sát
+tests/          Test bảo mật, lưu trữ, danh mục, giám sát, trợ lý chat
 ```
 
 ## Tài liệu khác

@@ -4,6 +4,8 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import { sqliteDb } from './sqlite.ts';
 import { processJobInBackground } from './ai.ts';
+import { askGemini, chatConfigured, parseChatRequest, ChatUnavailableError } from './chat.ts';
+import { positiveLimit } from './storage.ts';
 import {
   setSessionCookie,
   clearSessionCookie,
@@ -382,6 +384,57 @@ apiRouter.delete('/drafts/:id', requireAuth, (req: AuthenticatedRequest, res: Re
     res.json({ success: true, message: 'Đã xóa bản phác thảo khỏi tủ đồ.' });
   } catch (err: any) {
     res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+// ========================================================
+// 3b. CHAT ASSISTANT (GUESTS ALLOWED, DAILY QUOTA PER ACCOUNT OR IP)
+// ========================================================
+
+// Vercel overwrites X-Forwarded-For with the visitor IP before proxying to Railway.
+function clientIp(req: Request): string {
+  const forwarded = req.get('x-forwarded-for')?.split(',')[0]?.trim();
+  return forwarded || req.socket.remoteAddress || 'unknown';
+}
+function chatQuotaKey(req: AuthenticatedRequest): { key: string; limit: number } {
+  return req.user
+    ? { key: `user:${req.user.id}`, limit: positiveLimit('CHAT_USER_DAILY_LIMIT', 30) }
+    : { key: `ip:${clientIp(req)}`, limit: positiveLimit('CHAT_GUEST_DAILY_LIMIT', 10) };
+}
+
+// GET /api/chat/usage
+apiRouter.get('/chat/usage', optionalAuth, (req: AuthenticatedRequest, res: Response) => {
+  const { key, limit } = chatQuotaKey(req);
+  res.json({ success: true, data: { enabled: chatConfigured(), limit, ...sqliteDb.getChatUsage(key, limit) } });
+});
+
+// POST /api/chat
+apiRouter.post('/chat', optionalAuth, async (req: AuthenticatedRequest, res: Response) => {
+  const parsed = parseChatRequest(req.body);
+  if (typeof parsed === 'string') return res.status(400).json({ success: false, error: parsed });
+  if (!chatConfigured()) {
+    res.locals.expectedLimit = true;
+    return res.status(503).json({ success: false, error: 'Trợ lý chưa được bật trên máy chủ.' });
+  }
+  const { key, limit } = chatQuotaKey(req);
+  const quota = sqliteDb.consumeChatQuota(key, limit, positiveLimit('CHAT_GLOBAL_DAILY_LIMIT', 1000));
+  if (!quota) {
+    res.locals.expectedLimit = true;
+    return res.status(429).json({ success: false, error: req.user
+      ? 'Bạn đã dùng hết lượt hỏi trợ lý hôm nay. Hãy quay lại vào ngày mai.'
+      : 'Bạn đã dùng hết lượt hỏi trợ lý hôm nay. Đăng nhập để có thêm lượt hỏi.' });
+  }
+  try {
+    const reply = await askGemini(parsed.messages, parsed.costumeId);
+    monitor.event('chat_completed');
+    res.json({ success: true, data: { reply, remaining: quota.remaining } });
+  } catch (err: any) {
+    sqliteDb.refundChatQuota(key);
+    if (!(err instanceof ChatUnavailableError)) recordFailure('chat', err);
+    res.locals.expectedLimit = err?.status === 429;
+    res.status(503).json({ success: false, error: err?.status === 429 || err?.status === 503
+      ? 'Trợ lý đang quá tải. Vui lòng thử lại sau ít phút.'
+      : 'Trợ lý chưa trả lời được. Vui lòng thử lại.' });
   }
 });
 

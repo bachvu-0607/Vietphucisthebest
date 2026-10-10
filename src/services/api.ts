@@ -225,6 +225,25 @@ export const api = {
     }
   },
 
+  // Chat assistant (guests allowed, daily quota per account or IP)
+  async getChatUsage(): Promise<{ enabled: boolean; limit: number; remaining: number } | null> {
+    try {
+      const res = await fetch(`${API_BASE}/chat/usage`, { headers: getAuthHeaders(false) });
+      return res.ok ? (await res.json()).data : null;
+    } catch { return null; }
+  },
+
+  async sendChat(messages: { role: 'user' | 'model'; text: string }[], costumeId?: string): Promise<{ reply: string; remaining: number }> {
+    const res = await fetch(`${API_BASE}/chat`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify({ messages, costumeId })
+    });
+    const json = await res.json().catch(() => null);
+    if (!res.ok || !json?.success) throw new Error(json?.error || 'Trợ lý chưa trả lời được. Vui lòng thử lại.');
+    return json.data;
+  },
+
   // AI Jobs (Protected per user with Rate Limit checks)
   async getAIUsage(): Promise<{ usage: number; max: number; totalUsage?: number; totalMax?: number }> {
     const res = await fetch(`${API_BASE}/ai/jobs/usage`, {

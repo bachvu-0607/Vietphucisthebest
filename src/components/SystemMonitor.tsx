@@ -19,7 +19,7 @@ export function SystemMonitor() {
     return()=>{stopped=true;clearInterval(timer);document.removeEventListener('visibilitychange',load);};
   },[]);
   const counts=data?.last24h;
-  const messages:Record<string,string>={server_started:'Máy chủ khởi động',ai_completed:'AI hoàn tất',ai_failed:'AI thất bại',ai_interrupted:'AI bị gián đoạn khi khởi động lại',ai_provider_attempt:'Gọi dịch vụ AI',ai_provider_error:'Dịch vụ AI trả lỗi',ai_provider_limit:'Dịch vụ AI giới hạn lượt',ai_result_save_failed:'Không lưu được kết quả AI',backup_failed:'Backup thất bại',http_server_error:'Yêu cầu gặp lỗi máy chủ'};
+  const messages:Record<string,string>={server_started:'Máy chủ khởi động',ai_completed:'AI hoàn tất',ai_failed:'AI thất bại',ai_interrupted:'AI bị gián đoạn khi khởi động lại',ai_provider_attempt:'Gọi dịch vụ AI',ai_provider_error:'Dịch vụ AI trả lỗi',ai_provider_limit:'Dịch vụ AI giới hạn lượt',ai_result_save_failed:'Không lưu được kết quả AI',backup_failed:'Backup thất bại',http_server_error:'Yêu cầu gặp lỗi máy chủ',chat_completed:'Trợ lý đã trả lời',chat_rate_limited:'Gemini giới hạn lượt trợ lý',chat_timeout:'Trợ lý quá thời gian',chat_upstream:'Gemini lỗi phía máy chủ',chat_bad_request:'Trợ lý gọi sai model hoặc yêu cầu',chat_credentials:'Khóa Gemini không hợp lệ',chat_unknown:'Trợ lý gặp lỗi'};
   return <section className="rounded-2xl border border-pink-200 bg-white p-5 space-y-4">
     <h2 className="text-xl font-semibold">Theo dõi hệ thống · Quản trị viên</h2>
     <p className="text-sm text-gray-600">Tự cập nhật mỗi phút khi trang đang mở. Thống kê kết quả giữ 7 ngày, bắt đầu từ khi bật giám sát.</p>

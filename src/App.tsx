@@ -12,6 +12,7 @@ import { CultureGuideModal } from './components/CultureGuideModal';
 import { AoDaiRecommender } from './components/AoDaiRecommender';
 import { HomePage } from './components/HomePage';
 import { AuthModal } from './components/AuthModal';
+import { ChatAssistant } from './components/ChatAssistant';
 import { TrienSonSeal, ChimLacIcon, HoaSenDivider, PubSeal } from './components/VietnameseMotifs';
 import { Loader2, AlertCircle, Sparkles } from 'lucide-react';
 
@@ -437,6 +438,12 @@ export default function App() {
         costumes={costumes}
         isOpen={showCultureModal}
         onClose={() => setShowCultureModal(false)}
+      />
+
+      {/* Floating chat assistant; knows the costume open in detail or Studio */}
+      <ChatAssistant
+        currentCostume={currentView === 'costume-detail' || currentView === 'studio' ? selectedCostume : null}
+        userId={currentUser?.id}
       />
 
       {/* User Authentication Modal (Register, Login, Forgot Password, Reset) */}

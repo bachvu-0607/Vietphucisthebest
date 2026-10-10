@@ -58,6 +58,16 @@ Lệnh kiểm tra file trước khi thay database, tạo snapshot trước resto
 
 `npm test` dùng dữ liệu giả trong thư mục tạm, khóa AI trống; kiểm tra hai tài khoản, ảnh riêng tư, reset, quota, ghi thất bại, backup/restore và entrypoint production. Không kiểm chứng cấu hình deployment thực tế hay chất lượng ảnh từ model có phí.
 
+## Trợ lý chat (Gemini)
+
+Nút "Hỏi trợ lý" ở góc phải gọi `POST /api/chat`; backend gọi Gemini bằng `GEMINI_API_KEY`, khóa không bao giờ gửi xuống trình duyệt. Trợ lý chỉ dùng nội dung trong `content/` (danh mục, dịp, bối cảnh, hồ sơ trang phục liên quan) và phần hướng dẫn trong `server/chat.ts`; không đọc mã nguồn, database hay dữ liệu người dùng. Lịch sử trò chuyện chỉ nằm trong trình duyệt, mất khi tải lại trang.
+
+- `CHAT_MODEL=gemini-3.5-flash-lite`, `CHAT_FALLBACK_MODEL=gemini-3.5-flash`: model chính và dự phòng khi model chính bận hoặc lỗi. Các model chữ Flash dùng được ở free tier; model tạo ảnh và dòng Pro có hạn mức free tier bằng 0.
+- `CHAT_GUEST_DAILY_LIMIT=10` (theo IP), `CHAT_USER_DAILY_LIMIT=30` (theo tài khoản), `CHAT_GLOBAL_DAILY_LIMIT=1000` (toàn hệ thống). Tính lại lúc 0h giờ Việt Nam. Câu hỏi bị lỗi phía Gemini được hoàn lượt.
+- IP khách lấy từ phần tử đầu của `X-Forwarded-For` do Vercel đặt. Người gọi thẳng vào domain Railway có thể giả header này, nên `CHAT_GLOBAL_DAILY_LIMIT` là giới hạn bảo vệ cuối cùng.
+- Thiếu `GEMINI_API_KEY` thì trợ lý báo chưa bật, phần còn lại của ứng dụng vẫn chạy.
+- Ở free tier, Google có thể dùng nội dung hội thoại để cải thiện sản phẩm; giao diện nhắc người dùng không nhập thông tin cá nhân. Hạn mức free tier theo phút/ngày thấp, khi Gemini trả 429 người dùng thấy "Trợ lý đang quá tải".
+
 ## Vercel giao diện + Railway backend
 
 `vercel.json` chuyển `/api/*`, `/assets/results/*`, `/assets/costumes/*`, `/assets/events/*` và `/healthz` đến `https://vietphucisthebest-production.up.railway.app`. Giao diện vẫn gọi `/api` trên domain Vercel. Cookie HttpOnly ở cùng domain giao diện, nên tải lại trang và ảnh riêng tư không phụ thuộc cookie bên thứ ba. API và ảnh riêng tư không được cache. Không đưa API key vào biến có tiền tố VITE_.

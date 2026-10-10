@@ -118,6 +118,7 @@ class SQLiteDatabase {
     } catch {}
 
     this.db.exec(`CREATE TABLE IF NOT EXISTS auth_attempts (key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires_at INTEGER NOT NULL);`);
+    this.db.exec(`CREATE TABLE IF NOT EXISTS chat_usage (key TEXT NOT NULL, day TEXT NOT NULL, count INTEGER NOT NULL, PRIMARY KEY (key, day));`);
     // 2. Active Sessions / Token revocation table
     this.db.exec(`
       CREATE TABLE IF NOT EXISTS sessions (
@@ -472,6 +473,37 @@ class SQLiteDatabase {
       ON CONFLICT(key) DO UPDATE SET count = count + 1`).run(key, now + 15 * 60000);
     const row = this.db.prepare('SELECT count FROM auth_attempts WHERE key = ?').get(key) as any;
     return row.count <= limit;
+  }
+
+  /**
+   * Reserve one chatbot message for `key` (user or guest) and the whole system today.
+   * Returns the caller's remaining messages, or null when either limit is reached.
+   */
+  public consumeChatQuota(key: string, limit: number, globalLimit: number): { remaining: number } | null {
+    const day = this.getStartOfTodayIso();
+    this.db.exec('BEGIN IMMEDIATE');
+    try {
+      this.db.prepare('DELETE FROM chat_usage WHERE day < ?').run(day);
+      const read = (k: string) => (this.db.prepare('SELECT count FROM chat_usage WHERE key = ? AND day = ?').get(k, day) as any)?.count ?? 0;
+      const used = read(key);
+      if (used >= limit || read('global') >= globalLimit) { this.db.exec('ROLLBACK'); return null; }
+      const bump = this.db.prepare(`INSERT INTO chat_usage (key, day, count) VALUES (?, ?, 1)
+        ON CONFLICT(key, day) DO UPDATE SET count = count + 1`);
+      bump.run(key, day); bump.run('global', day);
+      this.db.exec('COMMIT');
+      return { remaining: limit - used - 1 };
+    } catch (err) { try { this.db.exec('ROLLBACK'); } catch {} throw err; }
+  }
+
+  /** Give back a reserved chatbot message when the AI provider failed. */
+  public refundChatQuota(key: string): void {
+    const day = this.getStartOfTodayIso();
+    this.db.prepare('UPDATE chat_usage SET count = MAX(count - 1, 0) WHERE day = ? AND key IN (?, ?)').run(day, key, 'global');
+  }
+
+  public getChatUsage(key: string, limit: number): { remaining: number } {
+    const row = this.db.prepare('SELECT count FROM chat_usage WHERE key = ? AND day = ?').get(key, this.getStartOfTodayIso()) as any;
+    return { remaining: Math.max(limit - (row?.count ?? 0), 0) };
   }
 
   public resetPasswordWithToken(tokenHash: string, passwordHash: string): boolean {
