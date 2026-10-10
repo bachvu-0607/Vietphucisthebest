@@ -34,7 +34,7 @@ function Opening({ onComplete }: { onComplete: () => void }) {
 
   return (
     <div id="vietphuc-opening" ref={root} role="dialog" aria-modal="true"
-      aria-label="Chào mừng đến với Việt Phục" tabIndex={-1}
+      aria-label="Chào mừng đến với Việt Phục Discovery" tabIndex={-1}
       onKeyDown={event => {
         if (event.key === 'Escape') onComplete();
         if (event.key === 'Tab') {
@@ -51,7 +51,7 @@ function Opening({ onComplete }: { onComplete: () => void }) {
         <div className="ts-curtain" aria-hidden="true" />
         <div className="ts-invitation">
           <span>NAM PHỤC CHÍNH TÔNG</span>
-          <h1>Việt Phục</h1>
+          <h1>Việt Phục Discovery</h1>
           <button className="ts-open" type="button" disabled={!ready}>Khám phá <span aria-hidden="true">↗</span></button>
         </div>
         <button className="ts-skip" type="button" onClick={onComplete}>Bỏ qua</button>

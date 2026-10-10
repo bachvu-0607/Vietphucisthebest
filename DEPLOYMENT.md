@@ -1,4 +1,4 @@
-# Chạy và lưu dữ liệu Việt Phục Remix
+# Chạy và lưu dữ liệu Việt Phục Discovery
 
 Bản này giữ React + Express + SQLite. Chỉ chạy **một tiến trình máy chủ trên một ổ đĩa bền vững**. Không chạy nhiều container với database riêng rồi coi chúng là cùng một hệ thống.
 

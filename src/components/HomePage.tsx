@@ -286,7 +286,7 @@ export const HomePage: React.FC<HomePageProps> = ({
                 </h1>
 
                 <p className="text-sm sm:text-base text-[#57534E] font-light leading-relaxed">
-                  <strong>Việt phục của PUB League</strong> là nền tảng số hóa di sản trang phục truyền thống Việt Nam. Ứng dụng giúp bạn tìm hiểu trang phục qua các triều đại (Nguyễn, Lê, Lý, Trần), đối chiếu bối cảnh sự kiện thực tế, gợi ý chất liệu theo thời tiết và tự do phối thử trang phục trên Studio 2D hiện đại.
+                  <strong>Việt Phục Discovery</strong> là nền tảng số hóa di sản trang phục truyền thống Việt Nam. Ứng dụng giúp bạn tìm hiểu trang phục qua các triều đại (Nguyễn, Lê, Lý, Trần), đối chiếu bối cảnh sự kiện thực tế, gợi ý chất liệu theo thời tiết và tự do phối thử trang phục trên Studio 2D hiện đại.
                 </p>
 
                 {/* Core Feature Highlights */}

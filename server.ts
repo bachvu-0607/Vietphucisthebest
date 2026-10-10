@@ -76,7 +76,7 @@ export async function createApp() {
 }
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
   createApp().then(app => {
-    const server = app.listen(Number(process.env.PORT || 3000), process.env.HOST || '0.0.0.0', () => console.log('Việt Phục Remix server started.'));
+    const server = app.listen(Number(process.env.PORT || 3000), process.env.HOST || '0.0.0.0', () => console.log('Việt Phục Discovery server started.'));
     monitor.event('server_started');
     const monitorTimer=setInterval(()=>{try{systemStatus();}catch{monitor.event('monitor_sample_failed','error');}},60000);
     monitorTimer.unref();

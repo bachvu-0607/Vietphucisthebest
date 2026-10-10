@@ -2621,7 +2621,7 @@ export const LayerCanvas: React.FC<LayerCanvasProps> = ({
     ctx.font = 'bold 11px "Cinzel", Georgia, serif';
     ctx.fillStyle = 'rgba(155, 44, 44, 0.65)';
     ctx.textAlign = 'right';
-    ctx.fillText('VIỆT PHỤC REMIX • BẢN PHÁC THẢO CHUẨN ĐIỂN CHẾ', width - 24, height - 24);
+    ctx.fillText('VIỆT PHỤC DISCOVERY • BẢN PHÁC THẢO CHUẨN ĐIỂN CHẾ', width - 24, height - 24);
   };
 
   useEffect(() => {

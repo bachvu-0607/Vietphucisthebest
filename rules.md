@@ -16,7 +16,7 @@
 
 ## 1. MỤC TIÊU SẢN PHẨM
 
-Việt Phục Remix là ứng dụng giúp người dùng:
+Việt Phục Discovery là ứng dụng giúp người dùng:
 
 - Khám phá Việt phục.
 

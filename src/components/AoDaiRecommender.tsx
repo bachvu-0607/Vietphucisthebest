@@ -75,7 +75,7 @@ export const AoDaiRecommender: React.FC<AoDaiRecommenderProps> = ({
         <div className="max-w-3xl space-y-3 relative z-10">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#C84B69]/10 border border-[#C84B69]/20 text-[#C84B69] text-xs font-serif font-bold">
             <Sparkles className="w-3.5 h-3.5" />
-            <span>Việt Phục Remix Engine • Cỗ Máy Gợi Ý Áo Dài</span>
+            <span>Việt Phục Discovery Engine • Cỗ Máy Gợi Ý Áo Dài</span>
           </div>
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-[#1C1917] tracking-tight leading-tight">
             Gợi Ý Phối Áo Dài Chuẩn Văn Hóa & Thời Thượng

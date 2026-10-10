@@ -364,7 +364,7 @@ export async function generateCustomCompositedArtwork(
         <text x="24" y="32" fill="#FEF08A" font-family="'Times New Roman', serif" font-size="18" font-weight="bold">${escapeXml(options.costumeName)} • Sắc ${escapeXml(options.colorName || 'Nguyên bản')}</text>
         <text x="24" y="58" fill="#E7E5E4" font-family="sans-serif" font-size="12">Chất liệu: ${escapeXml(options.materialName || 'Gấm tơ tằm')} | Phụ kiện: ${escapeXml(accList)}</text>
         <text x="24" y="80" fill="#A8A29E" font-family="sans-serif" font-size="11">Sự kiện: ${escapeXml(options.eventName)} • ${escapeXml(bgLabel)} | ${styleLabel}</text>
-        <text x="${width - 90}" y="56" fill="#D4AF37" font-family="'Times New Roman', serif" font-size="13" font-style="italic" text-anchor="end">VIỆT PHỤC REMIX</text>
+        <text x="${width - 90}" y="56" fill="#D4AF37" font-family="'Times New Roman', serif" font-size="13" font-style="italic" text-anchor="end">VIỆT PHỤC DISCOVERY</text>
       </g>
     </svg>
   `;
@@ -582,7 +582,7 @@ function generateRealisticMockResult(options: {
       <rect width="780" height="90" rx="12" fill="#0f0c0b" fill-opacity="0.92" stroke="#d4af37" stroke-width="1.5" filter="url(#softGlow)"/>
       <text x="30" y="36" fill="#fef08a" font-family="'Times New Roman', serif" font-size="22" font-weight="bold">${costume} • ${style}</text>
       <text x="30" y="64" fill="#e2e8f0" font-family="sans-serif" font-size="14">Sự kiện: ${event} | Bối cảnh: ${bg}</text>
-      <text x="750" y="52" text-anchor="end" fill="#d4af37" font-family="'Times New Roman', serif" font-size="16" font-style="italic">VIỆT PHỤC REMIX AI</text>
+      <text x="750" y="52" text-anchor="end" fill="#d4af37" font-family="'Times New Roman', serif" font-size="16" font-style="italic">VIỆT PHỤC DISCOVERY AI</text>
     </g>
   </svg>`;
 

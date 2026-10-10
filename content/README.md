@@ -1,4 +1,4 @@
-# Dữ liệu nội dung Việt Phục Remix
+# Dữ liệu nội dung Việt Phục Discovery
 
 Nội dung tra cứu và phối đồ được lưu ở đây; tài khoản, bản phối và ảnh người dùng vẫn do backend quản lý trong SQLite/Volume.
 
