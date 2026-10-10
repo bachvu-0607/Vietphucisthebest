@@ -129,7 +129,9 @@ export function processJobInBackground(jobId: string, options: {
               model: modelName,
               prompt: trimmedPrompt,
               n: 1,
-              size: '1024x1536'
+              size: '1024x1536',
+              quality: 'medium',
+              output_format: 'jpeg'
             });
 
             if (dalleResponse.data?.[0]?.b64_json) {
@@ -138,7 +140,7 @@ export function processJobInBackground(jobId: string, options: {
               if (!fs.existsSync(outDir)) {
                 fs.mkdirSync(outDir, { recursive: true });
               }
-              const outFileName = `ai-${jobId}.png`;
+              const outFileName = `ai-${jobId}.jpg`;
               const outPath = path.resolve(outDir, outFileName);
               fs.writeFileSync(outPath, Buffer.from(b64, 'base64'));
               finalImageUrl = `/assets/results/${outFileName}`;
